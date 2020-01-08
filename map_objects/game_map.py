@@ -1,7 +1,7 @@
 import libtcodpy as libtcod
 from random import randint
 
-from components.ai import BasicMonster
+from components.ai import BasicMonster, RandomWalk, CameraMan
 from components.equipment import EquipmentSlots
 from components.equippable import Equippable
 from components.fighter import Fighter
@@ -75,6 +75,9 @@ class GameMap:
                     # this is the first room, where the player starts at
                     player.x = new_x
                     player.y = new_y
+                    
+
+                    
                 else:
                     # all rooms after the first:
                     # connect it to the previous room with a tunnel
@@ -105,11 +108,20 @@ class GameMap:
 
         self.create_doors()
 
+        #make the first camera man!!!
+        fighter_component = Fighter(hp=15, defense=0, power=0, speed=5)
+        ai_component = CameraMan()
+        cameraman = Entity(player.x - 2, player.y - 2, 301, libtcod.light_gray, 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
+                        fighter=fighter_component, ai=ai_component)
+        entities.append(cameraman)
+        
+        
+        
         stairs_component = Stairs(self.dungeon_level + 1)
-        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, 25, (102,102,153), 'Stairs',
+        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, 320, (102,102,153), 'Stairs',
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
         entities.append(down_stairs)
-        
+
         
 
     def clean_map(self):
@@ -292,7 +304,7 @@ class GameMap:
     def place_junk(self, room, entities):
     
         # Get a random number of junk items    
-        number_of_junks = randint(-1, 4) + 1
+        number_of_junks = randint(-1, 2) + 1
         
         # Get a random type of junk
         junk_symbol = randint(0, 3)
@@ -306,11 +318,11 @@ class GameMap:
         
         for i in range(number_of_junks):
             # Choose a random location in the room
-            x = randint(room.x1 + 1, room.x2 - 1)
-            y = randint(room.y1 + 1, room.y2 - 1)
+            x = randint(room.x1 + 2, room.x2 - 2)
+            y = randint(room.y1 + 2, room.y2 - 2)
             
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                new_junk = Entity(x, y, junk_char, (51,51,102), 'Junk', render_order=RenderOrder.ITEM)
+                new_junk = Entity(x, y, junk_char, (51,51,102), 'Junk', render_order=RenderOrder.JUNK, blocks=False)
                 entities.append(new_junk)
             
     def place_entities(self, room, entities):
@@ -324,7 +336,9 @@ class GameMap:
         number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {
-            'orc': 80,
+            'rat': from_dungeon_level([[40, 1], [30, 2], [25, 3]], self.dungeon_level),
+            'bat': 50,
+            'goblin': 30,
             'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
         }
 
@@ -346,17 +360,46 @@ class GameMap:
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 monster_choice = random_choice_from_dict(monster_chances)
 
-                if monster_choice == 'orc':
-                    fighter_component = Fighter(hp=20, defense=0, power=4, xp=35)
+                if monster_choice == 'rat':
+                    fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=15)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True,
+                    monster = Entity(x, y, 304, libtcod.light_gray, 'rat', blocks=True,
+                                     render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                                
+                    chance_for_swarm = 60
+                    swarm_check = randint(0, 100)
+                    if swarm_check <= chance_for_swarm:
+                        for i in range(1, randint(0,4)+1):
+                            rx = randint(room.x1 + 1, room.x2 - 1)
+                            ry = randint(room.y1 + 1, room.y2 - 1)
+                            if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
+                                fighter_component = Fighter(hp=5, defense=0, power=3, speed=8, xp=15)
+                                ai_component = BasicMonster()
+
+                                monster = Entity(x, y, 304, libtcod.light_gray, 'rat', blocks=True,
+                                                 render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                                entities.append(monster)
+
+                elif monster_choice == 'bat':
+                    fighter_component = Fighter(hp=10, defense=0, power=3, speed=10, xp=15)
+                    ai_component = RandomWalk(randomfactor=66)
+
+                    monster = Entity(x, y, 305, libtcod.light_gray, 'bat', blocks=True,
+                                     render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                
+        
+                elif monster_choice == 'goblin':
+                    fighter_component = Fighter(hp=20, defense=0, power=4, speed=5, xp=35)
+                    ai_component = BasicMonster()
+
+                    monster = Entity(x, y, 295, libtcod.desaturated_green, 'goblin', blocks=True,
                                      render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                 else:
-                    fighter_component = Fighter(hp=30, defense=2, power=8, xp=100)
+                    fighter_component = Fighter(hp=30, defense=2, power=8, speed=5, xp=100)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', blocks=True, fighter=fighter_component,
+                    monster = Entity(x, y, 296, libtcod.light_orange, 'Troll', blocks=True, fighter=fighter_component,
                                      render_order=RenderOrder.ACTOR, ai=ai_component)
 
                 entities.append(monster)
@@ -369,32 +412,34 @@ class GameMap:
                 item_choice = random_choice_from_dict(item_chances)
 
                 if item_choice == 'healing_potion':
-                    item_component = Item(use_function=heal, amount=40)
-                    item = Entity(x, y, '!', (190,111,255), 'Healing Potion', render_order=RenderOrder.ITEM,
+                    item_component = Item(use_function=heal, stackable=True, amount=40)
+                    item = Entity(x, y, 349, (200,121,255), 'Healing Potion', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'sword':
                     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-                    item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)
+                    item = Entity(x, y, 369, libtcod.sky, 'Sword', equippable=equippable_component)
                 elif item_choice == 'shield':
                     equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-                    item = Entity(x, y, '[', libtcod.darker_orange, 'Shield', equippable=equippable_component)
+                    item = Entity(x, y, 375, libtcod.darker_orange, 'Shield', equippable=equippable_component)
                 elif item_choice == 'fireball_scroll':
                     item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
                         'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
                                           damage=25, radius=3)
-                    item = Entity(x, y, '#', libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'confusion_scroll':
                     item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
                         'Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan))
-                    item = Entity(x, y, '#', libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 else:
                     item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5)
-                    item = Entity(x, y, '#', libtcod.yellow, 'Lightning Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, libtcod.yellow, 'Lightning Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
 
                 entities.append(item)
+
+                    
 
     def is_blocked(self, x, y):
         return self.tiles[x][y].blocked

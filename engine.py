@@ -12,11 +12,25 @@ from menus import main_menu, message_box
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
+from random import randint
+
+
+def set_goals(map, num_goals=3):
+    """
+    :param DijkstraMap map: The map needing goals
+    :param int num_goals: Number of goals to add
+    :return:
+    """
+    for goal in range(0, num_goals):
+        x = randint(0, map.width - 1)
+        y = randint(0, map.height - 1)
+        map.add_goal(x, y)
 
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
-    fov_recompute = True
 
+    fov_recompute = True
     fov_map = initialize_fov(game_map)
+
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
@@ -32,7 +46,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'],
                           constants['fov_algorithm'])
-
+                 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
                    constants['screen_width'], constants['screen_height'], constants['bar_width'],
                    constants['panel_height'], constants['panel_y'], mouse, constants['colors'], game_state)
@@ -58,6 +72,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
         key_targeting = action.get('key_targeting')
+        kick = action.get('kick')
 
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
@@ -80,6 +95,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         player.move(dx, dy)
 
                         fov_recompute = True
+                        dijkstra_recompute = True
 
                     game_state = GameStates.ENEMY_TURN
                 else:
@@ -87,9 +103,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         if not game_map.tiles[destination_x][destination_y].door.is_open:
                             game_map.tiles[destination_x][destination_y].door.toggle_open(game_map, destination_x, destination_y)
                             fov_recompute = True
-                            initialize_fov(game_map)
-                            recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'],
-                              constants['fov_algorithm'])
+                            dijkstra_recompute = True
+                            fov_map = initialize_fov(game_map)
+                            
             elif game_state == GameStates.KEYTARGETING:
                 dx, dy = move
                 destination_x = targeter.x + dx
@@ -117,14 +133,59 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         if key_targeting:
             previous_game_state = game_state
-            
+            game_state = GameStates.KEYTARGETING
             #create 'targeting' entity
             targeter = Entity(player.x, player.y, 233, (204,153,51), 'Targeter', blocks=False, render_order=RenderOrder.TARGETING)
             entities.append(targeter)
             
-            game_state = GameStates.KEYTARGETING
-            
-            
+        if kick:
+            if game_state == GameStates.KICKING:
+                
+                dx, dy = kick
+              
+                kickx, kicky  = player.x + dx, player.y +dy             
+                
+                if game_map.tiles[kickx][kicky].door:
+                    if game_map.tiles[kickx][kicky].door.is_open:
+                        message_log.add_message(Message('Your foot flies through the open doorway.', libtcod.red))
+                    else:
+                        message_log.add_message(Message('You kick the closed door.', libtcod.red))
+                        
+                elif game_map.tiles[kickx][kicky].blocked:
+                    message_log.add_message(Message('Kicking a wall does not feel good.', libtcod.red))
+                    player.fighter.take_damage(3)
+                    
+                else:
+                    target = None
+                    for entity in entities:
+                        if entity.x == kickx and entity.y == kicky:
+                            target = entity
+                            break
+                        
+                    if target == None:
+                        message_log.add_message(Message('There is nothing here to kick.', libtcod.yellow))
+                    else:
+                        if target.fighter:
+                            message_log.add_message(Message('You  ' + target.name + ' dodges your kick.', libtcod.gray))
+               
+
+                        else:
+        
+                            if not game_map.tiles[target.x+dx][target.y+dy].block_sight:
+                                target.move(dx, dy)
+                            
+                     
+                
+                if previous_game_state == GameStates.PLAYERS_TURN:
+                    game_state = GameStates.ENEMY_TURN
+                else:
+                    game_state = previous_game_state
+                
+            else:
+                
+                previous_game_state = game_state
+                game_state = GameStates.KICKING
+
 
         if show_inventory:
             previous_game_state = game_state
@@ -211,9 +272,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if dead_entity:
                 if dead_entity == player:
-                    message, game_state = kill_player(dead_entity)
+                    message, game_state = kill_player(dead_entity, game_map)
                 else:
-                    message = kill_monster(dead_entity)
+                    message = kill_monster(dead_entity, player)
 
                 message_log.add_message(message)
 
@@ -257,6 +318,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 game_state = previous_game_state
 
                 message_log.add_message(Message('Targeting cancelled'))
+                fov_recompute = True
 
             if xp:
                 leveled_up = player.level.add_xp(xp)
@@ -268,27 +330,35 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     game_state = GameStates.LEVEL_UP
 
         if game_state == GameStates.ENEMY_TURN:
+        
+            #Do once-a-turn things
+            player.turn_count += 1
+        
             for entity in entities:
                 if entity.ai:
-                    enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities)
+                    if entity.fighter:
+                        entity.fighter.timer += entity.fighter.speed
+                        while entity.fighter.timer >= player.fighter.speed:
+                            enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities)
+                            entity.fighter.timer -= player.fighter.speed
+                            
+                            for enemy_turn_result in enemy_turn_results:
+                                message = enemy_turn_result.get('message')
+                                dead_entity = enemy_turn_result.get('dead')
 
-                    for enemy_turn_result in enemy_turn_results:
-                        message = enemy_turn_result.get('message')
-                        dead_entity = enemy_turn_result.get('dead')
+                                if message:
+                                    message_log.add_message(message)
 
-                        if message:
-                            message_log.add_message(message)
+                                if dead_entity:
+                                    if dead_entity == player:
+                                        message, game_state = kill_player(dead_entity, game_map)
+                                    else:
+                                        message = kill_monster(dead_entity, player)
 
-                        if dead_entity:
-                            if dead_entity == player:
-                                message, game_state = kill_player(dead_entity)
-                            else:
-                                message = kill_monster(dead_entity)
+                                    message_log.add_message(message)
 
-                            message_log.add_message(message)
-
-                            if game_state == GameStates.PLAYER_DEAD:
-                                break
+                                    if game_state == GameStates.PLAYER_DEAD:
+                                        break
 
                     if game_state == GameStates.PLAYER_DEAD:
                         break
@@ -299,8 +369,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 def main():
     constants = get_constants()
 
-    libtcod.console_set_custom_font('font.png', libtcod.FONT_LAYOUT_ASCII_INROW)
-
+    #libtcod.console_set_custom_font('font.png', libtcod.FONT_LAYOUT_ASCII_INROW)
+    libtcod.console_set_custom_font('fontplus.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW, 16, 26)
+    
     libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'], False)
 
     con = libtcod.console_new(constants['screen_width'], constants['screen_height'])

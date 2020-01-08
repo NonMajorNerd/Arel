@@ -11,16 +11,28 @@ class Inventory:
     def add_item(self, item):
         results = []
 
-        if len(self.items) >= self.capacity:
-            results.append({
-                'item_added': None,
-                'message': Message('You cannot carry any more, your inventory is full', libtcod.yellow)
-            })
-        else:
-            results.append({
-                'item_added': item,
-                'message': Message('You pick up the {0}!'.format(item.name), libtcod.blue)
-            })
+        stacked = False
+        for i in self.items:
+            if i.name == item.name and i.item.stackable:
+                i.item.count += 1
+                stacked = True
+                results.append({
+                    'item_added': item,
+                    'message': Message('You pick up the {0}!'.format(item.name), libtcod.blue)
+                })
+                
+                
+        if not stacked:
+            if len(self.items) >= self.capacity:
+                results.append({
+                    'item_added': None,
+                    'message': Message('You cannot carry any more, your inventory is full', libtcod.yellow)
+                })
+            else:
+                results.append({
+                    'item_added': item,
+                    'message': Message('You pick up the {0}!'.format(item.name), libtcod.blue)
+                })
 
             self.items.append(item)
 
@@ -54,7 +66,11 @@ class Inventory:
         return results
 
     def remove_item(self, item):
-        self.items.remove(item)
+        if item.item.stackable:
+            if item.item.count > 1:
+                item.item.count -=1
+            else:
+                self.items.remove(item)
 
     def drop_item(self, item):
         results = []
@@ -64,7 +80,7 @@ class Inventory:
 
         item.x = self.owner.x
         item.y = self.owner.y
-
+        
         self.remove_item(item)
         results.append({'item_dropped': item, 'message': Message('You dropped the {0}'.format(item.name),
                                                                  libtcod.yellow)})

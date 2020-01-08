@@ -42,6 +42,18 @@ class Equipment:
 
         return bonus
 
+    @property
+    def speed_bonus(self):
+        bonus = 0
+
+        if self.main_hand and self.main_hand.equippable:
+            bonus += self.main_hand.equippable.speed_bonus
+
+        if self.off_hand and self.off_hand.equippable:
+            bonus += self.off_hand.equippable.speed_bonus
+
+        return bonus
+
     def toggle_equip(self, equippable_entity):
         results = []
 

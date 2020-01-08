@@ -18,8 +18,20 @@ from map_objects.game_map import GameMap
 
 from render_functions import RenderOrder
 
+def load_customfont():
+    #The index of the first custom tile in the file
+    a = 256
+ 
+    #The "y" is the row index, here we load the sixth row in the font file. Increase the "6" to load any new rows from the file
+    for y in range(5,20):
+        libtcod.console_map_ascii_codes_to_font(a, 32, 0, y)
+        a += 32
+
 
 def get_constants():
+
+    load_customfont()
+
     window_title = "A'Rel"
 
     screen_width = 60
@@ -81,17 +93,17 @@ def get_constants():
 
 
 def get_game_variables(constants):
-    fighter_component = Fighter(hp=100, defense=1, power=2)
+    fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
     inventory_component = Inventory(26)
     level_component = Level()
     equipment_component = Equipment()
-    player = Entity(0, 0, 2, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
+    player = Entity(0, 0, 256, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
                     fighter=fighter_component, inventory=inventory_component, level=level_component,
                     equipment=equipment_component)
     entities = [player]
 
     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
-    dagger = Entity(0, 0, '-', libtcod.sky, 'Dagger', equippable=equippable_component)
+    dagger = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component)
     player.inventory.add_item(dagger)
     player.equipment.toggle_equip(dagger)
 
@@ -99,6 +111,7 @@ def get_game_variables(constants):
     game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
                       constants['map_width'], constants['map_height'], player, entities)
    
+
     
     message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
 

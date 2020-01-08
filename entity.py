@@ -6,6 +6,8 @@ from components.item import Item
 
 from render_functions import RenderOrder
 
+import random
+
 
 class Entity:
     """
@@ -28,6 +30,17 @@ class Entity:
         self.level = level
         self.equipment = equipment
         self.equippable = equippable
+
+        if self.name == "Player":
+            self.kill_counts = []
+            self.turn_count = 0
+            
+            self.achievements = [
+            
+            ['Potions Drank', 0],   #no drinks = prohibitionist
+            ['Gold Collected', 0]   #achievements at 5k, 10k, 100k?
+            
+            ]
 
         if self.fighter:
             self.fighter.owner = self
@@ -63,6 +76,7 @@ class Entity:
         self.x += dx
         self.y += dy
 
+    
     def move_towards(self, target_x, target_y, game_map, entities):
         dx = target_x - self.x
         dy = target_y - self.y
@@ -75,6 +89,60 @@ class Entity:
                     get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
             self.move(dx, dy)
 
+            
+    def move_from(self, target, game_map, fov_map, entities):
+
+        dx = target.x - self.x
+        dy = target.y - self.y
+
+        mx = []
+        my = []
+        
+        moves =[]
+
+        if dx > 0: #i need to move left
+            mx.append(-1)
+            mx.append(0)
+            
+        elif dx < 0: #i need to move right
+            mx.append(1)
+            mx.append(0)
+        else:
+            mx.append(1)
+            mx.append(-1)
+            mx.append(0)
+            
+        if dy > 0: #i need to move down
+            my.append(-1)
+            my.append(0)
+        elif dy < 0: #i need to move up
+            my.append(1)
+            my.append(0)
+        else:
+            my.append(-1)
+            my.append(1)
+            my.append(0)
+            
+        for x in mx:
+            for y in my:
+                if not (x, y) == (0, 0):
+                    ent_in_way = False
+                    for ent in entities:
+                        if ent.x == self.x+x and ent.y == self.y+y: #if you add and. ent.blocks: then we will only avoid other actors..
+                            if not ent.name == "Junk" and ent.blocks:              #excluding this means we avoid all entities other than Junk
+                                ent_in_way = True                   
+                            
+                    if not ent_in_way and not game_map.tiles[self.x+x][self.y+y].block_sight:
+                        if libtcod.map_is_in_fov(fov_map, self.x+x, self.y+y):
+                            moves.append ([x, y])
+
+        if not len(moves) == 0:    
+            choice = random.randint(0, len(moves)-1)
+            
+            (nx, ny) = moves[choice]
+            self.x += nx
+            self.y += ny
+        
     def distance(self, x, y):
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 

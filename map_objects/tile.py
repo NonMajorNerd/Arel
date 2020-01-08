@@ -15,8 +15,7 @@ class Tile:
         
         self.explored = False
         self.empty_space = False
-        
-        
+
 class Door:
     
         def __init__(self, is_open=False, is_locked=False, keys=[]):
@@ -29,17 +28,20 @@ class Door:
                 self.is_locked = is_locked
             
             if self.is_open:
-                self.char = 196
+                self.char = 324
             else:
-                self.char = 197
+                if self.is_locked:
+                    self.char = 323
+                else:
+                    self.char = 322
             
         def toggle_open(self, game_map, x, y):
             self.is_open = not self.is_open
             
             if self.is_open:
-                self.char = 196
+                self.char = 324
             else:
-                self.char = 197
+                self.char = 322
                 
             game_map.tiles[x][y].block_sight = not self.is_open
             game_map.tiles[x][y].blocked = not self.is_open
