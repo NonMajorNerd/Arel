@@ -63,6 +63,8 @@ def handle_player_turn_keys(key):
     elif key_char == 'k':
         return {'kick': True}
 
+    elif key_char == 'l':
+        return {'messagelog': True}
 
     elif key_char == 'i':
         return {'show_inventory': True}

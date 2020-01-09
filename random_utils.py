@@ -27,3 +27,12 @@ def random_choice_from_dict(choice_dict):
     chances = list(choice_dict.values())
 
     return choices[random_choice_index(chances)]
+
+def mid(s, offset, amount):
+    return s[offset-1:offset+amount-1]
+
+def left(s, amount):
+    return s[:amount]
+
+def right(s, amount):
+    return s[-amount:]

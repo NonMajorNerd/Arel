@@ -3,7 +3,7 @@ import libtcodpy as libtcod
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
-from game_messages import Message
+from game_messages import Message, message_log_history
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables
@@ -12,19 +12,9 @@ from menus import main_menu, message_box
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
+
 from random import randint
 
-
-def set_goals(map, num_goals=3):
-    """
-    :param DijkstraMap map: The map needing goals
-    :param int num_goals: Number of goals to add
-    :return:
-    """
-    for goal in range(0, num_goals):
-        x = randint(0, map.width - 1)
-        y = randint(0, map.height - 1)
-        map.add_goal(x, y)
 
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
 
@@ -73,6 +63,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         fullscreen = action.get('fullscreen')
         key_targeting = action.get('key_targeting')
         kick = action.get('kick')
+        messagelog = action.get('messagelog')
 
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
@@ -137,6 +128,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             #create 'targeting' entity
             targeter = Entity(player.x, player.y, 233, (204,153,51), 'Targeter', blocks=False, render_order=RenderOrder.TARGETING)
             entities.append(targeter)
+        
+        if messagelog:
+            message_log_history(message_log)
             
         if kick:
             if game_state == GameStates.KICKING:
@@ -147,9 +141,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 
                 if game_map.tiles[kickx][kicky].door:
                     if game_map.tiles[kickx][kicky].door.is_open:
-                        message_log.add_message(Message('Your foot flies through the open doorway.', libtcod.red))
+                        message_log.add_message(Message('There is nothing there to kick.', libtcod.red))
                     else:
-                        message_log.add_message(Message('You kick the closed door.', libtcod.red))
+                        message_log.add_message(Message('You kick the door. Ouch!', libtcod.red))
                         
                 elif game_map.tiles[kickx][kicky].blocked:
                     message_log.add_message(Message('Kicking a wall does not feel good.', libtcod.red))
@@ -163,10 +157,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             break
                         
                     if target == None:
-                        message_log.add_message(Message('There is nothing here to kick.', libtcod.yellow))
+                        message_log.add_message(Message('Nothing there to kick.', libtcod.yellow))
                     else:
                         if target.fighter:
-                            message_log.add_message(Message('You  ' + target.name + ' dodges your kick.', libtcod.gray))
+                            message_log.add_message(Message('The  ' + target.name + ' dodges your kick.', libtcod.gray))
                
 
                         else:
