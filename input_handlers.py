@@ -8,7 +8,7 @@ def handle_keys(key, game_state):
     elif game_state == GameStates.PLAYER_DEAD:
         return handle_player_dead_keys(key)
     elif game_state == GameStates.KEYTARGETING:
-        return handle_keyboard_targeting_keys(key)
+        return  player_pick_dir(key, strkey='move')
     elif game_state == GameStates.TARGETING:
         return handle_targeting_keys(key)
     elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
@@ -18,8 +18,45 @@ def handle_keys(key, game_state):
     elif game_state == GameStates.CHARACTER_SCREEN:
         return handle_character_screen(key)
     elif game_state == GameStates.KICKING:
-        return handle_player_kick_keys(key)
+        return  player_pick_dir(key, strkey='kick')
         
+    return {}
+
+def player_pick_dir(key, strkey='None'):
+    key_char = chr(key.c)
+
+    # Movement keys
+    if key.shift:
+        if key.vk == libtcod.KEY_UP:
+            return {strkey: (1, -1)}
+        elif key.vk == libtcod.KEY_DOWN:
+            return {strkey: (-1, 1)}
+        elif key.vk == libtcod.KEY_LEFT:
+            return {strkey: (-1, -1)}
+        elif key.vk == libtcod.KEY_RIGHT:
+            return {strkey: (1, 1)}
+    else:
+        if key.vk == libtcod.KEY_KP9:
+            return {strkey: (1, -1)}
+        elif key.vk == libtcod.KEY_KP1:
+            return {strkey: (-1, 1)}
+        elif key.vk == libtcod.KEY_KP7:
+            return {strkey: (-1, -1)}
+        elif key.vk == libtcod.KEY_KP3:
+            return {strkey: (1, 1)}
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+            return {strkey: (0, -1)}
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+            return {strkey: (0, 1)}
+        elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
+            return {strkey: (-1, 0)}
+        elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
+            return {strkey: (1, 0)}
+
+
+    if key.vk == libtcod.KEY_ESCAPE:
+        return {'exit': True}
+
     return {}
 
 def handle_player_turn_keys(key):
@@ -54,9 +91,7 @@ def handle_player_turn_keys(key):
             return {'move': (1, 0)}
         elif key_char == 'z' or key.vk == libtcod.KEY_KP5:
             return {'wait': True}
-    
-
-
+            
     if key_char == 'g':
         return {'pickup': True}
 
@@ -91,76 +126,11 @@ def handle_player_turn_keys(key):
     # No key was pressed
     return {}
 
-def handle_player_kick_keys(key):
-    key_char = chr(key.c)
-
-    # Movement keys
-    if key.shift:
-        if key.vk == libtcod.KEY_UP:
-            return {'kick': (1, -1)}
-        elif key.vk == libtcod.KEY_DOWN:
-            return {'kick': (-1, 1)}
-        elif key.vk == libtcod.KEY_LEFT:
-            return {'kick': (-1, -1)}
-        elif key.vk == libtcod.KEY_RIGHT:
-            return {'kick': (1, 1)}
-    else:
-        if key.vk == libtcod.KEY_KP9:
-            return {'kick': (1, -1)}
-        elif key.vk == libtcod.KEY_KP1:
-            return {'kick': (-1, 1)}
-        elif key.vk == libtcod.KEY_KP7:
-            return {'kick': (-1, -1)}
-        elif key.vk == libtcod.KEY_KP3:
-            return {'kick': (1, 1)}
-        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
-            return {'kick': (0, -1)}
-        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
-            return {'kick': (0, 1)}
-        elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
-            return {'kick': (-1, 0)}
-        elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
-            return {'kick': (1, 0)}
-
-
-    if key.vk == libtcod.KEY_ESCAPE:
-        return {'exit': True}
-
-    return {}
-
-
-def handle_keyboard_targeting_keys(key):
-    # Movement keys for keyboard-based targeting
-    
-    key_char = chr(key.c)
-    
-    if key.vk == libtcod.KEY_UP or key_char == 'k':
-        return {'move': (0, -1)}
-    elif key.vk == libtcod.KEY_DOWN or key_char == 'j':
-        return {'move': (0, 1)}
-    elif key.vk == libtcod.KEY_LEFT or key_char == 'h':
-        return {'move': (-1, 0)}
-    elif key.vk == libtcod.KEY_RIGHT or key_char == 'l':
-        return {'move': (1, 0)}
-    elif key_char == 'y':
-        return {'move': (-1, -1)}
-    elif key_char == 'u':
-        return {'move': (1, -1)}
-    elif key_char == 'b':
-        return {'move': (-1, 1)}
-    elif key_char == 'n':
-        return {'move': (1, 1)}
-    elif key.vk == libtcod.KEY_ESCAPE:
-        return {'exit': True}
-
-    return {}
-
 def handle_targeting_keys(key):
     if key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
 
     return {}
-
 
 def handle_player_dead_keys(key):
     key_char = chr(key.c)
@@ -177,7 +147,6 @@ def handle_player_dead_keys(key):
 
     return {}
 
-
 def handle_inventory_keys(key):
     index = key.c - ord('a')
 
@@ -193,7 +162,6 @@ def handle_inventory_keys(key):
 
     return {}
 
-
 def handle_main_menu(key):
     key_char = chr(key.c)
 
@@ -205,7 +173,6 @@ def handle_main_menu(key):
         return {'exit': True}
 
     return {}
-
 
 def handle_level_up_menu(key):
     if key:
@@ -220,13 +187,11 @@ def handle_level_up_menu(key):
 
     return {}
 
-
 def handle_character_screen(key):
     if key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
 
     return {}
-
 
 def handle_mouse(mouse):
     (x, y) = (mouse.cx, mouse.cy)
