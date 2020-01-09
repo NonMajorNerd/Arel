@@ -39,6 +39,9 @@ class MessageLog:
                 
                 currentmessage = currentmessage + " (x" + strcount + ")"
                     
+                if len(self.history[len(self.history)-1].text) + 6 > self.width:
+                    del self.messages[len(self.messages)-1]
+                    
                 #delete last message in the on-screen log
                 if len(self.messages)>0: del self.messages[len(self.messages)-1]
     
@@ -46,6 +49,7 @@ class MessageLog:
         new_msg_lines = textwrap.wrap(currentmessage, self.width)
 
         for line in new_msg_lines:
+            
             # If the buffer is full, remove the first line to make room for the new one
             if len(self.messages) == self.height:
                 del self.messages[0]

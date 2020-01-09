@@ -12,10 +12,8 @@ from menus import main_menu, message_box
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
-
 from random import randint
-
-
+    
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
 
     fov_recompute = True
@@ -361,6 +359,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 
 def main():
+
+    
     constants = get_constants()
 
     #libtcod.console_set_custom_font('font.png', libtcod.FONT_LAYOUT_ASCII_INROW)
