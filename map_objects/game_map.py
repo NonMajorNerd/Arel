@@ -113,16 +113,12 @@ class GameMap:
         ai_component = CameraMan()
         cameraman = Entity(player.x - 2, player.y - 2, 301, libtcod.light_gray, 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
                         fighter=fighter_component, ai=ai_component)
-        entities.append(cameraman)
-        
-        
+        entities.append(cameraman)  
         
         stairs_component = Stairs(self.dungeon_level + 1)
         down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, 320, (102,102,153), 'Stairs',
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
-        entities.append(down_stairs)
-
-        
+        entities.append(down_stairs)        
 
     def clean_map(self):
         #this iterates through the map and turns unused wall space into empty space so that the autotile function will work in rendering
@@ -280,9 +276,7 @@ class GameMap:
             self.tiles[x][y].door = door_component
                 
             self.tiles[x][y].block_sight = not open
-            self.tiles[x][y].blocked = not open
-
-                   
+            self.tiles[x][y].blocked = not open                  
 
     def create_room(self, room):
         # go through the tiles in the rectangle and make them passable
@@ -328,7 +322,7 @@ class GameMap:
     def place_entities(self, room, entities):
         max_monsters_per_room = from_dungeon_level([[2, 1], [3, 4], [5, 6]], self.dungeon_level)
         max_items_per_room = from_dungeon_level([[1, 1], [2, 4]], self.dungeon_level)
-
+        
         # Get a random number of monsters
         number_of_monsters = randint(0, max_monsters_per_room)
 
@@ -412,7 +406,9 @@ class GameMap:
                 item_choice = random_choice_from_dict(item_chances)
 
                 if item_choice == 'healing_potion':
-                    item_component = Item(use_function=heal, stackable=True, amount=40)
+                    item_component = Item(use_function=heal, stackable=True, amount=40,
+                        description="A small glass vial containing a crystalline violet liquid which shimmers slightly in the light.",
+                        effect="Typically used to cure minor wounds.")
                     item = Entity(x, y, 349, (200,121,255), 'Healing Potion', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'sword':

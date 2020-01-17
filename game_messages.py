@@ -83,7 +83,7 @@ def message_log_history(message_log):
     else:
         numpages = int(entries / messages_per_page)+1
 
-    currentpage = 1
+    currentpage = numpages
         
     while True:
         libtcod.console_clear(0)
@@ -120,7 +120,7 @@ def message_log_history(message_log):
             break
             
         if key.vk == libtcod.KEY_DOWN:
-            if numpages>= currentpage + 1:
+            if numpages >= currentpage + 1:
                 currentpage += 1
                 
         elif key.vk == libtcod.KEY_UP:

@@ -2,10 +2,18 @@ from equipment_slots import EquipmentSlots
 
 
 class Equipment:
-    def __init__(self, main_hand=None, off_hand=None):
+    def __init__(self, main_hand=None, off_hand=None, helm=None, armor=None, accessory1=None, accessory2=None):
         self.main_hand = main_hand
         self.off_hand = off_hand
-
+        self.helm = helm
+        self.armor = armor
+        self.accessory1 = accessory1
+        self.accessory2 = accessory2
+ 
+    @property
+    def list(self):
+        return [self.main_hand, self.off_hand, self.helm, self.armor, self.accessory1, self.accessory2]
+        
     @property
     def max_hp_bonus(self):
         bonus = 0
@@ -53,6 +61,19 @@ class Equipment:
             bonus += self.off_hand.equippable.speed_bonus
 
         return bonus
+        
+    @property
+    def luck_bonus(self):
+        bonus = 0
+
+        if self.main_hand and self.main_hand.equippable:
+            bonus += self.main_hand.equippable.luck_bonus
+
+        if self.off_hand and self.off_hand.equippable:
+            bonus += self.off_hand.equippable.luck_bonus
+
+        return bonus
+
 
     def toggle_equip(self, equippable_entity):
         results = []

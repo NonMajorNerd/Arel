@@ -8,7 +8,7 @@ from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from loader_functions.data_loaders import load_game, save_game
-from menus import main_menu, message_box
+from menus import main_menu, message_box, inventory_menu
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
@@ -40,7 +40,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                    constants['panel_height'], constants['panel_y'], mouse, constants['colors'], game_state)
 
         fov_recompute = False
-
+ 
         libtcod.console_flush()
 
         clear_all(con, entities)
@@ -94,7 +94,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             fov_recompute = True
                             dijkstra_recompute = True
                             fov_map = initialize_fov(game_map)
-                            
+                                
             elif game_state == GameStates.KEYTARGETING:
                 dx, dy = move
                 destination_x = targeter.x + dx
@@ -104,8 +104,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     targeter.move(dx, dy)
                     fov_recompute = True
                     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
-                    
-
 
         elif wait:
             game_state = GameStates.ENEMY_TURN
@@ -145,7 +143,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         
                 elif game_map.tiles[kickx][kicky].blocked:
                     message_log.add_message(Message('Kicking a wall does not feel good.', libtcod.red))
-                    player.fighter.take_damage(3)
+                    player_turn_results.extend(player.fighter.take_damage(3))
                     
                 else:
                     target = None
@@ -159,29 +157,22 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     else:
                         if target.fighter:
                             message_log.add_message(Message('The  ' + target.name + ' dodges your kick.', libtcod.gray))
-               
 
-                        else:
-        
+                        else:        
                             if not game_map.tiles[target.x+dx][target.y+dy].block_sight:
-                                target.move(dx, dy)
-                            
-                     
+                                target.move(dx, dy)                  
                 
                 if previous_game_state == GameStates.PLAYERS_TURN:
                     game_state = GameStates.ENEMY_TURN
                 else:
                     game_state = previous_game_state
                 
-            else:
-                
+            else:   
                 previous_game_state = game_state
                 game_state = GameStates.KICKING
 
-
         if show_inventory:
-            previous_game_state = game_state
-            game_state = GameStates.SHOW_INVENTORY
+            player_turn_results.extend(inventory_menu(player, entities, fov_map))
 
         if drop_inventory:
             previous_game_state = game_state
@@ -359,7 +350,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 
 def main():
-
     
     constants = get_constants()
 

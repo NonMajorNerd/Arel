@@ -71,10 +71,14 @@ class Inventory:
                 item.item.count -=1
             else:
                 self.items.remove(item)
+        else:
+            self.items.remove(item)
+
 
     def drop_item(self, item):
         results = []
 
+        #TODO :: Add other equipment slots..
         if self.owner.equipment.main_hand == item or self.owner.equipment.off_hand == item:
             self.owner.equipment.toggle_equip(item)
 

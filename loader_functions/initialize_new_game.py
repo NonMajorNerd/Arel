@@ -2,6 +2,7 @@ import libtcodpy as libtcod
 
 from components.equipment import Equipment
 from components.equippable import Equippable
+from components.item import Item
 from components.fighter import Fighter
 from components.inventory import Inventory
 from components.level import Level
@@ -22,7 +23,6 @@ def load_customfont():
     #The index of the first custom tile in the file
     a = 256
  
-    #The "y" is the row index, here we load the sixth row in the font file. Increase the "6" to load any new rows from the file
     for y in range(5,20):
         libtcod.console_map_ascii_codes_to_font(a, 32, 0, y)
         a += 32
@@ -94,7 +94,7 @@ def get_constants():
 
 def get_game_variables(constants):
     fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
-    inventory_component = Inventory(26)
+    inventory_component = Inventory(50)
     level_component = Level()
     equipment_component = Equipment()
     player = Entity(0, 0, 256, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
@@ -102,8 +102,9 @@ def get_game_variables(constants):
                     equipment=equipment_component)
     entities = [player]
 
+    item_component = Item(description="A short rusty dagger. It's dull and has notches missing from the blade. Theres some extra text here to test the inventory screen out. That is still not enough room, dangit! I have to add more.")
     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
-    dagger = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component)
+    dagger = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component, item=item_component)
     player.inventory.add_item(dagger)
     player.equipment.toggle_equip(dagger)
 
