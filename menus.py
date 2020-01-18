@@ -32,6 +32,259 @@ def menu(con, header, options, width, screen_width, screen_height):
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
 
+def game_options(constants):
+ 
+    index = 0
+ 
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+       
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+     
+    difficulty = "Newcomer"
+            
+    libtcod.console_set_default_background(0, libtcod.black)
+    libtcod.console_clear(0)
+
+    libtcod.console_set_default_background(0, screen_darkgray)
+    libtcod.console_set_default_foreground(0, libtcod.black)
+    
+    for y in range(11, 29):
+        for x in range(9, 49):
+            libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, " ")
+            if y == 28:
+                libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+            if x == 9 or x == 48:
+                libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT,chr(186))
+                
+    libtcod.console_print_ex(0, 9, 10, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+    libtcod.console_print_ex(0, 26, 10, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+           
+    for x in range(9, 27):
+        libtcod.console_print_ex(0, x, 9, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+        
+    for x in range(26, 49):
+        libtcod.console_print_ex(0, x, 10, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+        
+    #corners, T pieces
+    libtcod.console_print_ex(0, 9, 9, libtcod.BKGND_SET, libtcod.LEFT, chr(201))
+    libtcod.console_print_ex(0, 26, 9, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    libtcod.console_print_ex(0, 9, 10, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+    libtcod.console_print_ex(0, 26, 10, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    libtcod.console_print_ex(0, 48, 10, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+
+    libtcod.console_print_ex(0, 9, 28, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    libtcod.console_print_ex(0, 48, 28, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+           
+    libtcod.console_set_default_foreground(0, screen_yellow)               
+    libtcod.console_print_ex(0, 10, 10, libtcod.BKGND_SET, libtcod.LEFT, "New Game Options") 
+    
+    libtcod.console_set_default_foreground(0, libtcod.white)
+    libtcod.console_print_ex(0, 13, 26, libtcod.BKGND_SET, libtcod.LEFT, "Enter to accept, Esc to return") 
+    libtcod.console_print_ex(0, 14, 27, libtcod.BKGND_SET, libtcod.LEFT, "Left/Right to change options") 
+    libtcod.console_set_default_foreground(0, libtcod.black)    
+    
+    while True:
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
+        libtcod.console_set_default_foreground(0, screen_darkgray)
+        libtcod.console_print_ex(0, 21, 12, libtcod.BKGND_SET, libtcod.LEFT, "              ")
+        for y in range(11, 26):
+            for x in range(10, 48):
+                libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, " ")
+
+        libtcod.console_set_default_foreground(0, libtcod.black)
+        strtut = "Disabled"
+        if constants['options_tutorial_enabled']: strtut = "Enabled"
+        
+        libtcod.console_print_ex(0, 32, 14, libtcod.BKGND_SET, libtcod.RIGHT, "Tutorial Tips:")
+        libtcod.console_print_ex(0, 34, 14, libtcod.BKGND_SET, libtcod.LEFT, strtut)
+        
+        if index == 0:
+            libtcod.console_set_default_foreground(0, screen_green)
+            
+        libtcod.console_print_ex(0, 24, 12, libtcod.BKGND_SET, libtcod.LEFT, difficulty)
+            
+        if difficulty != "Newcomer":
+            libtcod.console_set_default_foreground(0, screen_yellow)               
+            libtcod.console_print_ex(0, 21, 12, libtcod.BKGND_SET, libtcod.LEFT, chr(17))
+            libtcod.console_print_ex(0, 22, 12, libtcod.BKGND_SET, libtcod.LEFT, chr(17))
+            
+        if difficulty != " Custom ":
+            libtcod.console_set_default_foreground(0, screen_yellow)               
+            libtcod.console_print_ex(0, 33, 12, libtcod.BKGND_SET, libtcod.LEFT, chr(16))
+            libtcod.console_print_ex(0, 34, 12, libtcod.BKGND_SET, libtcod.LEFT, chr(16))
+            
+        if difficulty == "Newcomer":
+            desc = "Made for players less familiar with roguelike games. You do slightly more damage while enemies do slightly less. You also level up more quickly, and have slightly elevated luck. You are able to continue your game after death."
+        elif difficulty == "Standard":
+            desc = "Typical roguelike style; after dying, you must start a new game. Your enemies damage, your damage, expierence and luck are all at their normal levels."
+        elif difficulty == " Expert ":
+            desc = "Choose this if you're looking for a bit of a challenge. Your enemies will be more hardy, and you will find yourself leveling at a slower pace. Your luck will be slightly lower as well."
+        elif difficulty == " Sadist ":
+            desc = "You do significantly less damage, enemies do more, XP trickles in at a sap-like pace, and your luck is that of someone who kicked a black cat through a mirror while standing under a ladder."
+        elif difficulty == " Custom ":
+            desc=""
+            libtcod.console_set_default_foreground(0, libtcod.black)
+            libtcod.console_print_ex(0, 32, 16, libtcod.BKGND_SET, libtcod.RIGHT, "Enemy Damage:") 
+            libtcod.console_print_ex(0, 34, 16, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_enemy_damage_scale']) + "%")
+            libtcod.console_print_ex(0, 32, 18, libtcod.BKGND_SET, libtcod.RIGHT, "Player Damage:")
+            libtcod.console_print_ex(0, 34, 18, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_player_damage_scale']) + "%")
+            libtcod.console_print_ex(0, 32, 20, libtcod.BKGND_SET, libtcod.RIGHT, "Experience Multiplier:") 
+            libtcod.console_print_ex(0, 34, 20, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_xp_multiplier']) + "x")
+            libtcod.console_print_ex(0, 32, 22, libtcod.BKGND_SET, libtcod.RIGHT, "Luck Scale:") 
+            libtcod.console_print_ex(0, 34, 22, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_luck_scale']) + "%")
+            libtcod.console_print_ex(0, 32, 24, libtcod.BKGND_SET, libtcod.RIGHT, "Delete Save on Death:") 
+            strdel = "No"
+            if constants['options_death_delete_save']: strdel = "Yes"
+            libtcod.console_print_ex(0, 34, 24, libtcod.BKGND_SET, libtcod.LEFT, strdel)
+        
+        libtcod.console_set_default_foreground(0, screen_green)
+        if index == 1:
+            strtut = "Disabled"
+            if constants['options_tutorial_enabled']: strtut = "Enabled"
+            libtcod.console_print_ex(0, 32, 14, libtcod.BKGND_SET, libtcod.RIGHT, "Tutorial Tips:")
+            libtcod.console_print_ex(0, 34, 14, libtcod.BKGND_SET, libtcod.LEFT, strtut)
+            
+        elif index == 2:
+            libtcod.console_print_ex(0, 32, 16, libtcod.BKGND_SET, libtcod.RIGHT, "Enemy Damage:")
+            libtcod.console_print_ex(0, 34, 16, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_enemy_damage_scale']) + "%")
+            
+        elif index == 3:
+            libtcod.console_print_ex(0, 32, 18, libtcod.BKGND_SET, libtcod.RIGHT, "Player Damage:")
+            libtcod.console_print_ex(0, 34, 18, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_player_damage_scale']) + "%")
+            
+        elif index == 4:
+            libtcod.console_print_ex(0, 32, 20, libtcod.BKGND_SET, libtcod.RIGHT, "Experience Multiplier:")
+            libtcod.console_print_ex(0, 34, 20, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_xp_multiplier']) + "x")
+            
+        elif index == 5:
+            libtcod.console_print_ex(0, 32, 22, libtcod.BKGND_SET, libtcod.RIGHT, "Luck Scale:")
+            libtcod.console_print_ex(0, 34, 22, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_luck_scale']) + "%")
+            
+            
+        elif index == 6:
+            libtcod.console_print_ex(0, 32, 24, libtcod.BKGND_SET, libtcod.RIGHT, "Delete Save on Death:")
+            strdel = "No"
+            if constants['options_death_delete_save']: strdel = "Yes"
+            libtcod.console_print_ex(0, 34, 24, libtcod.BKGND_SET, libtcod.LEFT, strdel)
+            
+        libtcod.console_set_default_foreground(0, screen_lightgray)
+
+        description_lines = textwrap.wrap("  " + desc, 35)               #description for display in the inventory system
+        y = 16
+        for line in description_lines:
+            libtcod.console_print_ex(0, 11, y, libtcod.BKGND_SET, libtcod.LEFT, line)
+            y += 1
+            
+        libtcod.console_flush()
+
+        if key.vk == libtcod.KEY_ENTER:            
+        
+            if difficulty == "Newcomer":
+                constants['options_enemy_damage_scale'] = 80
+                constants['options_player_damage_scale'] = 120
+                constants['options_xp_multiplier'] = round(1.5, 1)
+                constants['options_luck_scale'] = 150
+                constants['options_death_delete_save'] = False
+                
+            elif difficulty == "Standard":
+                constants['options_enemy_damage_scale'] = 100
+                constants['options_player_damage_scale'] = 100
+                constants['options_xp_multiplier'] = 1
+                constants['options_luck_scale'] = 100
+                constants['options_death_delete_save'] = True
+                
+            elif difficulty == " Expert ":
+                constants['options_enemy_damage_scale'] = 130
+                constants['options_player_damage_scale'] = 70
+                constants['options_xp_multiplier'] = round(.5, 1)
+                constants['options_luck_scale'] = 75
+                constants['options_death_delete_save'] = True
+                
+            elif difficulty == " Sadist ":
+                constants['options_enemy_damage_scale'] = 200
+                constants['options_player_damage_scale'] = 30
+                constants['options_xp_multiplier'] = round(.1, 1)
+                constants['options_luck_scale'] = 30
+                constants['options_death_delete_save'] = True
+                
+                
+            break
+            
+        if key.vk == libtcod.KEY_ESCAPE:
+            engine.main()
+            
+        elif key.vk == libtcod.KEY_RIGHT:
+            if index == 0:
+                if difficulty == "Newcomer":
+                    difficulty = "Standard"
+                elif difficulty == "Standard":
+                    difficulty = " Expert "
+                elif difficulty == " Expert ":
+                    difficulty = " Sadist "
+                elif difficulty == " Sadist ":
+                    difficulty = " Custom "
+            if index == 1: #tutorial tips
+                constants['options_tutorial_enabled'] = not constants['options_tutorial_enabled']
+            if index == 2:
+                if constants['options_enemy_damage_scale'] < 990: constants['options_enemy_damage_scale'] += 10
+            if index == 3:
+                if constants['options_player_damage_scale'] < 990: constants['options_player_damage_scale'] += 10       
+            if index == 4:
+                if constants['options_xp_multiplier'] < 100:
+                    constants['options_xp_multiplier'] = round(constants['options_xp_multiplier']+ 0.2, 1)
+            if index == 5:
+                if constants['options_luck_scale'] < 990: constants['options_luck_scale'] += 10   
+            if index == 6:
+                constants['options_death_delete_save'] = not constants['options_death_delete_save']
+                
+        elif key.vk == libtcod.KEY_LEFT:
+            if index == 0:  
+                if difficulty == "Standard":
+                    difficulty = "Newcomer"
+                elif difficulty == " Expert ":
+                    difficulty = "Standard"
+                elif difficulty == " Sadist ":
+                    difficulty = " Expert "
+                elif difficulty == " Custom ":
+                    difficulty = " Sadist "
+            if index == 1:
+                constants['options_tutorial_enabled'] = not constants['options_tutorial_enabled']
+            if index == 2:
+                if constants['options_enemy_damage_scale'] > 10: constants['options_enemy_damage_scale'] -= 10
+            if index == 3:
+                if constants['options_player_damage_scale'] > 10: constants['options_player_damage_scale'] -= 10    
+            if index == 4:
+                if constants['options_xp_multiplier'] > 0.2:
+                    constants['options_xp_multiplier'] = round(constants['options_xp_multiplier'] - 0.2, 1)
+            if index == 5:
+                if constants['options_luck_scale'] > 10: constants['options_luck_scale'] -= 10    
+            if index == 6:
+                constants['options_death_delete_save'] = not constants['options_death_delete_save']
+                
+               
+        elif key.vk == libtcod.KEY_DOWN:
+            if index == 0:
+                index += 1
+            elif index > 0:
+                if difficulty == " Custom ":
+                    if index < 6:
+                        index += 1
+            print(str(index))
+            
+        elif key.vk == libtcod.KEY_UP:
+            if index > 0: index -= 1
+            print(str(index))                  
+            
+
 def inventory_menu(player, entities, fov_map):
     
     results = []

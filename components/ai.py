@@ -6,7 +6,7 @@ from game_messages import Message
 
 
 class CameraMan:
-    def take_turn(self, target, fov_map, game_map, entities):
+    def take_turn(self, target, fov_map, game_map, entities, constants):
         results = []
         monster = self.owner
 
@@ -35,7 +35,7 @@ class CameraMan:
         return results
 
 class BasicMonster:
-    def take_turn(self, target, fov_map, game_map, entities):
+    def take_turn(self, target, fov_map, game_map, entities, constants):
         results = []
 
         monster = self.owner
@@ -45,7 +45,7 @@ class BasicMonster:
                 monster.move_astar(target, entities, game_map)
 
             elif target.fighter.hp > 0:
-                attack_results = monster.fighter.attack(target)
+                attack_results = monster.fighter.attack(target, constants)
                 results.extend(attack_results)
 
         return results
@@ -77,7 +77,7 @@ class RandomWalk:
     def __init__(self, randomfactor=50):
         self.randomfactor = randomfactor
 
-    def take_turn(self, target, fov_map, game_map, entities):
+    def take_turn(self, target, fov_map, game_map, entities, constants):
         results = []
         monster = self.owner
         
@@ -93,7 +93,7 @@ class RandomWalk:
                 if monster.distance_to(target) >= 2:
                     monster.move_astar(target, entities, game_map)
                 elif target.fighter.hp > 0:
-                    attack_results = monster.fighter.attack(target)
+                    attack_results = monster.fighter.attack(target, constants)
                     results.extend(attack_results)
 
         return results

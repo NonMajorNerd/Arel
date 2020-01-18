@@ -68,8 +68,7 @@ def kill_player(player, game_map):
             for pair in player.kill_counts:
                 libtcod.console_print_ex(0, 3, i, libtcod.BKGND_NONE, libtcod.LEFT, chr(pair[2]) + ' ' + pair[0] + " x" + str(pair[1]))
                 i = i + 1
-        
-        
+         
         libtcod.console_flush()
         
         choice = key

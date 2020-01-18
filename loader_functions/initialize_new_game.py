@@ -59,6 +59,14 @@ def get_constants():
     max_monsters_per_room = 3
     max_items_per_room = 2
 
+    options_enemy_damage_scale = 100
+    options_player_damage_scale = 100
+    options_xp_multiplier = 1
+    options_luck_scale = 100
+    options_death_delete_save = True
+    options_tutorial_enabled = True
+
+
     colors = {
         'dark_wall': libtcod.Color(34, 34, 68),
         'dark_ground': libtcod.Color(17, 17, 34),
@@ -86,7 +94,13 @@ def get_constants():
         'fov_radius': fov_radius,
         'max_monsters_per_room': max_monsters_per_room,
         'max_items_per_room': max_items_per_room,
-        'colors': colors
+        'colors': colors,
+        'options_enemy_damage_scale': options_enemy_damage_scale,
+        'options_player_damage_scale': options_player_damage_scale,
+        'options_xp_multiplier': options_xp_multiplier,
+        'options_luck_scale': options_luck_scale,
+        'options_death_delete_save': options_death_delete_save,
+        'options_tutorial_enabled': options_tutorial_enabled
     }
 
     return constants
@@ -102,7 +116,7 @@ def get_game_variables(constants):
                     equipment=equipment_component)
     entities = [player]
 
-    item_component = Item(description="A short rusty dagger. It's dull and has notches missing from the blade. Theres some extra text here to test the inventory screen out. That is still not enough room, dangit! I have to add more.")
+    item_component = Item(description="A short rusty dagger. It's dull and has notches missing from the blade.")
     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
     dagger = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component, item=item_component)
     player.inventory.add_item(dagger)

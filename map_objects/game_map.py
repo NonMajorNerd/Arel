@@ -371,7 +371,7 @@ class GameMap:
                                 fighter_component = Fighter(hp=5, defense=0, power=3, speed=8, xp=15)
                                 ai_component = BasicMonster()
 
-                                monster = Entity(x, y, 304, libtcod.light_gray, 'rat', blocks=True,
+                                monster = Entity(rx, ry, 304, libtcod.light_gray, 'rat', blocks=True,
                                                  render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                                 entities.append(monster)
 

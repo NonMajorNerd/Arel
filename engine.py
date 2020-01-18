@@ -8,7 +8,7 @@ from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from loader_functions.data_loaders import load_game, save_game
-from menus import main_menu, message_box, inventory_menu
+from menus import main_menu, message_box, inventory_menu, game_options
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
@@ -78,7 +78,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     target = get_blocking_entities_at_location(entities, destination_x, destination_y)
 
                     if target:  
-                        attack_results = player.fighter.attack(target)
+                        attack_results = player.fighter.attack(target, constants)
                         player_turn_results.extend(attack_results)     
                     else:
                         player.move(dx, dy)
@@ -304,7 +304,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 fov_recompute = True
 
             if xp:
-                leveled_up = player.level.add_xp(xp)
+                leveled_up = player.level.add_xp(xp, constants)
                 message_log.add_message(Message('You gain {0} experience points.'.format(xp)))
 
                 if leveled_up:
@@ -322,26 +322,27 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     if entity.fighter:
                         entity.fighter.timer += entity.fighter.speed
                         while entity.fighter.timer >= player.fighter.speed:
-                            enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities)
+                            enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities, constants)
                             entity.fighter.timer -= player.fighter.speed
                             
-                            for enemy_turn_result in enemy_turn_results:
-                                message = enemy_turn_result.get('message')
-                                dead_entity = enemy_turn_result.get('dead')
+                            if enemy_turn_results != None:
+                                for enemy_turn_result in enemy_turn_results:
+                                    message = enemy_turn_result.get('message')
+                                    dead_entity = enemy_turn_result.get('dead')
 
-                                if message:
-                                    message_log.add_message(message)
+                                    if message:
+                                        message_log.add_message(message)
 
-                                if dead_entity:
-                                    if dead_entity == player:
-                                        message, game_state = kill_player(dead_entity, game_map)
-                                    else:
-                                        message = kill_monster(dead_entity, player)
+                                    if dead_entity:
+                                        if dead_entity == player:
+                                            message, game_state = kill_player(dead_entity, game_map)
+                                        else:
+                                            message = kill_monster(dead_entity, player)
 
-                                    message_log.add_message(message)
+                                        message_log.add_message(message)
 
-                                    if game_state == GameStates.PLAYER_DEAD:
-                                        break
+                                        if game_state == GameStates.PLAYER_DEAD:
+                                            break
 
                     if game_state == GameStates.PLAYER_DEAD:
                         break
@@ -396,6 +397,7 @@ def main():
             if show_load_error_message and (new_game or load_saved_game or exit_game):
                 show_load_error_message = False
             elif new_game:
+                game_options(constants)
                 player, entities, game_map, message_log, game_state = get_game_variables(constants)
                 game_state = GameStates.PLAYERS_TURN
 
