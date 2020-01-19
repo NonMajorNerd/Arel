@@ -111,7 +111,13 @@ class GameMap:
         #make the first camera man!!!
         fighter_component = Fighter(hp=15, defense=0, power=0, speed=5)
         ai_component = CameraMan()
-        cameraman = Entity(player.x - 2, player.y - 2, 301, libtcod.light_gray, 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
+        spot_blocked = True
+        while spot_blocked:
+            rx = randint(-4, 4)
+            ry = randint(-4, 4)
+            if not any([entity for entity in entities if entity.x == player.x+rx and entity.y == player.y+ry]): spot_blocked = False
+        
+        cameraman = Entity(player.x +rx, player.y +ry, 301, libtcod.light_gray, 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
                         fighter=fighter_component, ai=ai_component)
         entities.append(cameraman)  
         

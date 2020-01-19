@@ -304,7 +304,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 fov_recompute = True
 
             if xp:
-                axp = round(xp * constants['options_xp_multiplier'], 0)
+                axp = int(xp * constants['options_xp_multiplier'])
                 leveled_up = player.level.add_xp(axp, constants)
                 message_log.add_message(Message('You gain {0} experience points.'.format(axp)))
 
