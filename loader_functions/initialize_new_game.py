@@ -58,7 +58,8 @@ def get_constants():
 
     max_monsters_per_room = 3
     max_items_per_room = 2
-
+    
+    options_difficulty = "Standard"
     options_enemy_damage_scale = 100
     options_player_damage_scale = 100
     options_xp_multiplier = 1
@@ -95,6 +96,7 @@ def get_constants():
         'max_monsters_per_room': max_monsters_per_room,
         'max_items_per_room': max_items_per_room,
         'colors': colors,
+        'options_difficulty': options_difficulty,
         'options_enemy_damage_scale': options_enemy_damage_scale,
         'options_player_damage_scale': options_player_damage_scale,
         'options_xp_multiplier': options_xp_multiplier,

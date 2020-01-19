@@ -178,7 +178,7 @@ def game_options(constants):
             
         libtcod.console_set_default_foreground(0, screen_lightgray)
 
-        description_lines = textwrap.wrap("  " + desc, 35)               #description for display in the inventory system
+        description_lines = textwrap.wrap("  " + desc, 36)               #description for display in the inventory system
         y = 16
         for line in description_lines:
             libtcod.console_print_ex(0, 11, y, libtcod.BKGND_SET, libtcod.LEFT, line)
@@ -216,11 +216,12 @@ def game_options(constants):
                 constants['options_luck_scale'] = 30
                 constants['options_death_delete_save'] = True
                 
+            constants['options_difficulty'] = difficulty.strip()
                 
             break
             
         if key.vk == libtcod.KEY_ESCAPE:
-            engine.main()
+            return "nah"
             
         elif key.vk == libtcod.KEY_RIGHT:
             if index == 0:
@@ -240,7 +241,11 @@ def game_options(constants):
                 if constants['options_player_damage_scale'] < 990: constants['options_player_damage_scale'] += 10       
             if index == 4:
                 if constants['options_xp_multiplier'] < 100:
-                    constants['options_xp_multiplier'] = round(constants['options_xp_multiplier']+ 0.2, 1)
+                    if key.shift:
+                        constants['options_xp_multiplier'] += 10
+                    else:
+                        constants['options_xp_multiplier'] = round(constants['options_xp_multiplier']+ 0.2, 1)
+                    if constants['options_xp_multiplier'] > 100: constants['options_xp_multiplier'] = 100
             if index == 5:
                 if constants['options_luck_scale'] < 990: constants['options_luck_scale'] += 10   
             if index == 6:
@@ -264,7 +269,11 @@ def game_options(constants):
                 if constants['options_player_damage_scale'] > 10: constants['options_player_damage_scale'] -= 10    
             if index == 4:
                 if constants['options_xp_multiplier'] > 0.2:
-                    constants['options_xp_multiplier'] = round(constants['options_xp_multiplier'] - 0.2, 1)
+                    if key.shift:
+                        constants['options_xp_multiplier'] = round(constants['options_xp_multiplier'] -10, 1)
+                    else:
+                        constants['options_xp_multiplier'] = round(constants['options_xp_multiplier'] - 0.2, 1)
+                    if constants['options_xp_multiplier'] < 0.2: constants['options_xp_multiplier'] = 0.2
             if index == 5:
                 if constants['options_luck_scale'] > 10: constants['options_luck_scale'] -= 10    
             if index == 6:
@@ -278,11 +287,9 @@ def game_options(constants):
                 if difficulty == " Custom ":
                     if index < 6:
                         index += 1
-            print(str(index))
             
         elif key.vk == libtcod.KEY_UP:
-            if index > 0: index -= 1
-            print(str(index))                  
+            if index > 0: index -= 1                
             
 
 def inventory_menu(player, entities, fov_map):

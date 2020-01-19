@@ -10,7 +10,7 @@ class Level:
         return self.level_up_base + self.current_level * self.level_up_factor
 
     def add_xp(self, xp, constants):
-        self.current_xp += round(xp*constants['options_xp_multiplier'], 0)
+        self.current_xp += xp
 
         if self.current_xp > self.experience_to_next_level:
             self.current_xp -= self.experience_to_next_level

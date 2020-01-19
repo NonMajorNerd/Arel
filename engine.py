@@ -13,7 +13,7 @@ from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
 from random import randint
-    
+
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
 
     fov_recompute = True
@@ -232,7 +232,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     entities.remove(targeter)
                 player_turn_results.append({'targeting_cancelled': True})
             else:
-                save_game(player, entities, game_map, message_log, game_state)
+                save_game(player, entities, game_map, message_log, game_state, constants)
 
                 return True
 
@@ -255,7 +255,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if dead_entity:
                 if dead_entity == player:
-                    message, game_state = kill_player(dead_entity, game_map)
+                    message, game_state = kill_player(dead_entity, game_map, constants)
                 else:
                     message = kill_monster(dead_entity, player)
 
@@ -304,8 +304,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 fov_recompute = True
 
             if xp:
-                leveled_up = player.level.add_xp(xp, constants)
-                message_log.add_message(Message('You gain {0} experience points.'.format(xp)))
+                axp = round(xp * constants['options_xp_multiplier'], 0)
+                leveled_up = player.level.add_xp(axp, constants)
+                message_log.add_message(Message('You gain {0} experience points.'.format(axp)))
 
                 if leveled_up:
 
@@ -335,7 +336,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
                                     if dead_entity:
                                         if dead_entity == player:
-                                            message, game_state = kill_player(dead_entity, game_map)
+                                            message, game_state = kill_player(dead_entity, game_map, constants)
                                         else:
                                             message = kill_monster(dead_entity, player)
 
@@ -351,10 +352,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 
 def main():
-    
     constants = get_constants()
 
-    #libtcod.console_set_custom_font('font.png', libtcod.FONT_LAYOUT_ASCII_INROW)
     libtcod.console_set_custom_font('fontplus.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW, 16, 26)
     
     libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'], False)
@@ -397,11 +396,11 @@ def main():
             if show_load_error_message and (new_game or load_saved_game or exit_game):
                 show_load_error_message = False
             elif new_game:
-                game_options(constants)
-                player, entities, game_map, message_log, game_state = get_game_variables(constants)
-                game_state = GameStates.PLAYERS_TURN
+                if not game_options(constants) == "nah":
+                    player, entities, game_map, message_log, game_state = get_game_variables(constants)
+                    game_state = GameStates.PLAYERS_TURN
 
-                show_main_menu = False
+                    show_main_menu = False
             elif load_saved_game:
                 try:
                     player, entities, game_map, message_log, game_state = load_game()

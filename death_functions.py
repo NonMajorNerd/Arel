@@ -7,7 +7,7 @@ from game_states import GameStates
 from render_functions import RenderOrder
 
 
-def kill_player(player, game_map):
+def kill_player(player, game_map, constants):
     player.char = 329
     player.color = (255, 255, 177)
 
@@ -37,8 +37,8 @@ def kill_player(player, game_map):
         libtcod.console_print_ex(0, 30, 2, libtcod.BKGND_NONE, libtcod.CENTER, "[ESC] to Close")
 
         libtcod.console_set_default_foreground(0, screen_yellow)
-        libtcod.console_print_ex(0, 30, 4, libtcod.BKGND_NONE, libtcod.CENTER, player.name)
-        libtcod.console_print_ex(0, 30, 5, libtcod.BKGND_NONE, libtcod.CENTER, "Level " + str(player.level.current_level))
+        libtcod.console_print_ex(0, 30, 4, libtcod.BKGND_NONE, libtcod.CENTER, player.name + ", Level " + str(player.level.current_level))
+        libtcod.console_print_ex(0, 30, 5, libtcod.BKGND_NONE, libtcod.CENTER, constants['options_difficulty'] + " Difficulty")
         
         libtcod.console_set_default_foreground(0, screen_purple)
         libtcod.console_print_ex(0, 30, 6, libtcod.BKGND_NONE, libtcod.CENTER, str(player.turn_count) + " Turns")
