@@ -1,4 +1,4 @@
-import libtcodpy as libtcod
+import tcod as libtcod
 import textwrap
 from game_messages import Message
 from random_utils import left, mid, right
@@ -277,8 +277,7 @@ def game_options(constants):
             if index == 5:
                 if constants['options_luck_scale'] > 10: constants['options_luck_scale'] -= 10    
             if index == 6:
-                constants['options_death_delete_save'] = not constants['options_death_delete_save']
-                
+                constants['options_death_delete_save'] = not constants['options_death_delete_save']         
                
         elif key.vk == libtcod.KEY_DOWN:
             if index == 0:

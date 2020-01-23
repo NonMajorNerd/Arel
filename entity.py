@@ -30,6 +30,7 @@ class Entity:
         self.level = level
         self.equipment = equipment
         self.equippable = equippable
+        self.conditions = []
 
         if self.name == "Player":
             self.kill_counts = []
@@ -42,41 +43,29 @@ class Entity:
             
             ]
 
-        if self.fighter:
-            self.fighter.owner = self
-
-        if self.ai:
-            self.ai.owner = self
-
-        if self.item:
-            self.item.owner = self
-
-        if self.inventory:
-            self.inventory.owner = self
-
-        if self.stairs:
-            self.stairs.owner = self
-
-        if self.level:
-            self.level.owner = self
-
-        if self.equipment:
-            self.equipment.owner = self
-
-        if self.equippable:
+        if self.fighter: self.fighter.owner = self
+        if self.ai: self.ai.owner = self
+        if self.item: self.item.owner = self
+        if self.inventory: self.inventory.owner = self
+        if self.stairs: self.stairs.owner = self
+        if self.level: self.level.owner = self
+        if self.equipment: self.equipment.owner = self
+        
+        if self.equippable: 
             self.equippable.owner = self
 
             if not self.item:
                 item = Item()
                 self.item = item
                 self.item.owner = self
+        
+        if self.conditions: self.conditions.owner = self
 
     def move(self, dx, dy):
         # Move the entity by a given amount
         self.x += dx
         self.y += dy
 
-    
     def move_towards(self, target_x, target_y, game_map, entities):
         dx = target_x - self.x
         dy = target_y - self.y

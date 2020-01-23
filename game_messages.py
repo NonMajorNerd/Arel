@@ -1,4 +1,4 @@
-import libtcodpy as libtcod
+import tcod as libtcod
 
 import textwrap
 from random_utils import left, mid, right
@@ -20,12 +20,18 @@ class MessageLog:
         
     def add_message(self, message):
     
+        if len(message.text) > 58:
+             print(message.text)
+             raise Exception("Message is too long, and would cause a wrapping in the history log.")
+    
         currentmessage = message.text #current message being added
     
         if len(self.history) > 0:
+            
             lastmessage = self.history[len(self.history)-1].text #most recent message in the history log
             
             if lastmessage == currentmessage:
+                
                 lastlogmessage = self.messages[len(self.messages)-1].text #most recent message in the on-screen log
 
                 check = right(lastlogmessage, 5)
@@ -34,12 +40,12 @@ class MessageLog:
                     strcount = str(int(mid(check, 3, 2)) + 1)
                 else:
                     strcount = "02"
-                
+
                 if len(strcount) == 1: strcount = "0" + strcount
                 
                 currentmessage = currentmessage + " (x" + strcount + ")"
                     
-                if len(self.history[len(self.history)-1].text) + 6 > self.width:
+                if len(lastmessage) + 6 > self.width and int(strcount)>2:
                     del self.messages[len(self.messages)-1]
                     
                 #delete last message in the on-screen log

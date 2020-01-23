@@ -1,4 +1,4 @@
-import libtcodpy as libtcod
+import tcod as libtcod
 
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
@@ -19,7 +19,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
-
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
@@ -27,6 +26,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     previous_game_state = game_state
 
     targeting_item = None
+
+    player_turn_results = []
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
@@ -70,6 +71,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         if move:
             if game_state == GameStates.PLAYERS_TURN:
+                 
+                #this needs to find a better place.
+                if len(player.conditions) > 0:
+                    for condition in player.conditions:
+                        if condition.active:
+                            player_turn_results.extend(condition.inact())
+                
                 dx, dy = move
                 destination_x = player.x + dx
                 destination_y = player.y + dy
@@ -78,8 +86,15 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     target = get_blocking_entities_at_location(entities, destination_x, destination_y)
 
                     if target:  
-                        attack_results = player.fighter.attack(target, constants)
-                        player_turn_results.extend(attack_results)     
+                        if target.name == "Camera Op.":
+                            (tx, ty) = (player.x, player.y)
+                            player.x = target.x
+                            player.y = target.y
+                            target.x = tx
+                            target.y = ty
+                        else:
+                            attack_results = player.fighter.attack(target, constants)
+                            player_turn_results.extend(attack_results)     
                     else:
                         player.move(dx, dy)
 
@@ -305,19 +320,17 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if xp:
                 axp = int(xp * constants['options_xp_multiplier'])
-                leveled_up = player.level.add_xp(axp, constants)
+                leveled_up = player.level.add_xp(axp)
                 message_log.add_message(Message('You gain {0} experience points.'.format(axp)))
 
                 if leveled_up:
-
                     previous_game_state = game_state
                     game_state = GameStates.LEVEL_UP
 
-        if game_state == GameStates.ENEMY_TURN:
-        
-            #Do once-a-turn things
-            player.turn_count += 1
-        
+        if game_state == GameStates.ENEMY_TURN:   
+                            
+            player.turn_count += 1            
+                    
             for entity in entities:
                 if entity.ai:
                     if entity.fighter:
@@ -348,6 +361,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     if game_state == GameStates.PLAYER_DEAD:
                         break
             else:
+                
                 game_state = GameStates.PLAYERS_TURN
 
 
@@ -358,9 +372,11 @@ def main():
     
     libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'], False)
 
-    con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
-    panel = libtcod.console_new(constants['screen_width'], constants['panel_height'])
-
+    #con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
+    #panel = libtcod.console_new(constants['screen_width'], constants['panel_height'])
+    con = libtcod.console.Console(constants['screen_width'], constants['screen_height'])
+    panel = libtcod.console.Console(constants['screen_width'], constants['panel_height'])
+    
     player = None
     entities = []
     game_map = None

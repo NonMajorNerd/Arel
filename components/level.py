@@ -9,7 +9,7 @@ class Level:
     def experience_to_next_level(self):
         return self.level_up_base + self.current_level * self.level_up_factor
 
-    def add_xp(self, xp, constants):
+    def add_xp(self, xp):
         self.current_xp += xp
 
         if self.current_xp > self.experience_to_next_level:

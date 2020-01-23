@@ -7,6 +7,8 @@ from components.fighter import Fighter
 from components.inventory import Inventory
 from components.level import Level
 
+from condition_functions import Poison, Healing
+
 from entity import Entity
 
 from equipment_slots import EquipmentSlots
@@ -116,6 +118,8 @@ def get_game_variables(constants):
     player = Entity(0, 0, 256, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
                     fighter=fighter_component, inventory=inventory_component, level=level_component,
                     equipment=equipment_component)
+    player.conditions.append(Poison(target=player, active=True, duration=8, damage=2))
+    player.conditions.append(Healing(target=player, active=True, duration=10, healing=1))
     entities = [player]
 
     item_component = Item(description="A short rusty dagger. It's dull and has notches missing from the blade.")

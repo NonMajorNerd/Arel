@@ -7,7 +7,7 @@ class Item:
         self.targeting_message = targeting_message          #what is the message displayed when targeting occurs
         
         self.stackable = stackable                  #is this item stackable?
-        self.count = count                              #how many of this item are in this 'stack'?
+        self.count = count                              #how many of this item are in this specific 'stack'?
         
         self.description_lines = textwrap.wrap("  " + description, 26)               #description for display in the inventory system
         if len(self.description_lines) > 8:
