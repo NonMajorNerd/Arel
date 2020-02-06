@@ -17,18 +17,19 @@ class MessageLog:
         self.width = width
         self.height = height
         self.history = []
+        self.nolinehistory = []
         
     def add_message(self, message):
     
-        if len(message.text) > 58:
-             print(message.text)
-             raise Exception("Message is too long, and would cause a wrapping in the history log.")
+        #if len(message.text) > 58:
+        #     print(message.text)
+        #     raise Exception("Message is too long, and would cause a wrapping in the history log.")
     
         currentmessage = message.text #current message being added
     
         if len(self.history) > 0:
             
-            lastmessage = self.history[len(self.history)-1].text #most recent message in the history log
+            lastmessage = self.nolinehistory[len(self.nolinehistory)-1].text #most recent message in the history log
             
             if lastmessage == currentmessage:
                 
@@ -62,9 +63,10 @@ class MessageLog:
 
             # Add the new line as a Message object, with the text and the color
             self.messages.append(Message(line, message.color))
-        
+            self.history.append(Message(message.text, message.color))
+            
         #append the original, unaltered message to the history log
-        self.history.append(Message(message.text, message.color))
+        self.nolinehistory.append(Message(message.text, message.color))
         
 def message_log_history(message_log):
     

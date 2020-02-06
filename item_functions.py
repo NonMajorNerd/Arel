@@ -41,7 +41,7 @@ def cast_lightning(*args, **kwargs):
                 closest_distance = distance
 
     if target:
-        results.append({'consumed': True, 'target': target, 'message': Message('A lighting bolt strikes the {0} with a loud thunder! The damage is {1}'.format(target.name, damage))})
+        results.append({'consumed': True, 'target': target, 'message': Message('A lighting bolt strikes the {0} with a loud thunder!'.format(target.name))})
         results.extend(target.fighter.take_damage(damage))
     else:
         results.append({'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', libtcod.red)})
@@ -92,7 +92,7 @@ def cast_confuse(*args, **kwargs):
             confused_ai.owner = entity
             entity.ai = confused_ai
 
-            results.append({'consumed': True, 'message': Message('The eyes of the {0} look vacant, as he starts to stumble around!'.format(entity.name), libtcod.light_green)})
+            results.append({'consumed': True, 'message': Message('The eyes of the {0} become vacant as it starts to wander about confused!'.format(entity.name), libtcod.light_green)})
 
             break
     else:

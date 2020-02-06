@@ -1,4 +1,4 @@
-import libtcodpy as libtcod
+import tcod as libtcod
 
 from enum import Enum
 
@@ -15,16 +15,16 @@ class RenderOrder(Enum):
     ACTOR = 5
     TARGETING = 6
 
-def get_names_under_mouse(mouse, entities, fov_map):
+def get_names_under_mouse(mouse, entities, fov_map, names_list):
     (x, y) = (mouse.cx, mouse.cy)
 
-    names = [entity.name for entity in entities
+    names = [names_list[entity.name] for entity in entities
              if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
     names = ', '.join(names)
 
     return names.capitalize()
     
-def get_all_at(x, y, entities, fov_map, game_map):
+def get_all_at(x, y, entities, fov_map, game_map, names_list):
     
     if not libtcod.map_is_in_fov(fov_map, x, y):
         names = "???"
@@ -37,7 +37,7 @@ def get_all_at(x, y, entities, fov_map, game_map):
             tiles = 'Floor'  
     
         names = ""
-        names = [entity.name for entity in entities
+        names = [names_list[entity.name] for entity in entities
                  if entity.x == x and entity.y == y and not entity.name == "Targeter"]  
             
         names = ', '.join(names)
@@ -66,10 +66,36 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE, libtcod.CENTER,
                              '{0}: {1}/{2}'.format(name, value, maximum))
 
+def render_tooltip(x, y, text):
+    if 0 > x > self.width or 0 > y > self.height:
+        raise Exception("Render tooltip range is out of screen area. (" + str(x) + "," + str(y) + ")")
+    
+    if len(text) + 2 > 58:
+        print(text)
+        raise Exception("Tooltip text is too long. Must be 58 characters or less, string was " + (str(len(text))) + " characters.")
+    
+    ttcon = libtcod.console.Console(len(text)+2, 3)
+    libtcod.console_set_default_background(ttcon, libtcod.Color(102,102,102))
+    libtcod.console_set_default_foreground(ttcon, libtcod.black)
+    
+    libtcod.console_clear(ttcon)
+    
+    libtcod.console_print_ex(ttcon, 0, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(201))
+    libtcod.console_print_ex(ttcon, len(text)+1, 0, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    libtcod.console_print_ex(ttcon, 0, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    libtcod.console_print_ex(ttcon, len(text)+1, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+    libtcod.console_print_ex(ttcon, 0, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+    libtcod.console_print_ex(ttcon, len(text)+1, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+    for tx in range(1, len(text)+1):
+        libtcod.console_print_ex(ttcon, tx, 0, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+        libtcod.console_print_ex(ttcon, tx, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+        
+    libtcod.console_print_ex(ttcon, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, str(text))
+    
+    libtcod.console_blit(ttcon, 0, 0, 0, 0, 0, x, y)
 
 def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
-               bar_width, panel_height, panel_y, mouse, colors, game_state):
-
+               bar_width, panel_height, panel_y, mouse, colors, game_state, names_list):
                
     if fov_recompute:
     # Draw all the tiles in the game map
@@ -99,7 +125,6 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                             libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
                             libtcod.console_set_char_foreground(con, x, y, colors.get('light_wall'))
 
-                            
                         libtcod.console_set_char(con, x, y, 223)
 
                     elif game_map.blitmap[x][y] in [0, 1, 2, 8, 11]:
@@ -144,7 +169,6 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                         libtcod.console_set_char_background(con, x, y, (0,0,0), libtcod.BKGND_SET)
                         libtcod.console_set_char_foreground(con, x, y, (0,0,0))
                         
-
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
 
     # Draw all entities in the list
@@ -155,6 +179,11 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     libtcod.console_set_default_background(panel, libtcod.black)
     libtcod.console_clear(panel)
+
+    libtcod.console_set_default_foreground(panel, libtcod.white)
+    
+    #print mouse x/y
+    #libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, (str(mouse.cx) + "," + str(mouse.cy)))
 
     # Print the game messages, one line at a time
     y = 1
@@ -169,6 +198,18 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                              'Dungeon level: {0}'.format(game_map.dungeon_level))
     libtcod.console_print_ex(panel, 1, 4, libtcod.BKGND_NONE, libtcod.LEFT,
                              'Turn : {0}'.format(player.turn_count))
+                             
+    #print condition icons       
+    if len(player.conditions) > 0:
+        ind = 0
+        for condition in player.conditions:
+            if condition.active:
+                libtcod.console_print_ex(panel, 1+ind, 2, libtcod.BKGND_SET, libtcod.LEFT, condition.char)
+                libtcod.console_set_char_background(panel, 1+ind, 2, condition.bgcolor, libtcod.BKGND_SET)
+                libtcod.console_set_char_foreground(panel, 1+ind, 2, condition.fgcolor)
+                ind += 1
+               
+    
     if game_state == GameStates.KEYTARGETING:
         targeter = None
         for ent in entities:
@@ -177,13 +218,19 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         if not targeter == None:
             libtcod.console_set_default_foreground(panel, libtcod.light_gray)
             libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                                 get_all_at(targeter.x, targeter.y, entities, fov_map, game_map))
+                                 get_all_at(targeter.x, targeter.y, entities, fov_map, game_map, names_list))
 
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                             get_names_under_mouse(mouse, entities, fov_map))
+                             get_names_under_mouse(mouse, entities, fov_map, names_list))
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
+
+    if game_state == GameStates.PLAYERS_TURN:
+        if len(player.conditions) > 0:
+            if mouse.cy == 35: #the row where status icons are displayed
+                if mouse.cx > 0 and mouse.cx <= len(player.conditions):
+                    render_tooltip(mouse.cx+1,36,player.conditions[mouse.cx-1].tooltip)
 
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         if game_state == GameStates.SHOW_INVENTORY:

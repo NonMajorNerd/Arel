@@ -291,7 +291,7 @@ def game_options(constants):
             if index > 0: index -= 1                
             
 
-def inventory_menu(player, entities, fov_map):
+def inventory_menu(player, entities, fov_map, names_list):
     
     results = []
     
@@ -380,6 +380,7 @@ def inventory_menu(player, entities, fov_map):
     libtcod.console_print_ex(0, 2, 3, libtcod.BKGND_SET, libtcod.LEFT, "[Escape to Close]")
     
     while True:
+    
         libtcod.console_set_default_foreground(0, screen_lightgray)
         libtcod.console_set_default_background(0, screen_darkgray)
         
@@ -387,8 +388,12 @@ def inventory_menu(player, entities, fov_map):
         
         libtcod.console_print_ex(0, 31, 34, libtcod.BKGND_SET, libtcod.LEFT, "[A]pply [D]rop [T]hrow")
         
-        libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "                          ")
-        libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "Page " + str(currentpage) + " of " + str(numpages))
+        libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, chr(30)) #up
+        libtcod.console_print_ex(0, 32, 36, libtcod.BKGND_SET, libtcod.LEFT, chr(31)) #down
+        
+        libtcod.console_print_ex(0, 34, 36, libtcod.BKGND_SET, libtcod.LEFT, "                          ")
+        libtcod.console_print_ex(0, 34, 36, libtcod.BKGND_SET, libtcod.LEFT, "Page " + str(currentpage) + " of " + str(numpages))
+        
         
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
         
@@ -407,9 +412,9 @@ def inventory_menu(player, entities, fov_map):
         for x in range(start, start + itemsperpage):
             if x < numitems:
                 item = player.inventory.items[x] 
-                istr = chr(item.char) + " " + item.name
+                istr = chr(item.char) + " " + names_list[item.name]
                 for e in player.equipment.list:
-                    if e and item.name == e.name:
+                    if e and names_list[item.name] == e.name:
                         istr = "> " + istr
                 if len(istr) + 5 > 25: istr = left(istr,25) #ensure that the item, + '(x00)' is less than 25 characters wide
                 if item.item.stackable and item.item.count > 1: istr = istr + " (x" + str(item.item.count) + ")"
@@ -481,19 +486,28 @@ def inventory_menu(player, entities, fov_map):
         libtcod.console_set_default_background(0, screen_green)
         libtcod.console_set_default_foreground(0, screen_red)
         
+        #update index based on mouse position
+        if (mouse.cx >2 and mouse.cx < 30) and (mouse.cy > 12 and mouse.cy < 37):
+            selectedline = mouse.cy - 12
+            index = (((currentpage-1)*itemsperpage) + (selectedline-1))
+            if index > numitems - 1: index = numitems - 1
+
         #green selection line
         line = 13 + (index%itemsperpage)
         item = player.inventory.items[index]
         
-        stritem = chr(item.char) + " " + item.name
+        stritem = chr(item.char) + " " + names_list[item.name]
         if item.item.stackable and item.item.count > 1: stritem = stritem + " (x" + str(item.item.count) + ")"
         
         for e in player.equipment.list:
-                    if e and item.name == e.name:
+                    if e and names_list[item.name] == e.name:
                         stritem = "> " + stritem
         
         for i in range (27 - len(stritem)):
             stritem = stritem + " "
+        
+        if currentpage > 1: libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, chr(30)) #up
+        if currentpage < numpages: libtcod.console_print_ex(0, 32, 36, libtcod.BKGND_SET, libtcod.LEFT, chr(31)) #down)
         
         libtcod.console_print_ex(0, 3, line, libtcod.BKGND_SET, libtcod.LEFT, stritem)
         
@@ -509,17 +523,19 @@ def inventory_menu(player, entities, fov_map):
         libtcod.console_set_default_background(0, screen_midgray)
         libtcod.console_set_default_foreground(0, libtcod.white)
         
-        libtcod.console_print_ex(0, 44, 13, libtcod.BKGND_SET, libtcod.CENTER, " " + chr(item.char) + " " + item.name + " ")
+        libtcod.console_print_ex(0, 44, 13, libtcod.BKGND_SET, libtcod.CENTER, " " + chr(item.char) + " " + names_list[item.name] + " ")
         
         libtcod.console_set_default_background(0, screen_darkgray)
         libtcod.console_set_default_foreground(0, screen_lightgray)
 
+        lines = item.item.description_lines
+        
         y = 15
-        for l in item.item.description_lines:
+        for l in lines:
             libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
             y+=1           
             
-        if item.item.effect_lines:
+        if item.identified and item.item.effect_lines:
             y += 1 #start the effect text after the description text ends.
             for l in item.item.effect_lines:
                 libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
@@ -601,13 +617,32 @@ def inventory_menu(player, entities, fov_map):
             
         libtcod.console_flush()
 
+        m = libtcod.mouse_get_status()
+        click = m.lbutton_pressed
+
+        if click:
+            if (mouse.cx >2 and mouse.cx < 30) and (mouse.cy > 12 and mouse.cy < 37):
+                if item.item.use_function:
+                    results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list))
+                    item.identified = True
+                    return results
+                elif item.equippable:
+                    player.equipment.toggle_equip(item)
+            elif mouse.cx == 31 and mouse.cy == 36 and currentpage > 1:
+                currentpage -= 1
+                index = (itemsperpage * currentpage) - 1
+            elif mouse.cx == 32 and mouse.cy == 36 and currentpage <  numpages:
+                currentpage += 1
+                index = (currentpage -1) * itemsperpage
+                if index >  numitems -1 : index = numitems - 1
+                
         if key.vk == libtcod.KEY_ESCAPE or chr(key.c) == "i":
             results.append({'ignore': 0})
             return results
             
         elif key.vk == libtcod.KEY_DOWN:
             if index < numitems-1: index += 1
-            if line == 34 and currentpage + 1 <= numpages: currentpage = currentpage + 1
+            if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
 
         elif key.vk == libtcod.KEY_UP:
             if index > 0: index -= 1
@@ -615,7 +650,8 @@ def inventory_menu(player, entities, fov_map):
             
         elif key.vk == libtcod.KEY_ENTER:
             if item.item.use_function:
-                results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map))
+                results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list))
+                item.identified = True
                 return results
                 
             elif item.equippable:
@@ -635,11 +671,11 @@ def old_inventory_menu(con, header, player, inventory_width, screen_width, scree
 
         for item in player.inventory.items:
             if player.equipment.main_hand == item:
-                options.append('{0} (on main hand)'.format(item.name))
+                options.append('{0} (on main hand)'.format(names_list[item.name]))
             elif player.equipment.off_hand == item:
-                options.append('{0} (on off hand)'.format(item.name))
+                options.append('{0} (on off hand)'.format(names_list[item.name]))
             else:
-                strlist = item.name
+                strlist = names_list[item.name]
                 if item.item.stackable and item.item.count >1:
                     strlist = strlist + " (x" + str(item.item.count) + ")"
                     

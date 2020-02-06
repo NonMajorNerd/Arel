@@ -8,17 +8,21 @@ from render_functions import RenderOrder
 
 import random
 
+def get_ent_name(ent, names_list):
+    return names_list[ent.name]
 
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None,
-                 item=None, inventory=None, stairs=None, level=None, equipment=None, equippable=None):
+    def __init__(self, x, y, char, color, name,  identified=True, blocks=False,
+        render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inventory=None, stairs=None,
+        level=None, equipment=None, equippable=None):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
+        self.identified = identified
         self.name = name
         self.blocks = blocks
         self.render_order = render_order
@@ -60,6 +64,13 @@ class Entity:
                 self.item.owner = self
         
         if self.conditions: self.conditions.owner = self
+
+    @property
+    def display_name(self):
+        n = self.unidentified_name
+        if self.identified: n = self.name
+
+        return n
 
     def move(self, dx, dy):
         # Move the entity by a given amount

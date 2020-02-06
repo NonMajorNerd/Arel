@@ -1,4 +1,5 @@
-import libtcodpy as libtcod
+import tcod as libtcod
+from random import randint
 
 from components.equipment import Equipment
 from components.equippable import Equippable
@@ -59,7 +60,7 @@ def get_constants():
     fov_radius = 10
 
     max_monsters_per_room = 3
-    max_items_per_room = 2
+    max_items_per_room = 200
     
     options_difficulty = "Standard"
     options_enemy_damage_scale = 100
@@ -68,7 +69,6 @@ def get_constants():
     options_luck_scale = 100
     options_death_delete_save = True
     options_tutorial_enabled = True
-
 
     colors = {
         'dark_wall': libtcod.Color(34, 34, 68),
@@ -108,9 +108,126 @@ def get_constants():
     }
 
     return constants
+    
+    #random.choice[colors_list['Scrolls']]
+    
+def get_render_colors():
+    colors_list = {
+    'Scrolls':                      [
+                                    libtcod.Color(255, 236, 158),
+                                    libtcod.Color(255, 221, 138),
+                                    libtcod.Color(225, 173, 109),
+                                    libtcod.Color(201, 145, 87),
+                                    libtcod.Color(210, 170, 119)
+                                    ],
+    'White Potion':                 libtcod.Color(255, 255, 255),
+    'Yellow Potion':                libtcod.Color(255, 255, 0),
+    'Blue Potion':                  libtcod.Color(0, 0, 255),
+    'Red Potion':                   libtcod.Color(255, 0, 0),
+    'Green Potion':                 libtcod.Color(0, 255, 0),
+    'Black Potion':                 libtcod.Color(50, 50, 50),
+    'Brown Potion':                 libtcod.Color(145, 63, 0),
+    'Azure Potion':                 libtcod.Color(0, 50, 100),
+    'Ivory Potion':                 libtcod.Color(100, 100, 94),
+    'Teal Potion':                  libtcod.Color(0, 50, 50),
+    'Silver Potion':                libtcod.Color(175, 175, 175),
+    'Purple Potion':                libtcod.Color(150, 0, 150),
+    'Gray Potion':                  libtcod.Color(100, 100, 100),
+    'Orange Potion':                libtcod.Color(100, 65, 0),
+    'Maroon Potion':                libtcod.Color(50, 0, 0),
+    'Charcoal Potion':              libtcod.Color(80, 80, 80),
+    'Aquamarine Potion':            libtcod.Color(50, 100, 83),
+    'Coral Potion':                 libtcod.Color(100, 50, 31),
+    'Fuchsia Potion':               libtcod.Color(200, 0, 200),
+    'Crimson Potion':               libtcod.Color(83, 8, 24),
+    'Khaki Potion':                 libtcod.Color(94, 90, 55),
+    'Magenta Potion':               libtcod.Color(100, 20, 100),
+    'Golden Potion':                libtcod.Color(212, 175, 55),
+    'Plum Potion':                  libtcod.Color(87, 63, 87),
+    'Olive Potion':                 libtcod.Color(50, 50, 0),
+    'Cyan Potion':                  libtcod.Color(0, 100, 100)
+    }
+    
+    return colors_list
+    
+def get_unidentified_names():
+    
+    potion_colors_list = [    
+    'White',
+    'Yellow',
+    'Blue',
+    'Red',
+    'Green',
+    'Black',
+    'Brown',
+    'Azure',
+    'Ivory',
+    'Teal',
+    'Silver',
+    'Purple',
+    'Gray',
+    'Orange',
+    'Maroon',
+    'Charcoal',
+    'Aquamarine',
+    'Coral',
+    'Fuchsia',
+    'Crimson',
+    'Khaki',
+    'Magenta',
+    'Golden',
+    'Plum',
+    'Olive',
+    'Cyan'
+    ]
+    
+    scroll_names_list = [
+    "FOO",
+    "UBAR",
+    "NR 9",
+    "JAPE",
+    "ODOG",
+    "FREY",
+    "MACK",
+    "RBDKY", 
+    "DNGD",
+    "NTHK",
+    "YREJ",
+    "ETAN",
+    "KIAL",
+    "REBE"
+    ]
+    
+    names_list = {
+    'Player':               "Player",
+    'Goblin':               "Goblin",
+    'Troll':                "Troll",
+    'Camera Op.':           "Camera Op.",
+    'Dagger':               "Dagger",
+    'Sword':                "Sword",
+    'Shield':               "Shield",
+    'Healing Potion':       (str(get_item(potion_colors_list)) + " Potion"),
+    'Lightning Scroll':     ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
+    'Fireball Scroll':      ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
+    'Confusion Scroll':     ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'")
+    
+    }
+    
+    return names_list
+    
+def get_item(item_list, index=0):
+    #return a random item from a list, and remove that item from the list.
+    
+    if len(item_list) == 0: return "oops"
+    
+    i = randint(0, len(item_list)-1)
+    item = item_list[i]
+    item_list.remove(item_list[i])
+    
+    return item
+    
 
-
-def get_game_variables(constants):
+def get_game_variables(constants, names_list, render_colors_list):
     fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
     inventory_component = Inventory(50)
     level_component = Level()
@@ -125,12 +242,12 @@ def get_game_variables(constants):
     item_component = Item(description="A short rusty dagger. It's dull and has notches missing from the blade.")
     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
     dagger = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component, item=item_component)
-    player.inventory.add_item(dagger)
+    player.inventory.add_item(dagger, names_list)
     player.equipment.toggle_equip(dagger)
 
     game_map = GameMap(constants['map_width'], constants['map_height'])
     game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                      constants['map_width'], constants['map_height'], player, entities)
+                      constants['map_width'], constants['map_height'], player, entities, names_list, render_colors_list)
    
 
     
