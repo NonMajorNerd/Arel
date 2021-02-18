@@ -107,10 +107,18 @@ def game_options(constants):
         libtcod.console_print_ex(0, 32, 14, libtcod.BKGND_SET, libtcod.RIGHT, "Tutorial Tips:")
         libtcod.console_print_ex(0, 34, 14, libtcod.BKGND_SET, libtcod.LEFT, strtut)
         
+        libtcod.console_print_ex(0, 24, 12, libtcod.BKGND_SET, libtcod.LEFT, difficulty)
+        
+        #if difficulty == "Newcomer":
+        #    x = ">>"
+        #elif difficulty == "Custom ":
+        #    x = "<<"
+        #else:
+        #    x = "<< >>"
+        
         if index == 0:
             libtcod.console_set_default_foreground(0, screen_green)
-            
-        libtcod.console_print_ex(0, 24, 12, libtcod.BKGND_SET, libtcod.LEFT, difficulty)
+            libtcod.console_print_ex(0, 24, 12, libtcod.BKGND_SET, libtcod.LEFT, difficulty)
             
         if difficulty != "Newcomer":
             libtcod.console_set_default_foreground(0, screen_yellow)               

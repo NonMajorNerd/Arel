@@ -113,7 +113,7 @@ def handle_player_turn_keys(key):
     elif key.vk == libtcod.KEY_ENTER or key_char == '>':
         return {'take_stairs': True}
 
-    elif key_char == 'c':
+    elif key_char == 's':
         return {'show_character_screen': True}
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:
@@ -149,20 +149,20 @@ def handle_player_dead_keys(key):
 
     return {}
 
-def handle_inventory_keys(key):
-    index = key.c - ord('a')
-
-    if index >= 0:
-        return {'inventory_index': index}
-
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: toggle full screen
-        return {'fullscreen': True}
-    elif key.vk == libtcod.KEY_ESCAPE:
-        # Exit the menu
-        return {'exit': True}
-
-    return {}
+#def handle_inventory_keys(key):
+#    index = key.c - ord('a')
+#
+#    if index >= 0:
+#        return {'inventory_index': index}
+#
+#    if key.vk == libtcod.KEY_ENTER and key.lalt:
+#        # Alt+Enter: toggle full screen
+#        return {'fullscreen': True}
+#    elif key.vk == libtcod.KEY_ESCAPE:
+#        # Exit the menu
+#        return {'exit': True}
+#
+#    return {}
 
 def handle_main_menu(key):
     key_char = chr(key.c)
