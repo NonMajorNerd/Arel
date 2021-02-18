@@ -47,7 +47,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                  
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
                    constants['screen_width'], constants['screen_height'], constants['bar_width'],
-                   constants['panel_height'], constants['panel_y'], mouse, constants['colors'], game_state, names_list)
+                   constants['panel_height'], constants['panel_y'], mouse, constants['colors'], constants['options_tutorial_enabled'], game_state, names_list)
 
         fov_recompute = False
  

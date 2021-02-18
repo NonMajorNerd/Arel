@@ -199,17 +199,26 @@ def get_unidentified_names():
     ]
     
     names_list = {
-    'Player':               "Player",
-    'Goblin':               "Goblin",
-    'Troll':                "Troll",
-    'Camera Op.':           "Camera Op.",
-    'Dagger':               "Dagger",
-    'Sword':                "Sword",
-    'Shield':               "Shield",
-    'Healing Potion':       (str(get_item(potion_colors_list)) + " Potion"),
-    'Lightning Scroll':     ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
-    'Fireball Scroll':      ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
-    'Confusion Scroll':     ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'")
+    'Player':                   "Player",
+    'Camera Op.':               "Camera Op.",
+    "rat":                      "Rat",
+    'bat':                      "Bat",
+    'goblin':                   "Goblin",
+    'troll':                    "Troll",
+    'remains of Camera Op.':    "Remains of Camera Op.",
+    'remains of rat':           "Remains of Rat",
+    'remains of bat':           "Remains of Bat",
+    'remains of goblin':        "Remains of Goblin",
+    'remains of troll':         "Remains of Troll",
+    'Junk':                     "Junk",
+    'Dagger':                   "Dagger",
+    'Sword':                    "Sword",
+    'Shield':                   "Shield",
+    'Stairs':                   "Stairs",
+    'Healing Potion':           (str(get_item(potion_colors_list)) + " Potion"),
+    'Lightning Scroll':         ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
+    'Fireball Scroll':          ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
+    'Confusion Scroll':         ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'")
     
     }
     
@@ -229,13 +238,13 @@ def get_item(item_list, index=0):
 
 def get_game_variables(constants, names_list, render_colors_list):
     fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
-    inventory_component = Inventory(50)
+    inventory_component = Inventory(48)
     level_component = Level()
     equipment_component = Equipment()
     player = Entity(0, 0, 256, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
                     fighter=fighter_component, inventory=inventory_component, level=level_component,
                     equipment=equipment_component)
-    player.conditions.append(Poison(target=player, active=True, duration=8, damage=2))
+    player.conditions.append(Poison(target=player, active=True, duration=5, damage=2))
     player.conditions.append(Healing(target=player, active=True, duration=10, healing=1))
     entities = [player]
 
