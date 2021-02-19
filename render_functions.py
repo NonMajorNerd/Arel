@@ -224,8 +224,8 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                         if game_map.tiles[tdx][tdy].door:
                             if game_map.tiles[tdx][tdy].block_sight:
                                 libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Move into a closed door to open it.")
-                            #else:  
-                            #    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, " Press [c] and then a direction to close an open door. ")
+                            else:  
+                                libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [c] and then a direction to close an open door.")
                                                    
     # Print the game messages, one line at a time
     y = 1

@@ -66,10 +66,14 @@ def cast_fireball(*args, **kwargs):
     results.append({'consumed': True, 'message': Message('The fireball explodes, burning everything within {0} tiles!'.format(radius), libtcod.orange)})
 
     for entity in entities:
-        if entity.distance(target_x, target_y) <= radius and entity.fighter:
-            results.append({'message': Message('The {0} gets burned for {1} hit points.'.format(entity.name, damage), libtcod.orange)})
-            results.extend(entity.fighter.take_damage(damage))
-
+        if entity.distance(target_x, target_y) <= radius:
+            if entity.fighter:
+                results.append({'message': Message('The {0} gets burned for {1} hit points.'.format(entity.name, damage), libtcod.orange)})
+                results.extend(entity.fighter.take_damage(damage))
+            elif entity.item and entity.item.flamable:
+                #TODO :: Fix unidentified items displaying identified name when burned this way
+                results.append({'message': Message('The {0} is destroyed in the fire!'.format(entity.name, damage), libtcod.orange)})
+                entities.remove(entity)
     return results
 
 

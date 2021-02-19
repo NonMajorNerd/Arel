@@ -19,6 +19,8 @@ def handle_keys(key, game_state):
         return handle_character_screen(key)
     elif game_state == GameStates.KICKING:
         return  player_pick_dir(key, strkey='kick')
+    elif game_state == GameStates.CLOSING:
+        return  player_pick_dir(key, strkey='close')
         
     return {}
 
@@ -92,7 +94,10 @@ def handle_player_turn_keys(key):
         elif key_char == 'z' or key.vk == libtcod.KEY_KP5:
             return {'wait': True}
             
-    if key_char == 'g':
+    if key_char == 'c':
+        return {'close': True}
+        
+    elif key_char == 'g':
         return {'pickup': True}
 
     elif key_char == 'k':

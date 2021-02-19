@@ -2,14 +2,16 @@ import textwrap
 
 class Item:
     def __init__(self, use_function=None, targeting=False, targeting_message=None, stackable=False, count=1,
-        description="No Description", effect=None, **kwargs):
+        description="No Description", effect=None, flamable=False, **kwargs):
         
-        self.use_function = use_function            #what, if any, is this items use function?
+        self.use_function = use_function            #what, if any, is this items "use" function?
         self.targeting = targeting                      #does this item require targeting when used?
         self.targeting_message = targeting_message          #what is the message displayed when targeting occurs
         
         self.stackable = stackable                  #is this item stackable?
         self.count = count                              #how many of this item are in this specific 'stack'?
+        
+        self.flamable = flamable                    #is this item flamable?
         
         self.description_lines = textwrap.wrap("  " + description, 26)               #description for display in the inventory system
         if len(self.description_lines) > 8:

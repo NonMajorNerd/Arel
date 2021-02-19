@@ -38,6 +38,9 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 			 / | \  		  / | \               
 			1  2  3 		sD  D  sR 
     
+	[c] Close
+		press [c] and then a directional key as outlined above to close objects.
+	
     [i] Inventory
         Press [i] to open your inventory
             press [i] or [esc] to close the inventory
@@ -45,7 +48,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 			Within the inventory menu you can use the arrow keys to move and [Enter] to select/use/(d)equip an item, or you can use the mouse and left-click to select/use/(d)equip an item.
     
     [k] Kick
-        Press [k] and then a directional key as outlined above.
+        Press [k] and then a directional key as outlined above to kick.
 		
 	[l] Message Log
 		Press [l] to view the verbose message log
@@ -65,5 +68,14 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     **************
     * Change log *
     **************
-    
-    
+	
+	2/19/21
+		Added the ability to close doors
+			TODO :: factor opening doors into certain AI subsets (etc for the camera op, but not for rats)
+			
+		Added the 'flammable' property to the item component, and made fireball scroll destroy flammable objects
+			TODO :: Fix unidentified items displaying identified name when burned this way
+				
+		Fixed the order-of-operations in target seraching when kicking (mainly fixes kicking things through open doorways)
+		
+		Fixed spawn rates    
