@@ -1,5 +1,6 @@
 import tcod as libtcod
 
+#imports
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
@@ -24,7 +25,7 @@ def player_turn_end(player, player_turn_results):
                 player_turn_results.extend(condition.enact())   
 
 
-def play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, render_colors_list):
+def play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, colors_list):
 
     fov_recompute = True
     fov_map = initialize_fov(game_map)
@@ -47,7 +48,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                  
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
                    constants['screen_width'], constants['screen_height'], constants['bar_width'],
-                   constants['panel_height'], constants['panel_y'], mouse, constants['colors'], constants['options_tutorial_enabled'], game_state, names_list)
+                   constants['panel_height'], constants['panel_y'], mouse, constants['colors'], constants['options_tutorial_enabled'], game_state, names_list, colors_list)
 
         fov_recompute = False
  
@@ -70,6 +71,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
         key_targeting = action.get('key_targeting')
+        close = action.get('close')
         kick = action.get('kick')
         messagelog = action.get('messagelog')
 
@@ -154,34 +156,32 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 
                 dx, dy = kick
               
-                kickx, kicky  = player.x + dx, player.y +dy             
+                kickx, kicky  = player.x + dx, player.y + dy             
                 
-                if game_map.tiles[kickx][kicky].door:
-                    if game_map.tiles[kickx][kicky].door.is_open:
-                        message_log.add_message(Message('There is nothing there to kick.', libtcod.red))
-                    else:
-                        message_log.add_message(Message('You kick the door. Ouch!', libtcod.red))
-                        
-                elif game_map.tiles[kickx][kicky].blocked:
-                    message_log.add_message(Message('Kicking a wall does not feel good.', libtcod.red))
-                    player_turn_results.extend(player.fighter.take_damage(3))
+                target = None
+                for entity in entities:
+                    if entity.x == kickx and entity.y == kicky:
+                        target = entity
+                        break
                     
-                else:
-                    target = None
-                    for entity in entities:
-                        if entity.x == kickx and entity.y == kicky:
-                            target = entity
-                            break
-                        
-                    if target == None:
-                        message_log.add_message(Message('Nothing there to kick.', libtcod.yellow))
+                if target == None:
+                    if game_map.tiles[kickx][kicky].door:
+                        if game_map.tiles[kickx][kicky].door.is_open:
+                            message_log.add_message(Message('There is nothing there to kick.', libtcod.red))
+                        else:
+                            message_log.add_message(Message('You kick the door. Ouch!', libtcod.red))
+                    elif game_map.tiles[kickx][kicky].blocked:
+                        message_log.add_message(Message('Kicking a wall does not feel good.', libtcod.red))
+                        player_turn_results.extend(player.fighter.take_damage(3))
                     else:
-                        if target.fighter:
-                            message_log.add_message(Message('The  ' + target.name + ' dodges your kick.', libtcod.gray))
-
-                        else:        
-                            if not game_map.tiles[target.x+dx][target.y+dy].block_sight:
-                                target.move(dx, dy)                  
+                        message_log.add_message(Message('Nothing there to kick.', libtcod.yellow))
+                else:
+                    if target.fighter:
+                        message_log.add_message(Message('The  ' + target.name + ' dodges your kick.', libtcod.gray))
+                    else:        
+                        if not game_map.tiles[target.x+dx][target.y+dy].block_sight:
+                            target.move(dx, dy)
+                            if game_map.tiles[kickx][kicky].door: fov_recompute = True
                 
                 if previous_game_state == GameStates.PLAYERS_TURN:
                     player_turn_end(player, player_turn_results)
@@ -193,8 +193,37 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 previous_game_state = game_state
                 game_state = GameStates.KICKING
 
+        if close:
+            if game_state == GameStates.CLOSING:
+                
+                dx, dy = close
+              
+                closex, closey  = player.x + dx, player.y + dy             
+                
+                if game_map.tiles[closex][closey].door:
+                    if game_map.tiles[closex][closey].door.is_open:
+                        game_map.tiles[closex][closey].door.toggle_open(game_map, closex, closey)
+                        message_log.add_message(Message('You close the door.', libtcod.white))
+                        fov_map = initialize_fov(game_map)
+                        fov_recompute = True
+                    else:
+                        message_log.add_message(Message('The door is already closed.', libtcod.white))
+                else:
+                    #check for chests etc .. other objects that could be closed
+                    message_log.add_message(Message('There is nothing there to close.', libtcod.lighter_red))
+                    
+                if previous_game_state == GameStates.PLAYERS_TURN:
+                    player_turn_end(player, player_turn_results)
+                    game_state = GameStates.ENEMY_TURN
+                else:
+                    game_state = previous_game_state
+                
+            else:   
+                previous_game_state = game_state
+                game_state = GameStates.CLOSING
+
         if show_inventory:
-            player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list))
+            player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list))
 
         if drop_inventory:
             previous_game_state = game_state
@@ -212,7 +241,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         if take_stairs and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
                 if entity.stairs and entity.x == player.x and entity.y == player.y:
-                    entities = game_map.next_floor(player, message_log, constants, names_list, render_colors_list)
+                    entities = game_map.next_floor(player, message_log, constants, names_list, colors_list)
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
                     libtcod.console_clear(con)
@@ -374,7 +403,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 def main():
     constants = get_constants()
     names_list = get_unidentified_names()
-    render_colors_list = get_render_colors()
+    colors_list = get_render_colors()
 
     libtcod.console_set_custom_font('fontplus.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW, 16, 30)
     
@@ -419,7 +448,7 @@ def main():
                 show_load_error_message = False
             elif new_game:
                 if not game_options(constants) == "nah":
-                    player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, render_colors_list)
+                    player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
                     game_state = GameStates.PLAYERS_TURN
 
                     show_main_menu = False
@@ -434,7 +463,7 @@ def main():
 
         else:
             libtcod.console_clear(con)
-            play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, render_colors_list)
+            play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, colors_list)
 
             show_main_menu = True
 
