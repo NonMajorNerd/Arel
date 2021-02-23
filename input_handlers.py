@@ -11,14 +11,16 @@ def handle_keys(key, game_state):
         return  player_pick_dir(key, strkey='move')
     elif game_state == GameStates.TARGETING:
         return handle_targeting_keys(key)
-    elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
-        return handle_inventory_keys(key)
+    #elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+    #    return handle_inventory_keys(key)
     elif game_state == GameStates.LEVEL_UP:
         return handle_level_up_menu(key)
     elif game_state == GameStates.CHARACTER_SCREEN:
         return handle_character_screen(key)
     elif game_state == GameStates.KICKING:
         return  player_pick_dir(key, strkey='kick')
+    elif game_state == GameStates.CLOSING:
+        return  player_pick_dir(key, strkey='close')
         
     return {}
 
@@ -92,7 +94,10 @@ def handle_player_turn_keys(key):
         elif key_char == 'z' or key.vk == libtcod.KEY_KP5:
             return {'wait': True}
             
-    if key_char == 'g':
+    if key_char == 'c':
+        return {'close': True}
+        
+    elif key_char == 'g':
         return {'pickup': True}
 
     elif key_char == 'k':
@@ -108,12 +113,12 @@ def handle_player_turn_keys(key):
         return {'key_targeting': True}
 
     elif key_char == 'd':
-        return {'drop_inventory': True}
+        return {'show_inventory': True}
 
     elif key.vk == libtcod.KEY_ENTER or key_char == '>':
         return {'take_stairs': True}
 
-    elif key_char == 'c':
+    elif key_char == 's':
         return {'show_character_screen': True}
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:
@@ -149,20 +154,20 @@ def handle_player_dead_keys(key):
 
     return {}
 
-def handle_inventory_keys(key):
-    index = key.c - ord('a')
-
-    if index >= 0:
-        return {'inventory_index': index}
-
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: toggle full screen
-        return {'fullscreen': True}
-    elif key.vk == libtcod.KEY_ESCAPE:
-        # Exit the menu
-        return {'exit': True}
-
-    return {}
+#def handle_inventory_keys(key):
+#    index = key.c - ord('a')
+#
+#    if index >= 0:
+#        return {'inventory_index': index}
+#
+#    if key.vk == libtcod.KEY_ENTER and key.lalt:
+#        # Alt+Enter: toggle full screen
+#        return {'fullscreen': True}
+#    elif key.vk == libtcod.KEY_ESCAPE:
+#        # Exit the menu
+#        return {'exit': True}
+#
+#    return {}
 
 def handle_main_menu(key):
     key_char = chr(key.c)

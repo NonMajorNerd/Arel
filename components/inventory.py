@@ -6,8 +6,17 @@ from entity import get_ent_name
 
 class Inventory:
     def __init__(self, capacity):
-        self.capacity = capacity
+        self.base_capacity = capacity
         self.items = []
+
+    @property
+    def max_capacity(self):
+        if self.owner and self.owner.equipment:
+            bonus = self.owner.equipment.capacity_bonus
+        else:
+            bonus = 0
+
+        return self.base_capacity + bonus
 
     def add_item(self, item, names_list):
         results = []
@@ -25,7 +34,7 @@ class Inventory:
                 
                 
         if not stacked:
-            if len(self.items) >= self.capacity:
+            if len(self.items) >= self.max_capacity:
                 results.append({
                     'item_added': None,
                     'message': Message('You cannot carry any more, your inventory is full', libtcod.yellow)
@@ -41,7 +50,7 @@ class Inventory:
 
         return results
 
-    def use(self, item_entity, names_list, **kwargs):
+    def use(self, item_entity, names_list, colors_list, **kwargs):
         results = []
         used = False
         
@@ -69,7 +78,10 @@ class Inventory:
                 results.extend(item_use_results)
 
         #if the item was used, it is automatically identified. Update the 'names_list' with the real name of the item.
-        if used: names_list[item_entity.name] = item_entity.name
+        if used:
+            colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
+            del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
+            names_list[item_entity.name] = item_entity.name                                 #update the name in the names list
 
         return results
 

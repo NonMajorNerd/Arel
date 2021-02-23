@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class GameStates(Enum):
     PLAYERS_TURN = 1
     ENEMY_TURN = 2
@@ -12,3 +11,4 @@ class GameStates(Enum):
     CHARACTER_SCREEN = 8
     KEYTARGETING = 9
     KICKING = 10
+    CLOSING = 11

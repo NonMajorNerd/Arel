@@ -95,7 +95,7 @@ def render_tooltip(x, y, text):
     libtcod.console_blit(ttcon, 0, 0, 0, 0, 0, x, y)
 
 def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
-               bar_width, panel_height, panel_y, mouse, colors, game_state, names_list):
+               bar_width, panel_height, panel_y, mouse, colors, options_tutorial_enabled, game_state, names_list, colors_list):
                
     if fov_recompute:
     # Draw all the tiles in the game map
@@ -184,7 +184,49 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     
     #print mouse x/y
     #libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, (str(mouse.cx) + "," + str(mouse.cy)))
+    if options_tutorial_enabled:
+            MAP_HEIGHT = game_map.height
+            MAP_WIDTH = game_map.width
+            
+            if game_map.dungeon_level < 3:
+                libtcod.console_set_default_background(0, libtcod.lighter_blue)
+                libtcod.console_set_default_foreground(0, libtcod.black)
+                
+                if player.y >= MAP_HEIGHT/2: #player on bottom half of the screen
+                    (tx, ty) = (58, 2)
+                else: #player on top half of the map
+                    (tx, ty) = (58, 32)
 
+                if player.turn_count < 4:
+                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the mumpad or arrow keys to move.")
+               
+                elif player.turn_count < 10:
+                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
+                    
+                else:
+             
+                    for ent in entities:
+                       if not ent.name == "Player":
+                           if ent.x == player.x and ent.y == player.y:
+                                if ent.name == "stairs":
+                                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [Enter] to go down the stairs.")
+                                elif ent.item:
+                                    if not game_map.tiles[ent.x][ent.y].door:
+                                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [g] to grab an item.")
+                                
+                                        
+                    myneighbors = [(-1, -1), (0, -1), (1, -1),
+                                 (-1, 0), (1, 0),
+                                 (-1, 1), (0, 1), (1, 1)]
+                                 
+                    for dx, dy in myneighbors:
+                        tdx, tdy = player.x + dx, player.y + dy
+                        if game_map.tiles[tdx][tdy].door:
+                            if game_map.tiles[tdx][tdy].block_sight:
+                                libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Move into a closed door to open it.")
+                            else:  
+                                libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [c] and then a direction to close an open door.")
+                                                   
     # Print the game messages, one line at a time
     y = 1
     for message in message_log.messages:
@@ -209,7 +251,6 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                 libtcod.console_set_char_foreground(panel, 1+ind, 2, condition.fgcolor)
                 ind += 1
                
-    
     if game_state == GameStates.KEYTARGETING:
         targeter = None
         for ent in entities:
@@ -220,6 +261,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
             libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                                  get_all_at(targeter.x, targeter.y, entities, fov_map, game_map, names_list))
 
+    #print names of item(s) under mouse
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                              get_names_under_mouse(mouse, entities, fov_map, names_list))

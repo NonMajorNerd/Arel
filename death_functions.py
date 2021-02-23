@@ -38,7 +38,7 @@ def kill_player(player, game_map, constants):
 
         libtcod.console_set_default_foreground(0, screen_yellow)
         libtcod.console_print_ex(0, 30, 4, libtcod.BKGND_NONE, libtcod.CENTER, player.name + ", Level " + str(player.level.current_level))
-        libtcod.console_print_ex(0, 30, 5, libtcod.BKGND_NONE, libtcod.CENTER, constants['options_difficulty'] + " Difficulty")
+        libtcod.console_print_ex(0, 30, 5, libtcod.BKGND_NONE, libtcod.CENTER, constants['options_difficulty'] + " " + constants['options_origin'])
         
         libtcod.console_set_default_foreground(0, screen_purple)
         libtcod.console_print_ex(0, 30, 6, libtcod.BKGND_NONE, libtcod.CENTER, str(player.turn_count) + " Turns")
@@ -66,7 +66,7 @@ def kill_player(player, game_map, constants):
         else:
             libtcod.console_set_default_foreground(0, libtcod.lighter_gray)
             for pair in player.kill_counts:
-                libtcod.console_print_ex(0, 3, i, libtcod.BKGND_NONE, libtcod.LEFT, chr(pair[2]) + ' ' + pair[0] + " x" + str(pair[1]))
+                libtcod.console_print_ex(0, 3, i, libtcod.BKGND_NONE, libtcod.LEFT, chr(pair[2]) + ' ' + pair[0].title() + " x" + str(pair[1]))
                 i = i + 1
          
         libtcod.console_flush()

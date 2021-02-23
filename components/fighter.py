@@ -94,3 +94,4 @@ class Fighter:
                 self.owner.name.capitalize(), target.name), libtcod.white)})
 
         return results
+
