@@ -15,8 +15,9 @@ def heal(*args, **kwargs):
     if entity.fighter.hp == entity.fighter.max_hp:
         results.append({'consumed': False, 'message': Message('You are already at full health', libtcod.yellow)})
     else:
-        entity.fighter.heal(amount)
-        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', libtcod.green)})
+        entity.fighter.heal(amount)                                                                                 #heal for ammt  
+        if entity.name == 'Player': entity.potions_drank += 1                                                       #if this is the player, update potions drank #
+        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', libtcod.green)})  #consume item, send message
 
     return results
                 
@@ -43,6 +44,7 @@ def cast_lightning(*args, **kwargs):
     if target:
         results.append({'consumed': True, 'target': target, 'message': Message('A lighting bolt strikes the {0} with a loud thunder!'.format(target.name))})
         results.extend(target.fighter.take_damage(damage))
+        if entity.name == 'Player': entity.scrolls_read += 1                                                          #if this is the player, update scrolls read #
     else:
         results.append({'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', libtcod.red)})
 
@@ -65,12 +67,14 @@ def cast_fireball(*args, **kwargs):
 
     results.append({'consumed': True, 'message': Message('The fireball explodes, burning everything within {0} tiles!'.format(radius), libtcod.orange)})
 
+    
     for entity in entities:
+        if entity.name == 'Player': entity.scrolls_read += 1      #if this is the player, update scrolls read   TODO :: Change this so it only does this when the player uses this scroll .... wait is this needed??
         if entity.distance(target_x, target_y) <= radius:
             if entity.fighter:
                 results.append({'message': Message('The {0} gets burned for {1} hit points.'.format(entity.name, damage), libtcod.orange)})
                 results.extend(entity.fighter.take_damage(damage))
-            elif entity.item and entity.item.flamable:
+            elif entity.item and entity.item.flammable:
                 #TODO :: Fix unidentified items displaying identified name when burned this way
                 results.append({'message': Message('The {0} is destroyed in the fire!'.format(entity.name, damage), libtcod.orange)})
                 entities.remove(entity)
@@ -97,7 +101,9 @@ def cast_confuse(*args, **kwargs):
             entity.ai = confused_ai
 
             results.append({'consumed': True, 'message': Message('The eyes of the {0} become vacant as it starts to wander about confused!'.format(entity.name), libtcod.light_green)})
-
+        
+            if entity.name == 'Player': entity.scrolls_read += 1                                                          #if this is the player, update scrolls read #
+        
             break
     else:
         results.append({'consumed': False, 'message': Message('There is no targetable enemy at that location.', libtcod.yellow)})

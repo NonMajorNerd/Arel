@@ -69,11 +69,18 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     * Change log *
     **************
 	
-	2/19/21
+	02/22/21
+		Fixed a bug related to the colors_list and names_list after items had been identified.
+		
+		Updated the engine to catch the input and game state for door closing
+
+		added trackers for players # of scrolls read, # of potions drank
+	
+	02/19/21
 		Added the ability to close doors
 			TODO :: factor opening doors into certain AI subsets (etc for the camera op, but not for rats)
 			
-		Added the 'flammable' property to the item component, and made fireball scroll destroy flammable objects
+		Added the 'flamable' property to the item component, and made fireball scroll destroy flamable objects
 			TODO :: Fix unidentified items displaying identified name when burned this way
 				
 		Fixed the order-of-operations in target seraching when kicking (mainly fixes kicking things through open doorways)

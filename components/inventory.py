@@ -41,7 +41,7 @@ class Inventory:
 
         return results
 
-    def use(self, item_entity, names_list, **kwargs):
+    def use(self, item_entity, names_list, colors_list, **kwargs):
         results = []
         used = False
         
@@ -69,7 +69,10 @@ class Inventory:
                 results.extend(item_use_results)
 
         #if the item was used, it is automatically identified. Update the 'names_list' with the real name of the item.
-        if used: names_list[item_entity.name] = item_entity.name
+        if used:
+            colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
+            del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
+            names_list[item_entity.name] = item_entity.name                                 #update the name in the names list
 
         return results
 

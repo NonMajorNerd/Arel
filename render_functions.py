@@ -95,7 +95,7 @@ def render_tooltip(x, y, text):
     libtcod.console_blit(ttcon, 0, 0, 0, 0, 0, x, y)
 
 def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
-               bar_width, panel_height, panel_y, mouse, colors, options_tutorial_enabled, game_state, names_list, ):
+               bar_width, panel_height, panel_y, mouse, colors, options_tutorial_enabled, game_state, names_list, colors_list):
                
     if fov_recompute:
     # Draw all the tiles in the game map

@@ -11,3 +11,4 @@ class GameStates(Enum):
     CHARACTER_SCREEN = 8
     KEYTARGETING = 9
     KICKING = 10
+    CLOSING = 11

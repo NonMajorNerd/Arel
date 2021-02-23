@@ -133,7 +133,7 @@ def game_options(constants):
         if difficulty == "Newcomer":
             desc = "Made for players less familiar with roguelike games. You do slightly more damage while enemies do slightly less. You also level up more quickly, and have slightly elevated luck. You are able to continue your game after death."
         elif difficulty == "Standard":
-            desc = "Typical roguelike style; after dying, you must start a new game. Your enemies damage, your damage, expierence and luck are all at their normal levels."
+            desc = "Typical roguelike style; after dying, you must start a new game. Your enemies damage, your damage, experience and luck are all at their normal levels."
         elif difficulty == " Expert ":
             desc = "Choose this if you're looking for a bit of a challenge. Your enemies will be more hardy, and you will find yourself leveling at a slower pace. Your luck will be slightly lower as well."
         elif difficulty == " Sadist ":
@@ -299,7 +299,7 @@ def game_options(constants):
             if index > 0: index -= 1                
             
 
-def inventory_menu(player, entities, fov_map, names_list):
+def inventory_menu(player, entities, fov_map, names_list, colors_list):
     
     results = []
     
@@ -543,7 +543,7 @@ def inventory_menu(player, entities, fov_map, names_list):
             libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
             y+=1           
             
-        if item.identified and item.item.effect_lines:
+        if item.item.effect_lines: # TODO :: Build in check for unidentified items 
             y += 1 #start the effect text after the description text ends.
             for l in item.item.effect_lines:
                 libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
@@ -658,8 +658,7 @@ def inventory_menu(player, entities, fov_map, names_list):
             
         elif key.vk == libtcod.KEY_ENTER:
             if item.item.use_function:
-                results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list))
-                item.identified = True
+                results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list))
                 return results
                 
             elif item.equippable:
