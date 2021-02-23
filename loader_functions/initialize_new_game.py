@@ -63,7 +63,6 @@ def get_constants():
     max_items_per_room = 200
     
     options_difficulty = "Standard"
-    options_origin = "Adventurer"
     options_enemy_damage_scale = 100
     options_player_damage_scale = 100
     options_xp_multiplier = 1
@@ -100,7 +99,6 @@ def get_constants():
         'max_items_per_room': max_items_per_room,
         'colors': colors,
         'options_difficulty': options_difficulty,
-        'options_origin': options_origin,
         'options_enemy_damage_scale': options_enemy_damage_scale,
         'options_player_damage_scale': options_player_damage_scale,
         'options_xp_multiplier': options_xp_multiplier,
@@ -127,21 +125,21 @@ def get_render_colors():
     'Blue Potion':                  libtcod.Color(0, 0, 255),
     'Red Potion':                   libtcod.Color(255, 0, 0),
     'Green Potion':                 libtcod.Color(0, 255, 0),
-    'Black Potion':                 libtcod.Color(80, 80, 80),
+    'Black Potion':                 libtcod.Color(50, 50, 50),
     'Brown Potion':                 libtcod.Color(145, 63, 0),
     'Azure Potion':                 libtcod.Color(0, 50, 100),
     'Ivory Potion':                 libtcod.Color(100, 100, 94),
     'Teal Potion':                  libtcod.Color(0, 50, 50),
     'Silver Potion':                libtcod.Color(175, 175, 175),
     'Purple Potion':                libtcod.Color(150, 0, 150),
-    'Gray Potion':                  libtcod.Color(120, 120, 120),
+    'Gray Potion':                  libtcod.Color(100, 100, 100),
     'Orange Potion':                libtcod.Color(100, 65, 0),
     'Maroon Potion':                libtcod.Color(50, 0, 0),
     'Charcoal Potion':              libtcod.Color(80, 80, 80),
     'Aquamarine Potion':            libtcod.Color(50, 100, 83),
     'Coral Potion':                 libtcod.Color(100, 50, 31),
     'Fuchsia Potion':               libtcod.Color(200, 0, 200),
-    'Crimson Potion':               libtcod.Color(103, 28, 44),
+    'Crimson Potion':               libtcod.Color(83, 8, 24),
     'Khaki Potion':                 libtcod.Color(94, 90, 55),
     'Magenta Potion':               libtcod.Color(100, 20, 100),
     'Golden Potion':                libtcod.Color(212, 175, 55),
@@ -212,16 +210,11 @@ def get_unidentified_names():
     'remains of bat':           "Remains of Bat",
     'remains of goblin':        "Remains of Goblin",
     'remains of troll':         "Remains of Troll",
-    'Cargo Shorts':             "Cargo Shorts",
     'Junk':                     "Junk",
-    'Gold':                     "Gold",
     'Dagger':                   "Dagger",
-    'Fingerless Gloves':        "Fingerless Gloves",
     'Sword':                    "Sword",
     'Shield':                   "Shield",
     'Stairs':                   "Stairs",
-    'Staff':                    "Staff",
-    'Merchants Bag':            "Merchants Bag",
     'Healing Potion':           (str(get_item(potion_colors_list)) + " Potion"),
     'Lightning Scroll':         ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
     'Fireball Scroll':          ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
@@ -244,10 +237,8 @@ def get_item(item_list, index=0):
     
 
 def get_game_variables(constants, names_list, render_colors_list):
-    
-    #Build player entity
     fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
-    inventory_component = Inventory(24)
+    inventory_component = Inventory(48)
     level_component = Level()
     equipment_component = Equipment()
     player = Entity(0, 0, 256, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
@@ -257,99 +248,11 @@ def get_game_variables(constants, names_list, render_colors_list):
     player.conditions.append(Healing(target=player, active=True, duration=10, healing=1))
     entities = [player]
 
-    #Starting Inventory
-    origin = constants['options_origin']
-    
-    if origin == "Adventurer":
-        #sword
-        item_component = Item(use_function=None, stackable=False,
-                        description="A short, one-handed sword.",
-                        effect="Great for slashing, medicore at stabbing.")
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-        item = Entity(0, 0, 369, libtcod.sky, 'Sword', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)       
-        
-        #shield
-        item_component = Item(use_function=None, stackable=False,
-                        description="A small, round, metal shield.",
-                        effect="Helpful at preventing incoming attacks.")
-        equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-        item = Entity(0, 0, 375, libtcod.darker_orange, 'Shield', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
-        
-        #10 gold
-        item_component = Item(use_function=None, stackable=True, count=10,
-               description="Yanno, gold coins! For procuring goods and/or services!")
-        item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)    
-        
-    elif origin == "Merchant":
-        #staff
-        item_component = Item(use_function=None, stackable=False,
-                        description="A two-handed (but actually one-handed) wooden staff,",
-                        effect="Perfect for smacking things with.")
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
-        item = Entity(0, 0, 372, libtcod.sky, 'Staff', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)       
-        
-        #merchants bag
-        item_component = Item(use_function=None, stackable=False,
-                        description="A large leather satchel with many pockets and reinforced compartments.",
-                        effect="Increases carrying capacity by 24.")
-        equippable_component = Equippable(EquipmentSlots.ACC1, capacity_bonus=24)
-        item = Entity(0, 0, 364, libtcod.darker_orange, 'Merchants Bag', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
-        
-        #100 gold
-        item_component = Item(use_function=None, stackable=True, count=100,
-               description="Yanno, gold coins! For procuring goods and/or services!")
-        item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
-        
-    elif origin == "Criminal":
-        #dagger
-        item_component = Item(use_function=None, stackable=False,
-                        description="A small, rusty dagger. Probably unsafe to handle.",
-                        effect="This thing was made for doing stabs.")
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
-        item = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)       
-        
-        #fingerless gloves
-        item_component = Item(use_function=None, stackable=False,
-                        description="These definitely had fingers when they were made, but they don't now.",
-                        effect="Increases speed by 3")
-        equippable_component = Equippable(EquipmentSlots.ACC1, speed_bonus=3)
-        item = Entity(0, 0, 382, libtcod.darker_orange, 'Fingerless Gloves', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
-        
-        #30 gold
-        item_component = Item(use_function=None, stackable=True, count=30,
-               description="Yanno, gold coins! For procuring goods and/or services!")
-        item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
-        
-    elif origin == "Tourist":
-        #cargo shorts
-        item_component = Item(use_function=None, stackable=False,
-                        description="These are more pockets than they are shorts, which you're ok with.",
-                        effect="Increases carrying capacity by 8.")
-        equippable_component = Equippable(EquipmentSlots.ACC1, capacity_bonus=8)
-        item = Entity(0, 0, 395, libtcod.darker_orange, 'Cargo Shorts', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
-        
-        #10 gold
-        item_component = Item(use_function=None, stackable=True, count=10,
-               description="Yanno, gold coins! For procuring goods and/or services!")
-        item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
+    item_component = Item(description="A short rusty dagger. It's dull and has notches missing from the blade.")
+    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
+    dagger = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component, item=item_component)
+    player.inventory.add_item(dagger, names_list)
+    player.equipment.toggle_equip(dagger)
 
     game_map = GameMap(constants['map_width'], constants['map_height'])
     game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],

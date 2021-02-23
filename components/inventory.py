@@ -6,17 +6,8 @@ from entity import get_ent_name
 
 class Inventory:
     def __init__(self, capacity):
-        self.base_capacity = capacity
+        self.capacity = capacity
         self.items = []
-
-    @property
-    def max_capacity(self):
-        if self.owner and self.owner.equipment:
-            bonus = self.owner.equipment.capacity_bonus
-        else:
-            bonus = 0
-
-        return self.base_capacity + bonus
 
     def add_item(self, item, names_list):
         results = []
@@ -34,7 +25,7 @@ class Inventory:
                 
                 
         if not stacked:
-            if len(self.items) >= self.max_capacity:
+            if len(self.items) >= self.capacity:
                 results.append({
                     'item_added': None,
                     'message': Message('You cannot carry any more, your inventory is full', libtcod.yellow)
