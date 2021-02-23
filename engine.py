@@ -9,7 +9,7 @@ from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables, get_unidentified_names, get_render_colors
 from loader_functions.data_loaders import load_game, save_game
-from menus import main_menu, message_box, inventory_menu, game_options
+from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
@@ -63,7 +63,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         wait = action.get('wait')
         pickup = action.get('pickup')
         show_inventory = action.get('show_inventory')
-        drop_inventory = action.get('drop_inventory')
+        #drop_inventory = action.get('drop_inventory')
         inventory_index = action.get('inventory_index')
         take_stairs = action.get('take_stairs')
         level_up = action.get('level_up')
@@ -202,10 +202,18 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 
                 if game_map.tiles[closex][closey].door:
                     if game_map.tiles[closex][closey].door.is_open:
-                        game_map.tiles[closex][closey].door.toggle_open(game_map, closex, closey)
-                        message_log.add_message(Message('You close the door.', libtcod.white))
-                        fov_map = initialize_fov(game_map)
-                        fov_recompute = True
+                        blocked = False
+                        for entity in entities:
+                            if entity.x == closex and entity.y == closey:
+                                blocked = True
+                                break
+                        if not blocked:        
+                            game_map.tiles[closex][closey].door.toggle_open(game_map, closex, closey)
+                            message_log.add_message(Message('You close the door.', libtcod.white))
+                            fov_map = initialize_fov(game_map)
+                            fov_recompute = True
+                        else:
+                            message_log.add_message(Message('There is something in the way.', libtcod.lighter_red))
                     else:
                         message_log.add_message(Message('The door is already closed.', libtcod.white))
                 else:
@@ -225,9 +233,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         if show_inventory:
             player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list))
 
-        if drop_inventory:
-            previous_game_state = game_state
-            game_state = GameStates.DROP_INVENTORY
+        #if drop_inventory:
+        #    previous_game_state = game_state
+        #    game_state = GameStates.DROP_INVENTORY
 
         if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
                 player.inventory.items):
@@ -262,8 +270,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             game_state = previous_game_state
 
         if show_character_screen:
-            previous_game_state = game_state
-            game_state = GameStates.CHARACTER_SCREEN
+            player_turn_results.extend(character_screen(player, entities, constants, game_map.dungeon_level, names_list, colors_list))
 
         if game_state == GameStates.TARGETING:
             if left_click:
@@ -335,8 +342,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     if equipped:
                         message_log.add_message(Message('You equipped the {0}'.format(equipped.name)))
 
+                    # TODO :: Check carrying cap after dequipping items ..
+                        # if numitems > carrying cap .. gamestate = burdened
+                        # if game_state = burdened then can only access inventory
                     if dequipped:
-        
                         message_log.add_message(Message('You dequipped the {0}'.format(dequipped.name)))
 
                 game_state = GameStates.ENEMY_TURN
@@ -448,10 +457,11 @@ def main():
                 show_load_error_message = False
             elif new_game:
                 if not game_options(constants) == "nah":
-                    player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
-                    game_state = GameStates.PLAYERS_TURN
+                    if not origin_options(constants) == "nah":
+                        player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
+                        game_state = GameStates.PLAYERS_TURN
 
-                    show_main_menu = False
+                        show_main_menu = False
             elif load_saved_game:
                 try:
                     player, entities, game_map, message_log, game_state = load_game()

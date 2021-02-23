@@ -62,13 +62,27 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Press [esc] to leave targeting mode.
  
     ****************
-    * Known Issues *
+    *  To-Do List  *
     ****************
     
+		Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
+		Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)
+		Check whether or not items are identified before displaying effects in inventory system
+		Build support for two-handed weapons
+		Update accessory system
+		Fix fireball scroll displaying true name of unidentified burned items 
+		Probably a ton of other things
+		Add description_list and effects_list
+		Add a check/return so if a list is searched and there is no result, it returns a default .. eg if names list does not have a name for this item, just return the default name.
+		
     **************
     * Change log *
     **************
 	
+	02/23/21
+		Added origins and starting equipment
+		Added carrying capacity bonuses to equipment
+		
 	02/22/21
 		Fixed a bug related to the colors_list and names_list after items had been identified.
 		
@@ -80,8 +94,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Added the ability to close doors
 			TODO :: factor opening doors into certain AI subsets (etc for the camera op, but not for rats)
 			
-		Added the 'flamable' property to the item component, and made fireball scroll destroy flamable objects
-			TODO :: Fix unidentified items displaying identified name when burned this way
+		Added the 'flammable' property to the item component, and made fireball scroll destroy flammable objects
 				
 		Fixed the order-of-operations in target seraching when kicking (mainly fixes kicking things through open doorways)
 		
