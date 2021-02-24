@@ -408,7 +408,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:                
                 game_state = GameStates.PLAYERS_TURN
 
-#
+
 def main():
     constants = get_constants()
     names_list = get_unidentified_names()
@@ -478,6 +478,6 @@ def main():
 
             show_main_menu = True
 
-
+#
 if __name__ == '__main__':
     main()

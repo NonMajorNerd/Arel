@@ -73,6 +73,9 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Fix fireball scroll displaying true name of unidentified burned items 
 		Add description_list and effects_list
 		Add a check/return so if a list is searched and there is no result, it returns a default .. eg if names list does not have a name for this item, just return the default name.
+		Start building score system
+			build a check for "in/out of camera operator FoV"
+		Build a check for 'is there a camera op? if not, spawn one nearby (but outside of player FoV)'
 		Probably a ton of other things	
 		
     **************
@@ -84,6 +87,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Added origins and starting equipment
 		Added carrying capacity bonuses to equipment
 		Bug fixes related to unidentified items
+		Changes to item spawn rates
 		
 	02/22/21
 		Fixed a bug related to the colors_list and names_list after items had been identified.

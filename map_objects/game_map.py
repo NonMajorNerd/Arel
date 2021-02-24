@@ -330,14 +330,14 @@ class GameMap:
                 entities.append(new_junk)
             
     def place_entities(self, room, entities, names_list, render_colors_list):
-        max_monsters_per_room = from_dungeon_level([[2, 1], [3, 4], [5, 6]], self.dungeon_level)
-        max_items_per_room = from_dungeon_level([[1, 1], [2, 4]], self.dungeon_level)
+        max_monsters_per_room = from_dungeon_level([[2, 1], [3, 4], [5, 10]], self.dungeon_level)
+        max_items_per_room = from_dungeon_level([[1, 1], [2, 4], [3,10]], self.dungeon_level)
         
         # Get a random number of monsters
         number_of_monsters = randint(0, max_monsters_per_room)
         
         # Get a random number of items
-        number_of_items = randint(1, max_items_per_room)
+        number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {
             'rat': from_dungeon_level([[40, 1], [30, 2], [25, 3]], self.dungeon_level),
@@ -357,7 +357,7 @@ class GameMap:
             #'confusion_scroll': 25
             
             'healing_potion': 15,
-            'sword': from_dungeon_level([[5, 4]], self.dungeon_level),
+            'sword': from_dungeon_level([[5, 4], [15,10]], self.dungeon_level),
             'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
             'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
             'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
@@ -379,7 +379,6 @@ class GameMap:
 
                     monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                                
                     chance_for_swarm = 60
                     swarm_check = randint(0, 100)
                     if swarm_check >= chance_for_swarm:
@@ -425,8 +424,6 @@ class GameMap:
                     item_component = Item(use_function=heal, stackable=False, amount=40,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
                         effect="Typically used to cure minor wounds.")
-                    #item = Entity(x, y, 349, render_colors_list[names_list['Healing Potion']], 'Healing Potion',  identified=False, render_order=RenderOrder.ITEM,
-                    #              item=item_component)
                     item = Entity(x, y, 349, render_colors_list[names_list['Healing Potion']], 'Healing Potion', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'sword':

@@ -283,7 +283,8 @@ def get_game_variables(constants, names_list, render_colors_list):
         item_component = Item(use_function=None, stackable=True, count=10,
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)    
+        player.inventory.add_item(item, names_list)
+        player.gold_collected = 10
         
     elif origin == "Merchant":
         #staff
@@ -309,6 +310,7 @@ def get_game_variables(constants, names_list, render_colors_list):
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
         player.inventory.add_item(item, names_list)
+        player.gold_collected = 100
         
     elif origin == "Criminal":
         #dagger
@@ -334,6 +336,7 @@ def get_game_variables(constants, names_list, render_colors_list):
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
         player.inventory.add_item(item, names_list)
+        player.gold_collected = 30
         
     elif origin == "Tourist":
         #cargo shorts
@@ -350,7 +353,8 @@ def get_game_variables(constants, names_list, render_colors_list):
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
         player.inventory.add_item(item, names_list)
-
+        player.gold_collected = 10
+        
     game_map = GameMap(constants['map_width'], constants['map_height'])
     game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
                       constants['map_width'], constants['map_height'], player, entities, names_list, render_colors_list)

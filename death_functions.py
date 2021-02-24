@@ -50,8 +50,8 @@ def kill_player(player, game_map, constants):
         i = 8
         for itm in player.inventory.items:
             msg = itm.name + ' ' + chr(itm.char)
-            #if itm.item.count > 1:
-            #    msg = msg + " (x" + str(itm.item.count) + ")"
+            if itm.item.count > 1:
+                msg = msg + " (x" + str(itm.item.count) + ")"
             libtcod.console_print_ex(0, 60 - 4, i, libtcod.BKGND_NONE, libtcod.RIGHT, msg)
             i = i + 1
         

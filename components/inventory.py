@@ -24,14 +24,14 @@ class Inventory:
         stacked = False
         for i in self.items:
             if i.name == item.name and i.item.stackable:
-                i.item.count += 1
+                i.item.count += item.item.count
                 stacked = True
                 name = get_ent_name(item, names_list)
                 results.append({
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
                 })
-                
+                if item.name == 'Gold': self.owner.gold_collected += item.count
                 
         if not stacked:
             if len(self.items) >= self.max_capacity:
@@ -45,6 +45,7 @@ class Inventory:
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
                 })
+                if item.name == 'Gold': self.owner.gold_collected += item.item.count
 
             self.items.append(item)
 
@@ -80,9 +81,10 @@ class Inventory:
         #if the item was used, it is automatically identified. Update the 'names_list' with the real name of the item.
         if used:
             if not item_entity.name in colors_list.keys():
-                colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
-                del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
-                names_list[item_entity.name] = item_entity.name                                 #update the name in the names list
+                if names_list[item_entity.name] in colors_list.keys():
+                    colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
+                    del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
+            names_list[item_entity.name] = item_entity.name                                         #update the name in the names list
 
         return results
 
@@ -99,15 +101,18 @@ class Inventory:
     def drop_item(self, item):
         results = []
 
-        #TODO :: Add other equipment slots..
-        if self.owner.equipment.main_hand == item or self.owner.equipment.off_hand == item:
-            self.owner.equipment.toggle_equip(item)
+        if item.name == 'Gold':
+            results.append({'message': Message("You can't drop your gold!", libtcod.yellow)})
+        else:
+            #TODO :: Add other equipment slots..
+            if self.owner.equipment.main_hand == item or self.owner.equipment.off_hand == item:
+                self.owner.equipment.toggle_equip(item)
 
-        item.x = self.owner.x
-        item.y = self.owner.y
-        
-        self.remove_item(item)
-        results.append({'item_dropped': item, 'message': Message('You dropped the {0}'.format(item.name),
-                                                                 libtcod.yellow)})
+            item.x = self.owner.x
+            item.y = self.owner.y
+            
+            self.remove_item(item)
+            results.append({'item_dropped': item, 'message': Message('You dropped the {0}'.format(item.name),
+                                                                     libtcod.yellow)})
 
         return results
