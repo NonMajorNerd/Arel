@@ -9,7 +9,7 @@ from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables, get_unidentified_names, get_render_colors
 from loader_functions.data_loaders import load_game, save_game
-from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options
+from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options, intro
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
@@ -277,7 +277,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 target_x, target_y = left_click
 
                 item_use_results = player.inventory.use(targeting_item, entities=entities, fov_map=fov_map,
-                                                        target_x=target_x, target_y=target_y, names_list=names_list)
+                                                        target_x=target_x, target_y=target_y, names_list=names_list, colors_list=colors_list)
                 player_turn_results.extend(item_use_results)
             elif right_click:
                 player_turn_results.append({'targeting_cancelled': True})
@@ -408,7 +408,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:                
                 game_state = GameStates.PLAYERS_TURN
 
-
+#
 def main():
     constants = get_constants()
     names_list = get_unidentified_names()
@@ -456,12 +456,13 @@ def main():
             if show_load_error_message and (new_game or load_saved_game or exit_game):
                 show_load_error_message = False
             elif new_game:
-                if not game_options(constants) == "nah":
-                    if not origin_options(constants) == "nah":
-                        player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
-                        game_state = GameStates.PLAYERS_TURN
+                if intro(constants):
+                    if not game_options(constants) == "nah":
+                        if not origin_options(constants) == "nah":
+                            player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
+                            game_state = GameStates.PLAYERS_TURN
 
-                        show_main_menu = False
+                            show_main_menu = False
             elif load_saved_game:
                 try:
                     player, entities, game_map, message_log, game_state = load_game()

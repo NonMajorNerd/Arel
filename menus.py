@@ -31,6 +31,174 @@ def menu(con, header, options, width, screen_width, screen_height):
     y = int(screen_height / 2 - height / 2) + 16
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
+def intro(constants):
+
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+       
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+    
+    step = 1
+    
+    libtcod.console_set_default_background(0, libtcod.black)
+    libtcod.console_set_default_foreground(0, screen_lightgray)
+    libtcod.console_clear(0)
+    
+    while True:
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        
+        libtcod.console_set_default_background(0, libtcod.black)
+        libtcod.console_set_default_foreground(0, screen_lightgray)
+        libtcod.console_clear(0)
+
+        if step == 1:
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            
+        elif step == 2:
+            libtcod.console_print_ex(0, 30, 19, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+        elif step == 3:
+            libtcod.console_print_ex(0, 30, 17, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 18, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            
+        elif step == 4:
+            libtcod.console_print_ex(0, 30, 16, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 17, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 19, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            
+        elif step == 5:
+            libtcod.console_print_ex(0, 30, 15, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 16, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 18, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 19, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "You're my latest contenstant!")
+        
+        elif step == 6:
+            libtcod.console_print_ex(0, 30, 13, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 14, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 16, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 17, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            libtcod.console_print_ex(0, 30, 18, libtcod.BKGND_SET, libtcod.CENTER, "You're my latest contenstant!")
+            
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "That's right, I am Viodum the Adept!")
+            
+            libtcod.console_set_default_foreground(0, screen_blue)
+            libtcod.console_print_ex(0, 31, 20, libtcod.BKGND_SET, libtcod.LEFT, "Viodum the Adept")
+            
+        elif step == 7:
+            libtcod.console_print_ex(0, 30, 12, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 13, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 15, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 16, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            libtcod.console_print_ex(0, 30, 17, libtcod.BKGND_SET, libtcod.CENTER, "You're my latest contenstant!")
+            
+            libtcod.console_print_ex(0, 30, 19, libtcod.BKGND_SET, libtcod.CENTER, "That's right, I am Viodum the Adept!")
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "And you're on Vidoum's Victims!")
+            
+            libtcod.console_set_default_foreground(0, screen_blue)
+            libtcod.console_print_ex(0, 31, 19, libtcod.BKGND_SET, libtcod.LEFT, "Viodum the Adept")
+            libtcod.console_set_default_foreground(0, screen_red)
+            libtcod.console_print_ex(0, 29, 20, libtcod.BKGND_SET, libtcod.LEFT, "Viodum's Victims")
+            
+        elif step == 8:
+            libtcod.console_print_ex(0, 30, 10, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 11, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 13, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 14, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            libtcod.console_print_ex(0, 30, 15, libtcod.BKGND_SET, libtcod.CENTER, "You're my latest contenstant!")
+            
+            libtcod.console_print_ex(0, 30, 17, libtcod.BKGND_SET, libtcod.CENTER, "That's right, I am Viodum the Adept!")
+            libtcod.console_print_ex(0, 30, 18, libtcod.BKGND_SET, libtcod.CENTER, "And you're on Vidoum's Victims!")
+            
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "WAIT, I MEANT VICTORS! VIODUM'S VICTORS!")
+            
+            libtcod.console_set_default_foreground(0, screen_blue)
+            libtcod.console_print_ex(0, 31, 17, libtcod.BKGND_SET, libtcod.LEFT, "Viodum the Adept")
+            libtcod.console_set_default_foreground(0, screen_red)
+            libtcod.console_print_ex(0, 29, 18, libtcod.BKGND_SET, libtcod.LEFT, "Viodum's Victims")
+            
+            libtcod.console_print_ex(0, 33, 20, libtcod.BKGND_SET, libtcod.LEFT, "VIODUM'S VICTORS")
+            libtcod.console_set_default_foreground(0, screen_yellow)
+            libtcod.console_print_ex(0, 24, 20, libtcod.BKGND_SET, libtcod.LEFT, "VICTORS")
+            
+        elif step == 9:
+            libtcod.console_print_ex(0, 30, 9, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 10, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 11, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 12, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            libtcod.console_print_ex(0, 30, 13, libtcod.BKGND_SET, libtcod.CENTER, "You're my latest contenstant!")
+            
+            libtcod.console_print_ex(0, 30, 15, libtcod.BKGND_SET, libtcod.CENTER, "That's right, I am Viodum the Adept!")
+            libtcod.console_print_ex(0, 30, 16, libtcod.BKGND_SET, libtcod.CENTER, "And you're on Vidoum's Victims!")
+            
+            libtcod.console_print_ex(0, 30, 18, libtcod.BKGND_SET, libtcod.CENTER, "WAIT, I MEANT VICTORS! VIODUM'S VICTORS!")
+            
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "Don't be scared..")
+            
+            libtcod.console_set_default_foreground(0, screen_blue)
+            libtcod.console_print_ex(0, 31, 15, libtcod.BKGND_SET, libtcod.LEFT, "Viodum the Adept")
+            libtcod.console_set_default_foreground(0, screen_red)
+            libtcod.console_print_ex(0, 29, 16, libtcod.BKGND_SET, libtcod.LEFT, "Viodum's Victims")
+            
+            libtcod.console_print_ex(0, 33, 18, libtcod.BKGND_SET, libtcod.LEFT, "VIODUM'S VICTORS")
+            libtcod.console_set_default_foreground(0, screen_yellow)
+            libtcod.console_print_ex(0, 24, 18, libtcod.BKGND_SET, libtcod.LEFT, "VICTORS")
+            
+        elif step == 10:
+            libtcod.console_print_ex(0, 30, 8, libtcod.BKGND_SET, libtcod.CENTER, "Awake, weary traveler.. ")
+            libtcod.console_print_ex(0, 30, 9, libtcod.BKGND_SET, libtcod.CENTER, "You've been asleep for some time, now.")
+            
+            libtcod.console_print_ex(0, 30, 10, libtcod.BKGND_SET, libtcod.CENTER, "Sorry to have interrupted your plans..")
+            libtcod.console_print_ex(0, 30, 11, libtcod.BKGND_SET, libtcod.CENTER, "But you should be excited..")
+            libtcod.console_print_ex(0, 30, 12, libtcod.BKGND_SET, libtcod.CENTER, "You're my latest contenstant!")
+            
+            libtcod.console_print_ex(0, 30, 14, libtcod.BKGND_SET, libtcod.CENTER, "That's right, I am Viodum the Adept!")
+            libtcod.console_print_ex(0, 30, 15, libtcod.BKGND_SET, libtcod.CENTER, "And you're on Vidoum's Victims!")
+            
+            libtcod.console_print_ex(0, 30, 17, libtcod.BKGND_SET, libtcod.CENTER, "WAIT, I MEANT VICTORS! VIODUM'S VICTORS!")
+            
+            libtcod.console_print_ex(0, 30, 19, libtcod.BKGND_SET, libtcod.CENTER, "Don't be scared..")
+            
+            libtcod.console_set_default_foreground(0, screen_blue)
+            libtcod.console_print_ex(0, 31, 14, libtcod.BKGND_SET, libtcod.LEFT, "Viodum the Adept")
+            libtcod.console_set_default_foreground(0, screen_red)
+            libtcod.console_print_ex(0, 29, 15, libtcod.BKGND_SET, libtcod.LEFT, "Viodum's Victims")
+            
+            libtcod.console_print_ex(0, 33, 17, libtcod.BKGND_SET, libtcod.LEFT, "VIODUM'S VICTORS")
+            libtcod.console_print_ex(0, 30, 20, libtcod.BKGND_SET, libtcod.CENTER, "You're going to do great.")
+            libtcod.console_set_default_foreground(0, screen_yellow)
+            libtcod.console_print_ex(0, 24, 17, libtcod.BKGND_SET, libtcod.LEFT, "VICTORS")
+            
+        libtcod.console_set_default_foreground(0, screen_midgray)
+        libtcod.console_print_ex(0, 30, 38, libtcod.BKGND_SET, libtcod.CENTER, "[Enter] to continue, [Esc] to skip")
+        
+        libtcod.console_flush()
+        
+        if key.vk == libtcod.KEY_ENTER:
+            if step == 10:
+                return True
+            else:
+                step += 1
+                
+        if key.vk == libtcod.KEY_ESCAPE:          
+            return True
 
 def game_options(constants):
  

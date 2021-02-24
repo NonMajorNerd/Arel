@@ -71,17 +71,19 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Build support for two-handed weapons
 		Update accessory system
 		Fix fireball scroll displaying true name of unidentified burned items 
-		Probably a ton of other things
 		Add description_list and effects_list
 		Add a check/return so if a list is searched and there is no result, it returns a default .. eg if names list does not have a name for this item, just return the default name.
+		Probably a ton of other things	
 		
     **************
     * Change log *
     **************
 	
 	02/23/21
+		Added intro screen
 		Added origins and starting equipment
 		Added carrying capacity bonuses to equipment
+		Bug fixes related to unidentified items
 		
 	02/22/21
 		Fixed a bug related to the colors_list and names_list after items had been identified.

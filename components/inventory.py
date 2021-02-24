@@ -79,9 +79,10 @@ class Inventory:
 
         #if the item was used, it is automatically identified. Update the 'names_list' with the real name of the item.
         if used:
-            colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
-            del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
-            names_list[item_entity.name] = item_entity.name                                 #update the name in the names list
+            if not item_entity.name in colors_list.keys():
+                colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
+                del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
+                names_list[item_entity.name] = item_entity.name                                 #update the name in the names list
 
         return results
 
