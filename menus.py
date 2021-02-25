@@ -547,11 +547,11 @@ def origin_options(constants):
             
         libtcod.console_set_default_foreground(0, screen_lightgray)  
         if origin == "Adventurer":
-            desc = "A classic sword-and-shield adventurer, you are more suited to the challenge of the wizards' dungeon than most. We'll see how much of a difference that makes."
+            desc = "A classic sword-and-shield adventurer, you are more suited to the challenge my dungeon than most. We'll see how much of a difference that makes."
             
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(369) + " Sword (+3 ATK)")
             libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(375) + " Shield (+1 DEF)")
-            libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 10 Gold")
+            libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 20 Gold")
              
         elif origin == "Merchant":
             desc = "Though not the typical fighting type yourself, you've seen your share of scuffs and challenges. Your ability to swindle and swoon may come in handy."
@@ -561,14 +561,14 @@ def origin_options(constants):
             libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 100 Gold")
             
         elif origin == "Criminal":
-            desc = "Bad boi"
+            desc = "Found you in the seedy underbelly of town.  Doesnt look like you made many friends, I figured you might fit in around here."
             
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(368) + " Dagger (+2 ATK)")
             libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(382) + " Fingerless Gloves (+3 SPD)")
             libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 30 Gold")
             
         elif origin == "Tourist": 
-            desc= "This is why they say not to travel, just to stay at home. You were only wanting to get some time away from home, and now you're someone elses warning story."
+            desc= "This is why they say not to travel, just stay at home. You only wanted some time away from home, and now you're someone elses warning story."
         
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(395) + " Cargo Shorts (+8 Carrying)")
             libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 10 Gold")
@@ -1060,7 +1060,7 @@ def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
                'Strength (+1 attack, from {0})'.format(player.fighter.power),
                'Agility (+1 defense, from {0})'.format(player.fighter.defense)]
 
-    menu(con, header, options, menu_width, screen_width, screen_height-20)
+    menu(con, header, options, menu_width, screen_width, screen_height-40)
 
 
 def old_character_screen(player, character_screen_width, character_screen_height, screen_width, screen_height):

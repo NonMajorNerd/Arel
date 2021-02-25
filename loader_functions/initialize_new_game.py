@@ -127,26 +127,26 @@ def get_render_colors():
     'Blue Potion':                  libtcod.Color(0, 0, 255),
     'Red Potion':                   libtcod.Color(255, 0, 0),
     'Green Potion':                 libtcod.Color(0, 255, 0),
-    'Black Potion':                 libtcod.Color(80, 80, 80),
+    #'Black Potion':                 libtcod.Color(80, 80, 80),
     'Brown Potion':                 libtcod.Color(145, 63, 0),
-    'Azure Potion':                 libtcod.Color(0, 50, 100),
+    #'Azure Potion':                 libtcod.Color(0, 50, 100),
     'Ivory Potion':                 libtcod.Color(100, 100, 94),
-    'Teal Potion':                  libtcod.Color(0, 50, 50),
+    'Teal Potion':                  libtcod.Color(0, 75, 75),
     'Silver Potion':                libtcod.Color(175, 175, 175),
     'Purple Potion':                libtcod.Color(150, 0, 150),
-    'Gray Potion':                  libtcod.Color(120, 120, 120),
+    #'Gray Potion':                  libtcod.Color(120, 120, 120),
     'Orange Potion':                libtcod.Color(100, 65, 0),
     'Maroon Potion':                libtcod.Color(50, 0, 0),
-    'Charcoal Potion':              libtcod.Color(80, 80, 80),
+    #'Charcoal Potion':              libtcod.Color(80, 80, 80),
     'Aquamarine Potion':            libtcod.Color(50, 100, 83),
     'Coral Potion':                 libtcod.Color(100, 50, 31),
     'Fuchsia Potion':               libtcod.Color(200, 0, 200),
-    'Crimson Potion':               libtcod.Color(103, 28, 44),
+    #'Crimson Potion':               libtcod.Color(103, 28, 44),
     'Khaki Potion':                 libtcod.Color(94, 90, 55),
     'Magenta Potion':               libtcod.Color(100, 20, 100),
     'Golden Potion':                libtcod.Color(212, 175, 55),
-    'Plum Potion':                  libtcod.Color(87, 63, 87),
-    'Olive Potion':                 libtcod.Color(50, 50, 0),
+    #'Plum Potion':                  libtcod.Color(87, 63, 87),
+    #'Olive Potion':                 libtcod.Color(50, 50, 0),
     'Cyan Potion':                  libtcod.Color(0, 100, 100)
     }
     
@@ -160,26 +160,26 @@ def get_unidentified_names():
     'Blue',
     'Red',
     'Green',
-    'Black',
+    #'Black',
     'Brown',
-    'Azure',
+    #'Azure',
     'Ivory',
     'Teal',
     'Silver',
     'Purple',
-    'Gray',
+    #'Gray',
     'Orange',
     'Maroon',
-    'Charcoal',
+    #'Charcoal',
     'Aquamarine',
     'Coral',
     'Fuchsia',
-    'Crimson',
+    #'Crimson',
     'Khaki',
     'Magenta',
     'Golden',
-    'Plum',
-    'Olive',
+    #'Plum',
+    #'Olive',
     'Cyan'
     ]
     
@@ -280,11 +280,11 @@ def get_game_variables(constants, names_list, render_colors_list):
         player.equipment.toggle_equip(item)  
         
         #10 gold
-        item_component = Item(use_function=None, stackable=True, count=10,
+        item_component = Item(use_function=None, stackable=True, count=20,
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
         player.inventory.add_item(item, names_list)
-        player.gold_collected = 10
+        player.gold_collected = 20
         
     elif origin == "Merchant":
         #staff

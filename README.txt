@@ -82,6 +82,9 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     * Change log *
     **************
 	
+	02/24/21
+		Small interface changes (menu locations, item colors, description texts)
+	
 	02/23/21
 		Added intro screen
 		Added origins and starting equipment

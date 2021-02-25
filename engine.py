@@ -170,9 +170,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             message_log.add_message(Message('There is nothing there to kick.', libtcod.red))
                         else:
                             message_log.add_message(Message('You kick the door. Ouch!', libtcod.red))
+                            player_turn_results.extend(player.fighter.take_damage(2))
                     elif game_map.tiles[kickx][kicky].blocked:
                         message_log.add_message(Message('Kicking a wall does not feel good.', libtcod.red))
-                        player_turn_results.extend(player.fighter.take_damage(3))
+                        player_turn_results.extend(player.fighter.take_damage(2))
                     else:
                         message_log.add_message(Message('Nothing there to kick.', libtcod.yellow))
                 else:
@@ -340,13 +341,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     dequipped = equip_result.get('dequipped')
 
                     if equipped:
-                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name)))
+                        message_log.add_message(Message('You equipped the {0}.'.format(equipped.name)))
 
                     # TODO :: Check carrying cap after dequipping items ..
                         # if numitems > carrying cap .. gamestate = burdened
                         # if game_state = burdened then can only access inventory
                     if dequipped:
-                        message_log.add_message(Message('You dequipped the {0}'.format(dequipped.name)))
+                        message_log.add_message(Message('You dequipped the {0}.'.format(dequipped.name)))
 
                 game_state = GameStates.ENEMY_TURN
 
@@ -361,7 +362,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             if targeting_cancelled:
                 game_state = previous_game_state
 
-                message_log.add_message(Message('Targeting cancelled'))
+                message_log.add_message(Message('Targeting cancelled.'))
                 fov_recompute = True
 
             if xp:
