@@ -198,7 +198,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                     (tx, ty) = (58, 32)
 
                 if player.turn_count < 4:
-                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the mumpad or arrow keys to move.")
+                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the numpad or arrow keys to move.")
                
                 elif player.turn_count < 10:
                     libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")

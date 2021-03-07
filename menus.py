@@ -547,6 +547,8 @@ def origin_options(constants):
             
         libtcod.console_set_default_foreground(0, screen_lightgray)  
         if origin == "Adventurer":
+            libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(258))
+            
             desc = "A classic sword-and-shield adventurer, you are more suited to the challenge my dungeon than most. We'll see how much of a difference that makes."
             
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(369) + " Sword (+3 ATK)")
@@ -554,6 +556,7 @@ def origin_options(constants):
             libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 20 Gold")
              
         elif origin == "Merchant":
+            libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(262))
             desc = "Though not the typical fighting type yourself, you've seen your share of scuffs and challenges. Your ability to swindle and swoon may come in handy."
             
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(372) + " Staff (+2 ATK)")
@@ -561,6 +564,7 @@ def origin_options(constants):
             libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 100 Gold")
             
         elif origin == "Criminal":
+            libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(260))
             desc = "Found you in the seedy underbelly of town.  Doesnt look like you made many friends, I figured you might fit in around here."
             
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(368) + " Dagger (+2 ATK)")
@@ -568,6 +572,7 @@ def origin_options(constants):
             libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 30 Gold")
             
         elif origin == "Tourist": 
+            libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(256))
             desc= "This is why they say not to travel, just stay at home. You only wanted some time away from home, and now you're someone elses warning story."
         
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(395) + " Cargo Shorts (+8 Carrying)")
@@ -632,6 +637,107 @@ def origin_options(constants):
                 elif origin == "Tourist":
                     origin = "Criminal"
             
+
+def character_name(constants):
+
+    charname = "Player"
+
+    #    if backspace
+    #        new_string = left(current_string, len(current_string)-1)
+    #    if alpha:
+    #        new_string += character
+            
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+       
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+            
+    libtcod.console_set_default_background(0, libtcod.black)
+    libtcod.console_clear(0)
+
+    libtcod.console_set_default_background(0, screen_darkgray)
+    libtcod.console_set_default_foreground(0, libtcod.black)
+    
+    for y in range(11, 29):
+        for x in range(9, 49):
+            libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, " ")
+            if y == 28:
+                libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+            if x == 9 or x == 48:
+                libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT,chr(186))
+                
+    libtcod.console_print_ex(0, 9, 10, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+    libtcod.console_print_ex(0, 26, 10, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+           
+    for x in range(9, 27):
+        libtcod.console_print_ex(0, x, 9, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+        
+    for x in range(26, 49):
+        libtcod.console_print_ex(0, x, 10, libtcod.BKGND_SET, libtcod.LEFT,chr(205))
+        
+    #corners, T pieces
+    libtcod.console_print_ex(0, 9, 9, libtcod.BKGND_SET, libtcod.LEFT, chr(201))
+    libtcod.console_print_ex(0, 26, 9, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    libtcod.console_print_ex(0, 9, 10, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+    libtcod.console_print_ex(0, 26, 10, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    libtcod.console_print_ex(0, 48, 10, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+
+    libtcod.console_print_ex(0, 9, 28, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    libtcod.console_print_ex(0, 48, 28, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+       
+    libtcod.console_set_default_foreground(0, screen_darkgray)
+    libtcod.console_print_ex(0, 10, 10, libtcod.BKGND_SET, libtcod.LEFT, "                ") 
+    libtcod.console_set_default_foreground(0, screen_yellow)               
+    libtcod.console_print_ex(0, 11, 10, libtcod.BKGND_SET, libtcod.LEFT, "Character Name") 
+    
+    libtcod.console_set_default_foreground(0, screen_blue)
+    libtcod.console_print_ex(0, 10, 15, libtcod.BKGND_SET, libtcod.LEFT, "What is the name of our new celebrity?") 
+    
+    libtcod.console_set_default_foreground(0, screen_yellow)
+    libtcod.console_print_ex(0, 29, 17, libtcod.BKGND_SET, libtcod.CENTER, charname)
+    
+    libtcod.console_set_default_foreground(0, screen_lightgray)
+    libtcod.console_print_ex(0, 29, 23, libtcod.BKGND_SET, libtcod.CENTER, "Alphabetical characters only,")
+    libtcod.console_print_ex(0, 29, 24, libtcod.BKGND_SET, libtcod.CENTER, "backspace to delete.") 
+    
+    libtcod.console_set_default_foreground(0, libtcod.white)
+    libtcod.console_print_ex(0, 13, 26, libtcod.BKGND_SET, libtcod.LEFT, "Enter to accept, Esc to return") 
+    libtcod.console_set_default_foreground(0, libtcod.black)    
+    
+    while True:
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
+        libtcod.console_set_default_foreground(0, screen_darkgray)
+        libtcod.console_print_ex(0, 29, 17, libtcod.BKGND_SET, libtcod.CENTER, "               ")
+                    
+        libtcod.console_set_default_foreground(0, screen_yellow)
+        libtcod.console_print_ex(0, 29, 17, libtcod.BKGND_SET, libtcod.CENTER, charname)            
+                        
+        libtcod.console_flush()
+
+        if key.vk == libtcod.KEY_ESCAPE:
+            return "nah"
+            
+        elif key.vk == libtcod.KEY_ENTER:            
+            constants['player_name'] = charname
+            return True
+                
+        elif key.vk == libtcod.KEY_BACKSPACE:
+            charname = str(left(charname, len(charname)-1)).title()
+                
+        elif key.c > 96 and key.c < 123:
+            charname = str(charname + chr(key.c)).title()
+            if len(charname) > 15: charname = left(charname, 15)
+
+            
+       
 
 def inventory_menu(player, entities, fov_map, names_list, colors_list):
     
@@ -749,6 +855,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list):
             if x < numitems:
                 item = player.inventory.items[x] 
                 istr = chr(item.char) + " " + names_list[item.name]
+                # TODO :: Come up with a better way to do this ... currently if you equip a sword, and then pick up another sword, both get the > in front (because the name is what drives that)
                 for e in player.equipment.list:
                     if e and names_list[item.name] == e.name:
                         istr = "> " + istr
@@ -770,6 +877,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list):
         libtcod.console_print_ex(0, 47, 5, libtcod.BKGND_SET, libtcod.LEFT, "          ")
         libtcod.console_print_ex(0, 47, 6, libtcod.BKGND_SET, libtcod.LEFT, "          ")
         libtcod.console_print_ex(0, 47, 7, libtcod.BKGND_SET, libtcod.LEFT, "          ")
+        
         #equipment
         ename = "[  None  ]"
         libtcod.console_set_default_foreground(0, screen_midgray)
@@ -980,7 +1088,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list):
         if click:
             if (mouse.cx >2 and mouse.cx < 30) and (mouse.cy > 12 and mouse.cy < 37):
                 if item.item.use_function:
-                    results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list))
+                    results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list))
                     item.identified = True
                     return results
                 elif item.equippable:
@@ -1140,15 +1248,16 @@ def character_screen(player, entities, constants, dungeon_level, names_list, col
     libtcod.console_print_ex(0, 2, 3, libtcod.BKGND_SET, libtcod.LEFT, "[Escape to Close]")
     
     libtcod.console_set_default_foreground(0, screen_yellow)
-    libtcod.console_print_ex(0, 3, 5, libtcod.BKGND_NONE, libtcod.LEFT, player.name + ", Level " + str(player.level.current_level))
+    libtcod.console_print_ex(0, 3, 5, libtcod.BKGND_NONE, libtcod.LEFT, player.character_name + ", Level " + str(player.level.current_level))
     libtcod.console_print_ex(0, 3, 6, libtcod.BKGND_NONE, libtcod.LEFT, constants['options_difficulty'] + " " + constants['options_origin'])
     
     libtcod.console_set_default_foreground(0, screen_midgray)
-    libtcod.console_print_ex(0, 3, 8, libtcod.BKGND_NONE, libtcod.LEFT, str(player.turn_count) + " Turns")
-    libtcod.console_print_ex(0, 3, 9, libtcod.BKGND_NONE, libtcod.LEFT, "Dungeon Level " + str(dungeon_level))
+    libtcod.console_print_ex(0, 3, 8, libtcod.BKGND_NONE, libtcod.LEFT, str(player.score) + " Points")
+    libtcod.console_print_ex(0, 3, 9, libtcod.BKGND_NONE, libtcod.LEFT, str(player.turn_count) + " Turns")
+    libtcod.console_print_ex(0, 3, 10, libtcod.BKGND_NONE, libtcod.LEFT, "Dungeon Level " + str(dungeon_level))
     
     libtcod.console_set_default_foreground(0, screen_blue)
-    libtcod.console_print_ex(0, 3, 11, libtcod.BKGND_NONE, libtcod.LEFT, "Conduct")
+    libtcod.console_print_ex(0, 3, 12, libtcod.BKGND_NONE, libtcod.LEFT, "Conduct")
         
     libtcod.console_set_default_foreground(0, screen_lightgray)
     conduct = ""

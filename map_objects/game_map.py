@@ -2,11 +2,14 @@ import tcod as libtcod
 from random import randint, choice
 
 from components.ai import BasicMonster, RandomWalk, CameraMan
+from components.equipment import Equipment
 from components.equipment import EquipmentSlots
 from components.equippable import Equippable
-from components.fighter import Fighter
 from components.item import Item
+from components.inventory import Inventory
+from components.fighter import Fighter
 from components.stairs import Stairs
+
 
 from entity import Entity
 
@@ -329,7 +332,7 @@ class GameMap:
                 new_junk = Entity(x, y, junk_char, (51,51,102), 'Junk', render_order=RenderOrder.JUNK, blocks=False)
                 entities.append(new_junk)
             
-    def place_entities(self, room, entities, names_list, render_colors_list):
+    def place_entities(self, room, entities, names_list, colors_list):
         max_monsters_per_room = from_dungeon_level([[2, 1], [3, 4], [5, 10]], self.dungeon_level)
         max_items_per_room = from_dungeon_level([[1, 1], [2, 4], [3,10]], self.dungeon_level)
         
@@ -340,10 +343,10 @@ class GameMap:
         number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {
-            'rat': from_dungeon_level([[40, 1], [30, 2], [25, 3]], self.dungeon_level),
-            'bat': 50,
-            'goblin': 30,
-            'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
+            #'rat': from_dungeon_level([[40, 1], [30, 2], [25, 3]], self.dungeon_level),
+            #'bat': 50,
+            'goblin': 100, #30
+            #'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
         }
 
         item_chances = {
@@ -352,16 +355,16 @@ class GameMap:
             
             #SCROLL TEST
             #'healing_potion': 25,
-            #'lightning_scroll': 25,
-            #'fireball_scroll': 25,
-            #'confusion_scroll': 25
+            'lightning_scroll': 25,
+            'fireball_scroll': 25,
+            'confusion_scroll': 25
             
-            'healing_potion': 15,
-            'sword': from_dungeon_level([[5, 4], [15,10]], self.dungeon_level),
-            'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
-            'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
-            'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
-            'confusion_scroll': from_dungeon_level([[10, 2], [15, 3], [20,4]], self.dungeon_level)
+            #'healing_potion': 15,
+            #'sword': from_dungeon_level([[5, 4], [15,10]], self.dungeon_level),
+            #'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
+            #'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
+            #'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
+            #'confusion_scroll': from_dungeon_level([[10, 2], [15, 3], [20,4]], self.dungeon_level)
         }
 
         for i in range(number_of_monsters):
@@ -399,11 +402,21 @@ class GameMap:
                     monster = Entity(x, y, 305, libtcod.Color(191, 191, 191), 'bat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                     
                 elif monster_choice == 'goblin':
+                
+                    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+                    monster_weapon = Entity(x, y, 371, libtcod.lighter_green, 'Goblin Spear', equippable=equippable_component)
+                    
+                    equipment_component = Equipment()
+                    monster_inv = Inventory(3)
+                    
                     fighter_component = Fighter(hp=20, defense=0, power=4, speed=5, xp=35)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 295, libtcod.Color(107, 164, 107), 'goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-
+                    monster = Entity(x, y, 295, libtcod.Color(107, 164, 107), 'goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, 
+                        ai=ai_component, inventory=monster_inv, equipment=equipment_component)
+                    monster.inventory.add_item(monster_weapon, names_list)
+                    #monster.equipment.toggle_equip(monster_weapon) 
+        
                 else: #troll
                     fighter_component = Fighter(hp=30, defense=2, power=8, speed=5, xp=100)
                     ai_component = BasicMonster()
@@ -424,32 +437,32 @@ class GameMap:
                     item_component = Item(use_function=heal, stackable=False, amount=40,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
                         effect="Typically used to cure minor wounds.")
-                    item = Entity(x, y, 349, render_colors_list[names_list['Healing Potion']], 'Healing Potion', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 349, colors_list[names_list['Healing Potion']], 'Healing Potion', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'sword':
                     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-                    item = Entity(x, y, 369, libtcod.sky, 'Sword', equippable=equippable_component)
+                    item = Entity(x, y, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component)
                     
                 elif item_choice == 'shield':
                     equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-                    item = Entity(x, y, 375, libtcod.darker_orange, 'Shield', equippable=equippable_component)
+                    item = Entity(x, y, 375, colors_list[names_list['Shield']], 'Shield', equippable=equippable_component)
                     
                 elif item_choice == 'fireball_scroll':
                     item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
                         'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
                                           damage=25, radius=3, flammable=False)  #Fireball scrolls are not flamable
-                    item = Entity(x, y, 333, choice(render_colors_list['Scrolls']), 'Fireball Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Fireball Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                                   
                 elif item_choice == 'confusion_scroll':
                     item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
                         'Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan), flammable=True)
-                    item = Entity(x, y, 333, choice(render_colors_list['Scrolls']), 'Confusion Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Confusion Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                                   
                 else:
                     item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5, flammable=True)
-                    item = Entity(x, y, 333, choice(render_colors_list['Scrolls']), 'Lightning Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Lightning Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
 
                 entities.append(item)

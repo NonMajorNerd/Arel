@@ -9,7 +9,7 @@ from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables, get_unidentified_names, get_render_colors
 from loader_functions.data_loaders import load_game, save_game
-from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options, intro
+from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options, intro, character_name
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
@@ -316,8 +316,50 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 if dead_entity == player:
                     message, game_state = kill_player(dead_entity, game_map, constants)
                 else:
-                    message = kill_monster(dead_entity, player)
+                    if dead_entity.fighter:
 
+                        score_gained = int(dead_entity.fighter.xp * constants['options_xp_multiplier'] * constants['xp_to_score_ratio'])   
+                        print('base score: ' + str(score_gained))
+                        #assign the camera operator to the cam variable
+                        cam = None
+                        for entity in entities:
+                            if entity.name == "Camera Op.":
+                                cam = entity
+                                break
+                        
+                        #if a camera operator was located ...
+                        if cam:
+                            print ('camera op found')
+                            #assume the camera op did not see the kill
+                            seen = False
+                            
+                            #check if camera op saw the kill
+                          
+                            #initialize a fov around the camera operator using the same constants the player uses
+                            cam_fov = initialize_fov(game_map)
+                            recompute_fov(cam_fov, cam.x, cam.y, constants['fov_radius'], constants['fov_light_walls'],
+                                    constants['fov_algorithm'])
+                                    
+                            #assign the killx/killy positions using dead_entity
+                            (kill_x, kill_y) = (dead_entity.x, dead_entity.y)
+                            print ('kill located at ' + str(kill_x) + "," + str(kill_y))
+                            
+                            #check if killx/killy is in the camera_fov
+                            seen = libtcod.map_is_in_fov(cam_fov, kill_x, kill_y)
+                            print ('kill seen: ' + str(seen))
+                            
+                            # if the camera op did see the kill, multiply score gained by the 'seen kill' mulitiplier
+                            if seen: score_gained = int(score_gained * constants['kill_seen_by_camera_mult'])
+                        
+                        #ensure each kill gives at least one point
+                        if score_gained < 1: score_gained = 1
+                        
+                        #add the end result to the player score
+                        player.score += score_gained
+                        print('end score: ' + str(score_gained))
+                    
+                    message = kill_monster(dead_entity, player)
+                    
                 message_log.add_message(message)
 
             if item_added:
@@ -369,6 +411,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 axp = int(xp * constants['options_xp_multiplier'])
                 leveled_up = player.level.add_xp(axp)
                 message_log.add_message(Message('You gain {0} experience points.'.format(axp)))
+                
 
                 if leveled_up:
                     previous_game_state = game_state
@@ -460,10 +503,11 @@ def main():
                 if intro(constants):
                     if not game_options(constants) == "nah":
                         if not origin_options(constants) == "nah":
-                            player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
-                            game_state = GameStates.PLAYERS_TURN
+                            if not character_name(constants) == 'nah':
+                                player, entities, game_map, message_log, game_state = get_game_variables(constants, names_list, colors_list)
+                                game_state = GameStates.PLAYERS_TURN
 
-                            show_main_menu = False
+                                show_main_menu = False
             elif load_saved_game:
                 try:
                     player, entities, game_map, message_log, game_state = load_game()

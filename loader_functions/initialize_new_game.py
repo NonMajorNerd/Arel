@@ -62,6 +62,9 @@ def get_constants():
     max_monsters_per_room = 3
     max_items_per_room = 200
     
+    xp_to_score_ratio = 0.05
+    kill_seen_by_camera_mult = 4
+    
     options_difficulty = "Standard"
     options_origin = "Adventurer"
     options_enemy_damage_scale = 100
@@ -99,6 +102,9 @@ def get_constants():
         'max_monsters_per_room': max_monsters_per_room,
         'max_items_per_room': max_items_per_room,
         'colors': colors,
+        'xp_to_score_ratio': xp_to_score_ratio,
+        'kill_seen_by_camera_mult': kill_seen_by_camera_mult,
+        'player_name': "Player",
         'options_difficulty': options_difficulty,
         'options_origin': options_origin,
         'options_enemy_damage_scale': options_enemy_damage_scale,
@@ -147,7 +153,10 @@ def get_render_colors():
     'Golden Potion':                libtcod.Color(212, 175, 55),
     #'Plum Potion':                  libtcod.Color(87, 63, 87),
     #'Olive Potion':                 libtcod.Color(50, 50, 0),
-    'Cyan Potion':                  libtcod.Color(0, 100, 100)
+    'Cyan Potion':                  libtcod.Color(0, 100, 100),
+    'Sword':                        libtcod.light_sky,
+    'Shield':                       libtcod.darker_orange,
+    'Gold':                         libtcod.dark_yellow
     }
     
     return colors_list
@@ -222,6 +231,7 @@ def get_unidentified_names():
     'Stairs':                   "Stairs",
     'Staff':                    "Staff",
     'Merchants Bag':            "Merchants Bag",
+    'Goblin Spear':             "Goblin Spear",
     'Healing Potion':           (str(get_item(potion_colors_list)) + " Potion"),
     'Lightning Scroll':         ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
     'Fireball Scroll':          ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
@@ -243,50 +253,55 @@ def get_item(item_list, index=0):
     return item
     
 
-def get_game_variables(constants, names_list, render_colors_list):
+def get_game_variables(constants, names_list, colors_list):
     
     #Build player entity
     fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
     inventory_component = Inventory(24)
     level_component = Level()
     equipment_component = Equipment()
-    player = Entity(0, 0, 256, libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
+    player = Entity(0, 0, 256, libtcod.white, "Player", blocks=True, render_order=RenderOrder.ACTOR,
                     fighter=fighter_component, inventory=inventory_component, level=level_component,
                     equipment=equipment_component)
     player.conditions.append(Poison(target=player, active=True, duration=5, damage=2))
     player.conditions.append(Healing(target=player, active=True, duration=10, healing=1))
+    player.character_name = constants['player_name']
     entities = [player]
 
-    #Starting Inventory
+    #Starting Inventory, sprite
     origin = constants['options_origin']
     
     if origin == "Adventurer":
+        player.char = 258
+        
         #sword
         item_component = Item(use_function=None, stackable=False,
                         description="A short, one-handed sword.",
                         effect="Great for slashing, medicore at stabbing.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-        item = Entity(0, 0, 369, libtcod.sky, 'Sword', equippable=equippable_component, item=item_component)
+        item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
         player.inventory.add_item(item, names_list)
         player.equipment.toggle_equip(item)       
+        
         
         #shield
         item_component = Item(use_function=None, stackable=False,
                         description="A small, round, metal shield.",
                         effect="Helpful at preventing incoming attacks.")
         equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-        item = Entity(0, 0, 375, libtcod.darker_orange, 'Shield', equippable=equippable_component, item=item_component)
+        item = Entity(0, 0, 375, colors_list[names_list['Shield']], 'Shield', equippable=equippable_component, item=item_component)
         player.inventory.add_item(item, names_list)
         player.equipment.toggle_equip(item)  
         
         #10 gold
         item_component = Item(use_function=None, stackable=True, count=20,
                description="Yanno, gold coins! For procuring goods and/or services!")
-        item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
+        item = Entity(0, 0, 365, colors_list[names_list['Gold']], 'Gold', render_order=RenderOrder.ITEM, item=item_component)
         player.inventory.add_item(item, names_list)
         player.gold_collected = 20
         
     elif origin == "Merchant":
+        player.char = 262
         #staff
         item_component = Item(use_function=None, stackable=False,
                         description="A two-handed (but actually one-handed) wooden staff,",
@@ -313,6 +328,7 @@ def get_game_variables(constants, names_list, render_colors_list):
         player.gold_collected = 100
         
     elif origin == "Criminal":
+        player.char = 260
         #dagger
         item_component = Item(use_function=None, stackable=False,
                         description="A small, rusty dagger. Probably unsafe to handle.",
@@ -339,6 +355,7 @@ def get_game_variables(constants, names_list, render_colors_list):
         player.gold_collected = 30
         
     elif origin == "Tourist":
+        player.char = 256
         #cargo shorts
         item_component = Item(use_function=None, stackable=False,
                         description="These are more pockets than they are shorts, which you're ok with.",
@@ -357,7 +374,7 @@ def get_game_variables(constants, names_list, render_colors_list):
         
     game_map = GameMap(constants['map_width'], constants['map_height'])
     game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                      constants['map_width'], constants['map_height'], player, entities, names_list, render_colors_list)
+                      constants['map_width'], constants['map_height'], player, entities, names_list, colors_list)
    
 
     

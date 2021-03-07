@@ -4,6 +4,25 @@ from equipment_slots import EquipmentSlots
     # Build support for two-handed weapons
     # Replace ACC1 and ACC2 with a single system that can support up to two accessories
 
+def StatChange(equipment, item):
+                #equipment is an Equipment component, item is an Equippable component
+                
+    # This function will return a dictionary of stat changes based on the equipment and
+    # the item (equipment) passed to it. 
+    
+    results = {}
+        
+    if not item.slot:
+        raise Exception("Item to compare is a non-equippable component. Pass only the equippable component of the item to this function.")
+        
+    if (item.slot == EquipmentSlots.MAIN_HAND and item.owner.name == equipment.main_hand.name) or (item.slot == EquipmentSlots.OFF_HAND and item.owner.name == equipment.off_hand.name) or (item.slot == EquipmentSlots.HELM and item.owner.name == equipment.off_hand.name) or (item.slot == EquipmentSlots.ARMOR and item.owner.name == equipment.off_hand.name) or (item.slot == EquipmentSlots.ACC1 and item.owner.name == equipment.off_hand.name) or (item.slot == EquipmentSlots.ACC2 and item.owner.name == equipment.off_hand.name):
+        return results  
+    else:
+        x = 1
+        
+        return results
+
+
 class Equipment:
     def __init__(self, main_hand=None, off_hand=None, helm=None, armor=None, accessory1=None, accessory2=None):
         self.main_hand = main_hand
@@ -14,7 +33,7 @@ class Equipment:
         self.accessory2 = accessory2
  
     @property
-    def list(self):
+    def list(self):   
         return [self.main_hand, self.off_hand, self.helm, self.armor, self.accessory1, self.accessory2]
         
     @property

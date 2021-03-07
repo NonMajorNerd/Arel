@@ -44,7 +44,9 @@ def cast_lightning(*args, **kwargs):
     if target:
         results.append({'consumed': True, 'target': target, 'message': Message('A lighting bolt strikes the {0} with a loud thunder!'.format(target.name))})
         results.extend(target.fighter.take_damage(damage))
-        if entity.name == 'Player': entity.scrolls_read += 1                                                          #if this is the player, update scrolls read #
+        if entity.name == 'Player': 
+            entity.scrolls_read += 1 
+            print("scrolls read : " + str(entity.scrolls_read))                                                     #if this is the player, update scrolls read #
     else:
         results.append({'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', libtcod.red)})
 
@@ -66,10 +68,12 @@ def cast_fireball(*args, **kwargs):
         return results
 
     results.append({'consumed': True, 'message': Message('The fireball explodes, burning everything within {0} tiles!'.format(radius), libtcod.orange)})
-
+    
     
     for entity in entities:
-        if entity.name == 'Player': entity.scrolls_read += 1      #if this is the player, update scrolls read   TODO :: Change this so it only does this when the player uses this scroll .... wait is this needed??
+        if entity.name == 'Player': 
+            entity.scrolls_read += 1 
+            print("scrolls read : " + str(entity.scrolls_read))
         if entity.distance(target_x, target_y) <= radius:
             if entity.fighter:
                 results.append({'message': Message('The {0} gets burned for {1} hit points.'.format(entity.name, damage), libtcod.orange)})
@@ -94,6 +98,9 @@ def cast_confuse(*args, **kwargs):
         return results
 
     for entity in entities:
+        if entity.name == 'Player': 
+            entity.scrolls_read += 1 
+            print("scrolls read : " + str(entity.scrolls_read))
         if entity.x == target_x and entity.y == target_y and entity.ai:
             confused_ai = ConfusedMonster(entity.ai, 10)
 
@@ -101,8 +108,6 @@ def cast_confuse(*args, **kwargs):
             entity.ai = confused_ai
 
             results.append({'consumed': True, 'message': Message('The eyes of the {0} become vacant as it starts to wander about confused!'.format(entity.name), libtcod.light_green)})
-        
-            if entity.name == 'Player': entity.scrolls_read += 1                                                          #if this is the player, update scrolls read #
         
             break
     else:
