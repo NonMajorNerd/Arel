@@ -18,7 +18,6 @@ def kill_player(player, game_map, constants):
     
     SCREEN_WIDTH = 60
     
-    
     key = libtcod.Key()
     mouse = libtcod.Mouse()
      
@@ -99,5 +98,7 @@ def kill_monster(monster, player):
     monster.ai = None
     monster.name = 'remains of ' + monster.name
     monster.render_order = RenderOrder.CORPSE
+
+    for con in monster.conditions: con.active = False
 
     return death_message

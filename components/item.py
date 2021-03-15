@@ -17,7 +17,7 @@ class Item:
         if len(self.description_lines) > 8:
             for line in self.description_lines:
                     print(str(line))
-            raise Exception("Item description is too long. Description text must wrap (26 characters) to 8 lines or less to fit in the inventory design.")
+            raise Exception("Item effect text is too long. Effect text must wrap to 3 lines or fewer at 26 characters per line to fit in the inventory design.")
         
         self.effect_lines = None
         if effect: 
@@ -25,6 +25,6 @@ class Item:
             if len(self.effect_lines) > 3:
                 for line in self.effect_lines:
                     print(str(line))
-                raise Exception("Item effect text is too long. Effect text must wrap (26 characters) to 3 lines or less to fit in the inventory design.")
+                raise Exception("Item effect text is too long. Effect text must wrap to 3 lines or fewer at 26 characters per line to fit in the inventory design.")
         
         self.function_kwargs = kwargs

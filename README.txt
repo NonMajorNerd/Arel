@@ -69,7 +69,6 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
 		*Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)
-		*Check whether or not items are identified before displaying effects in inventory system
 		*Build support for two-handed weapons
 		*Update accessory system
 		*Fix fireball scroll displaying true name of unidentified burned items 
@@ -77,14 +76,25 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		*Add a check/return so if a list is searched and there is no result, it returns a default .. eg if names list does not have a name for this item, just return the default name.
 		*Expand scoring system
 		*Build a check for 'is there a camera op? if not, spawn one nearby (but outside of player FoV)'
-		*Add an option to sort the inventory 
-			**sort by equipped first, then alpha
-				***give users choice to sort by attack, defense, etc
 		*Certainly a ton of other things	
 		
     **************
     * Change log *
     **************
+	
+	03/14/21
+		Rebalanced item spawn rates, monster spawn rates, monster stats
+		All monster and player stats rebalanced
+		Took care of minor bugs related to inventory menu
+		Kept basic data sheets for future balancing
+		Implemented context menu for examining creatures.
+		Nailed it.
+		Got rid of inventory pre-identification via effect text
+
+	03/12/21
+		Decoupled inventory and equipment lists
+		Restructured equipment system
+		Implemented basic inventory sorting
 	
 	03/06/21
 		Added basic score system .. points are gained for kills, kills seen by camera operator reward more points

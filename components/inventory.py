@@ -3,7 +3,6 @@ import libtcodpy as libtcod
 from game_messages import Message
 from entity import get_ent_name
 
-
 class Inventory:
     def __init__(self, capacity):
         self.base_capacity = capacity
@@ -89,11 +88,8 @@ class Inventory:
         return results
 
     def remove_item(self, item):
-        if item.item.stackable:
-            if item.item.count > 1:
+        if item.item.stackable and item.item.count > 1:
                 item.item.count -=1
-            else:
-                self.items.remove(item)
         else:
             self.items.remove(item)
 

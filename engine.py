@@ -14,8 +14,7 @@ from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 
 from random import randint
-
-def player_turn_end(player, player_turn_results):
+def player_turn_end(player, player_turn_results, game_map, constants):
     
     player.turn_count += 1            
 
@@ -23,6 +22,15 @@ def player_turn_end(player, player_turn_results):
         for condition in player.conditions:
             if condition.active:
                 player_turn_results.extend(condition.enact())   
+
+    #process turn results for conditions
+    if player_turn_results:
+        for player_turn_result in player_turn_results:
+            damage = player_turn_result.get('damage')
+            if damage:
+                dead_entity = damage[0].get('dead')
+                if dead_entity == player:
+                    message, game_state = kill_player(dead_entity, game_map, constants)
 
 
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, colors_list):
@@ -57,9 +65,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         clear_all(con, entities)
 
         action = handle_keys(key, game_state)
+        #if len(action) > 0: print(action)
         mouse_action = handle_mouse(mouse)
 
         move = action.get('move')
+        
         wait = action.get('wait')
         pickup = action.get('pickup')
         show_inventory = action.get('show_inventory')
@@ -115,7 +125,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             dijkstra_recompute = True
                             fov_map = initialize_fov(game_map)
                     
-                player_turn_end(player, player_turn_results)
+                player_turn_end(player, player_turn_results, game_map, constants)
             
             elif game_state == GameStates.KEYTARGETING:
                 dx, dy = move
@@ -128,7 +138,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
 
         elif wait:
-            player_turn_end(player, player_turn_results)
+            player_turn_end(player, player_turn_results, game_map, constants)
             game_state = GameStates.ENEMY_TURN
             
         elif pickup and game_state == GameStates.PLAYERS_TURN:
@@ -179,13 +189,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 else:
                     if target.fighter:
                         message_log.add_message(Message('The  ' + target.name + ' dodges your kick.', libtcod.gray))
-                    else:        
+                    else:
                         if not game_map.tiles[target.x+dx][target.y+dy].block_sight:
                             target.move(dx, dy)
                             if game_map.tiles[kickx][kicky].door: fov_recompute = True
                 
                 if previous_game_state == GameStates.PLAYERS_TURN:
-                    player_turn_end(player, player_turn_results)
+                    player_turn_end(player, player_turn_results, game_map, constants)
                     game_state = GameStates.ENEMY_TURN
                 else:
                     game_state = previous_game_state
@@ -222,9 +232,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     message_log.add_message(Message('There is nothing there to close.', libtcod.lighter_red))
                     
                 if previous_game_state == GameStates.PLAYERS_TURN:
-                    player_turn_end(player, player_turn_results)
+                    player_turn_end(player, player_turn_results, game_map, constants)
                     game_state = GameStates.ENEMY_TURN
                 else:
+               
+
                     game_state = previous_game_state
                 
             else:   
@@ -232,7 +244,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 game_state = GameStates.CLOSING
 
         if show_inventory:
-            player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list))
+            player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list, message_log, constants))
 
         #if drop_inventory:
         #    previous_game_state = game_state
@@ -243,7 +255,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             item = player.inventory.items[inventory_index]
 
             if game_state == GameStates.SHOW_INVENTORY:
-                player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list))
+                player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, message_log=message_log))
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player.inventory.drop_item(item))
 
@@ -319,7 +331,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     if dead_entity.fighter:
 
                         score_gained = int(dead_entity.fighter.xp * constants['options_xp_multiplier'] * constants['xp_to_score_ratio'])   
-                        print('base score: ' + str(score_gained))
+
                         #assign the camera operator to the cam variable
                         cam = None
                         for entity in entities:
@@ -329,7 +341,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         
                         #if a camera operator was located ...
                         if cam:
-                            print ('camera op found')
+
                             #assume the camera op did not see the kill
                             seen = False
                             
@@ -342,11 +354,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                                     
                             #assign the killx/killy positions using dead_entity
                             (kill_x, kill_y) = (dead_entity.x, dead_entity.y)
-                            print ('kill located at ' + str(kill_x) + "," + str(kill_y))
                             
                             #check if killx/killy is in the camera_fov
                             seen = libtcod.map_is_in_fov(cam_fov, kill_x, kill_y)
-                            print ('kill seen: ' + str(seen))
                             
                             # if the camera op did see the kill, multiply score gained by the 'seen kill' mulitiplier
                             if seen: score_gained = int(score_gained * constants['kill_seen_by_camera_mult'])
@@ -356,7 +366,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         
                         #add the end result to the player score
                         player.score += score_gained
-                        print('end score: ' + str(score_gained))
                     
                     message = kill_monster(dead_entity, player)
                     
@@ -376,22 +385,28 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 game_state = GameStates.ENEMY_TURN
 
             if equip:
-                equip_results = player.equipment.toggle_equip(equip)
-
-                for equip_result in equip_results:
-                    equipped = equip_result.get('equipped')
-                    dequipped = equip_result.get('dequipped')
-
-                    if equipped:
-                        message_log.add_message(Message('You equipped the {0}.'.format(equipped.name)))
-
-                    # TODO :: Check carrying cap after dequipping items ..
-                        # if numitems > carrying cap .. gamestate = burdened
-                        # if game_state = burdened then can only access inventory
-                    if dequipped:
-                        message_log.add_message(Message('You dequipped the {0}.'.format(dequipped.name)))
-
-                game_state = GameStates.ENEMY_TURN
+                print("equip outside of inventory?!")
+                
+                #equip_results = player.equipment.toggle_equip(equip)
+                #print (equip.name)
+                #
+                #for equip_result in equip_results:
+                #    equipped = equip_result.get('equipped')
+                #    dequipped = equip_result.get('dequipped')
+                #
+                #    if equipped:
+                #        player.inventory.remove_item(equipped, names_list)
+                #        message_log.add_message(Message('You equipped the {0}.'.format(equipped.name)))
+                #        
+                #
+                #    # TODO :: Check carrying cap after dequipping items ..
+                #        # if numitems > carrying cap .. gamestate = burdened
+                #        # if game_state = burdened then can only access inventory
+                #    if dequipped:
+                #        player.inventory.add_item(dequipped, names_list)
+                #        message_log.add_message(Message('You dequipped the {0}.'.format(dequipped.name)))
+                #
+                #game_state = GameStates.ENEMY_TURN
 
             if targeting:
                 previous_game_state = GameStates.PLAYERS_TURN
@@ -418,34 +433,37 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     game_state = GameStates.LEVEL_UP
 
         if game_state == GameStates.ENEMY_TURN:   
+            enemy_turn_results = []
             
-            for entity in entities:
-                if entity.name == "Camera Op." or libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
+            for entity in entities: 
+                #proccess AI and turns
+                if entity.name == "Camera Op." or libtcod.map_is_in_fov(fov_map, entity.x, entity.y):              
                     if entity.ai:                 
                         if entity.fighter:
-                            entity.fighter.timer += entity.fighter.speed
-                            while entity.fighter.timer >= player.fighter.speed:
-                                enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities, constants)
-                                entity.fighter.timer -= player.fighter.speed
-                                
-                                if enemy_turn_results != None:
-                                    for enemy_turn_result in enemy_turn_results:
-                                        message = enemy_turn_result.get('message')
-                                        dead_entity = enemy_turn_result.get('dead')
+                            if player.fighter: #if player isn't dead ..
+                                entity.fighter.timer += entity.fighter.speed
+                                while entity.fighter.timer >= player.fighter.speed:
+                                    enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities, constants)
+                                    entity.fighter.timer -= player.fighter.speed
+                                    
+                                    if enemy_turn_results != None:
+                                        for enemy_turn_result in enemy_turn_results:
+                                            message = enemy_turn_result.get('message')
+                                            dead_entity = enemy_turn_result.get('dead')
 
-                                        if message:
-                                            message_log.add_message(message)
+                                            if message:
+                                                message_log.add_message(message)
 
-                                        if dead_entity:
-                                            if dead_entity == player:
-                                                message, game_state = kill_player(dead_entity, game_map, constants)
-                                            else:
-                                                message = kill_monster(dead_entity, player)
+                                            if dead_entity:
+                                                if dead_entity == player or dead_entity.name == "Player":
+                                                    message, game_state = kill_player(dead_entity, game_map, constants)
+                                                else:
+                                                    message = kill_monster(dead_entity, player)
 
-                                            message_log.add_message(message)
+                                                message_log.add_message(message)
 
-                                            if game_state == GameStates.PLAYER_DEAD:
-                                                break
+                                                if game_state == GameStates.PLAYER_DEAD:
+                                                    break
 
                         if game_state == GameStates.PLAYER_DEAD:
                             break

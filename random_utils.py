@@ -36,3 +36,22 @@ def left(s, amount):
 
 def right(s, amount):
     return s[-amount:]
+
+
+#This is the same as pythons 'operator.attrgetter', but the resolve_attr now specifies a default value of 0.
+def myattrgetter(*items):
+    if any(not isinstance(item, str) for item in items):
+        raise TypeError('attribute name must be a string')
+    if len(items) == 1:
+        attr = items[0]
+        def g(obj):
+            return resolve_attr(obj, attr)
+    else:
+        def g(obj):
+            return tuple(resolve_attr(obj, attr) for attr in items)
+    return g
+
+def resolve_attr(obj, attr):
+    for name in attr.split("."):
+        obj = getattr(obj, name, 0)
+    return obj

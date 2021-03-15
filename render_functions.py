@@ -5,7 +5,7 @@ from enum import Enum
 from game_states import GameStates
  
 from menus import character_screen, inventory_menu, level_up_menu
-
+from equipment_slots import EquipmentSlots
 
 class RenderOrder(Enum):
     JUNK = 1
@@ -182,6 +182,17 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     libtcod.console_set_default_foreground(panel, libtcod.white)
     
+    if game_state == GameStates.KEYTARGETING:
+        if player.y >= game_map.height/2: #player on bottom half of the screen
+            (tx, ty) = (58, 2)
+        else: #player on top half of the map
+            (tx, ty) = (58, 32)
+            
+        libtcod.console_set_default_background(0, libtcod.lighter_blue)
+        libtcod.console_set_default_foreground(0, libtcod.black)
+                
+        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [esc] to exit targeting.")
+                    
     #print mouse x/y
     #libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, (str(mouse.cx) + "," + str(mouse.cy)))
     if options_tutorial_enabled:
@@ -196,37 +207,41 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                     (tx, ty) = (58, 2)
                 else: #player on top half of the map
                     (tx, ty) = (58, 32)
-
-                if player.turn_count < 4:
-                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the numpad or arrow keys to move.")
-               
-                elif player.turn_count < 10:
-                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
                     
-                else:
-             
-                    for ent in entities:
-                       if not ent.name == "Player":
-                           if ent.x == player.x and ent.y == player.y:
-                                if ent.name == "stairs":
-                                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [Enter] to go down the stairs.")
-                                elif ent.item:
-                                    if not game_map.tiles[ent.x][ent.y].door:
-                                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [g] to grab an item.")
-                                
-                                        
-                    myneighbors = [(-1, -1), (0, -1), (1, -1),
-                                 (-1, 0), (1, 0),
-                                 (-1, 1), (0, 1), (1, 1)]
-                                 
-                    for dx, dy in myneighbors:
-                        tdx, tdy = player.x + dx, player.y + dy
-                        if game_map.tiles[tdx][tdy].door:
-                            if game_map.tiles[tdx][tdy].block_sight:
-                                libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Move into a closed door to open it.")
-                            else:  
-                                libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [c] and then a direction to close an open door.")
-                                                   
+                if game_state != GameStates.KEYTARGETING:
+                    if player.turn_count < 4:
+                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the numpad or arrow keys to move.")
+                   
+                    elif player.turn_count < 8:
+                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [x] to examine creatures or items on the ground.")
+                   
+                    elif player.turn_count < 10:
+                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
+                        
+                    else:
+                 
+                        for ent in entities:
+                           if not ent.name == "Player":
+                               if ent.x == player.x and ent.y == player.y:
+                                    if ent.name == "stairs":
+                                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [Enter] to go down the stairs.")
+                                    elif ent.item:
+                                        if not game_map.tiles[ent.x][ent.y].door:
+                                            libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [g] to grab an item.")
+                                    
+                                            
+                        myneighbors = [(-1, -1), (0, -1), (1, -1),
+                                     (-1, 0), (1, 0),
+                                     (-1, 1), (0, 1), (1, 1)]
+                                     
+                        for dx, dy in myneighbors:
+                            tdx, tdy = player.x + dx, player.y + dy
+                            if game_map.tiles[tdx][tdy].door:
+                                if game_map.tiles[tdx][tdy].block_sight:
+                                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Move into a closed door to open it.")
+                                else:  
+                                    libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [c] and then a direction to close an open door.")
+                                                       
     # Print the game messages, one line at a time
     y = 1
     for message in message_log.messages:
@@ -260,7 +275,12 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
             libtcod.console_set_default_foreground(panel, libtcod.light_gray)
             libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                                  get_all_at(targeter.x, targeter.y, entities, fov_map, game_map, names_list))
-
+            for ent in entities:
+                if ent.x == targeter.x and ent.y == targeter.y and ent.name != "Targeter" and ent.name != "Player" and ent.fighter:
+                    #print a context menu for the lil guy
+                    context_menu(game_map.width, game_map.height, ent, names_list)
+                    
+                    
     #print names of item(s) under mouse
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
@@ -288,7 +308,140 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     elif game_state == GameStates.CHARACTER_SCREEN:
         character_screen(player, 30, 10, screen_width, screen_height)
 
+def context_menu(gmw, gmh, entity, names_list):
+    
+    h = 8
+    if len(entity.conditions) > 0: h += 2
+    if entity.equipment and len(entity.equipment.list) > 0: h += 2
+    
+    w = len(names_list[entity.name]) + 4
+    if w < 9: w = 9
+    #if w%2 != 0: w-=1
+    
+    x = entity.x + 1
+    if entity.x + w + 1 > gmw: x = entity.x - w - 1
+    
+    y = entity.y - h
+    if entity.y - h < 1: y = entity.y
+    
+    #UI Color Defaults
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
 
+    #print UI elements
+    libtcod.console_set_default_background(0, screen_darkgray)
+    libtcod.console_set_default_foreground(0, libtcod.black)
+
+    #background
+    for iy in range (y, y+h+1):
+        for ix in range (x, x+w+2):
+            libtcod.console_print_ex(0, ix, iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+
+    #lines
+    for ix in range(x, x+w+2):
+        libtcod.console_print_ex(0, ix, y, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+        libtcod.console_print_ex(0, ix, y+h, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+        
+    for iy in range(y, y+h+1):
+        libtcod.console_print_ex(0, x, iy, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+        libtcod.console_print_ex(0, x+w+1, iy, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+          
+    #corners
+    libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, chr(201))
+    libtcod.console_print_ex(0, x+w+1, y, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    libtcod.console_print_ex(0, x, y+h, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    libtcod.console_print_ex(0, x+w+1, y+h, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+    printy = y+1
+    #print entity info
+    strname = chr(entity.char) + " " + names_list[entity.name]
+    libtcod.console_set_default_foreground(0, libtcod.white)
+    px = x+int(w/2)+1
+    libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, strname) 
+    
+    libtcod.console_set_default_foreground(0, entity.color)
+    
+    charx = px - int(len(strname)/2)
+    #if len(strname)%2 != 0: charx -= 1
+    
+    libtcod.console_print_ex(0, charx, y+1, libtcod.BKGND_SET, libtcod.CENTER, chr(entity.char)) 
+    print("x:" + str(x) + " y:" + str(y) + " w:" + str(w) + " (" + str(int(w/2)) + ") h:" + str(h) + " px" + str(px) + " cx:" + str(charx) + " modlen:" + str(len(strname)%2))
+    
+    printy += 1
+    strhealth = "OOPS"
+    print(str(entity.fighter.hp / entity.fighter.max_hp))
+    if entity.fighter.hp > entity.fighter.max_hp * 0.90:
+        libtcod.console_set_default_foreground(0, libtcod.dark_green)
+        strhealth = "Healthy"
+    elif  entity.fighter.hp > entity.fighter.max_hp * 0.70:
+        libtcod.console_set_default_foreground(0, libtcod.lime)
+        strhealth = "Bruised"
+    elif  entity.fighter.hp > entity.fighter.max_hp * 0.50:
+        libtcod.console_set_default_foreground(0, libtcod.light_yellow)
+        strhealth = "Wounded"
+    elif  entity.fighter.hp > entity.fighter.max_hp * 0.30:
+        libtcod.console_set_default_foreground(0, libtcod.amber)
+        strhealth = "Bloody"
+    else:
+        libtcod.console_set_default_foreground(0, libtcod.light_flame)
+        strhealth = "Maimed"
+    libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, strhealth)  
+    printy += 2
+    
+    l = len(entity.conditions)
+    if l > 0:
+        if l == 1:
+            libtcod.console_set_default_foreground(0, entity.conditions[0].fgcolor)
+            libtcod.console_set_default_background(0, entity.conditions[0].bgcolor)
+            libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, entity.conditions[0].char)
+            
+        if l ==2:
+            libtcod.console_set_default_foreground(0, entity.conditions[0].fgcolor)
+            libtcod.console_set_default_background(0, entity.conditions[0].bgcolor)
+            libtcod.console_print_ex(0, px-1, printy, libtcod.BKGND_SET, libtcod.CENTER, entity.conditions[0].char)
+            
+            libtcod.console_set_default_foreground(0, entity.conditions[1].fgcolor)
+            libtcod.console_set_default_background(0, entity.conditions[1].bgcolor)
+            libtcod.console_print_ex(0, px+1, printy, libtcod.BKGND_SET, libtcod.CENTER, entity.conditions[1].char)
+            
+        printy += 2    
+            
+    libtcod.console_set_default_background(0, screen_darkgray)
+    libtcod.console_set_default_foreground(0, screen_lightgray)
+    strpower = "POW  " + str(entity.fighter.power)
+    if entity.fighter.power < 10: strpower = "POW  0" + str(entity.fighter.power)
+    libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, strpower)
+    printy += 1
+    
+    strdef = "DEF  " + str(entity.fighter.defense)
+    if entity.fighter.defense < 10: strdef = "DEF  0" + str(entity.fighter.defense)
+    libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, strdef)
+    printy += 1
+    
+    strspeed = "SPD  " + str(entity.fighter.speed)
+    if entity.fighter.speed < 10: strspeed = "SPD  0" + str(entity.fighter.speed)
+    libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, strspeed)
+    printy += 2
+    
+    if entity.equipment and len(entity.equipment.list) > 0:
+        libtcod.console_set_default_foreground(0, screen_blue)
+        for eq in entity.equipment.list:
+            if eq.equippable.slot == EquipmentSlots.MAIN_HAND:
+                streq = chr(eq.char) + " " + names_list[eq.name]
+                streq[:w-2]
+                libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, streq)
+                printy += 1
+            elif eq.equippable.slot == EquipmentSlots.OFF_HAND:
+                streq = chr(eq.char) + " " + names_list[eq.name]
+                streq[:w-2]
+                libtcod.console_print_ex(0, px, printy, libtcod.BKGND_SET, libtcod.CENTER, streq)
+                printy += 1
+    
 def clear_all(con, entities):
     for entity in entities:
         clear_entity(con, entity)

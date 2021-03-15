@@ -2,6 +2,7 @@ import libtcodpy as libtcod
 
 from components.ai import ConfusedMonster
 from fov_functions import initialize_fov
+import condition_functions
 
 from game_messages import Message
 
@@ -13,14 +14,40 @@ def heal(*args, **kwargs):
     results = []
 
     if entity.fighter.hp == entity.fighter.max_hp:
-        results.append({'consumed': False, 'message': Message('You are already at full health', libtcod.yellow)})
+        results.append({'consumed': True, 'message': Message('Nothing seems to happen.', libtcod.yellow)})
     else:
-        entity.fighter.heal(amount)                                                                                 #heal for ammt  
-        if entity.name == 'Player': entity.potions_drank += 1                                                       #if this is the player, update potions drank #
-        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', libtcod.green)})  #consume item, send message
-
+        entity.fighter.heal(amount)                                                                            #heal for ammt                                                    
+        results.append({'consumed': True, 'message': Message('Your wounds instantly close!', libtcod.lighter_green)})  #consume item, send message
+    
+    if entity.name == 'Player': entity.potions_drank += 1  #if this is the player, update potions drank #
     return results
-                
+
+def poison_potion(*args, **kwargs):
+    entity = args[0]
+    duration = kwargs.get('duration')
+    damage = kwargs.get('damage')
+    
+    results = []
+    if entity.name == 'Player': entity.potions_drank += 1  
+    
+    entity.conditions.append(condition_functions.Poison(target=entity, active=True, duration=duration, damage=damage))
+    results.append({'consumed': True, 'message': Message('You feel unwell.', libtcod.lighter_red)})
+    
+    return results
+    
+def restore_wounds(*args, **kwargs):
+    entity = args[0]
+    duration = kwargs.get('duration')
+    healing = kwargs.get('healing')
+    
+    results = []
+    if entity.name == 'Player': entity.potions_drank += 1  
+    
+    entity.conditions.append(condition_functions.Healing(target=entity, active=True, duration=duration, healing=healing))
+    results.append({'consumed': True, 'message': Message('Your wounds begin to close.', libtcod.lighter_green)})
+    
+    return results
+    
 def cast_lightning(*args, **kwargs):
     caster = args[0]
     entities = kwargs.get('entities')

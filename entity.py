@@ -3,7 +3,6 @@ import libtcodpy as libtcod
 import math
 
 from components.item import Item
-
 from render_functions import RenderOrder
 
 import random
@@ -36,8 +35,11 @@ class Entity:
         self.conditions = []
 
         if self.name == "Player":
+            self.character_name = "Player"
+            
             self.kill_counts = []
             self.turn_count = 0
+            self.score = 0
             
             #achievements
             self.potions_drank = 0

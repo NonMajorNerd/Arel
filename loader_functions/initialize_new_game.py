@@ -73,7 +73,8 @@ def get_constants():
     options_luck_scale = 100
     options_death_delete_save = True
     options_tutorial_enabled = True
-
+    options_inventory_sort = "Alpha"
+    
     colors = {
         'dark_wall': libtcod.Color(34, 34, 68),
         'dark_ground': libtcod.Color(17, 17, 34),
@@ -112,7 +113,8 @@ def get_constants():
         'options_xp_multiplier': options_xp_multiplier,
         'options_luck_scale': options_luck_scale,
         'options_death_delete_save': options_death_delete_save,
-        'options_tutorial_enabled': options_tutorial_enabled
+        'options_tutorial_enabled': options_tutorial_enabled,
+        'options_inventory_sort': options_inventory_sort
     }
 
     return constants
@@ -210,36 +212,42 @@ def get_unidentified_names():
     ]
     
     names_list = {
-    'Player':                   "Player",
-    'Camera Op.':               "Camera Op.",
-    "rat":                      "Rat",
-    'bat':                      "Bat",
-    'goblin':                   "Goblin",
-    'troll':                    "Troll",
-    'remains of Camera Op.':    "Remains of Camera Op.",
-    'remains of rat':           "Remains of Rat",
-    'remains of bat':           "Remains of Bat",
-    'remains of goblin':        "Remains of Goblin",
-    'remains of troll':         "Remains of Troll",
-    'Cargo Shorts':             "Cargo Shorts",
-    'Junk':                     "Junk",
-    'Gold':                     "Gold",
-    'Dagger':                   "Dagger",
-    'Fingerless Gloves':        "Fingerless Gloves",
-    'Sword':                    "Sword",
-    'Shield':                   "Shield",
-    'Stairs':                   "Stairs",
-    'Staff':                    "Staff",
-    'Merchants Bag':            "Merchants Bag",
-    'Goblin Spear':             "Goblin Spear",
-    'Healing Potion':           (str(get_item(potion_colors_list)) + " Potion"),
+    'Junk':                     'Junk',
+    'Stairs':                   'Stairs',
+    'Player':                   'Player',
+    'Sword':                    'Sword',
+    'Shield':                   'Shield',
+    'Camera Op.':                'Camera Op.',
+    'rat':                      'rat',
+    'rat prince':               'rat prince',
+    'rat king':                 'rat king',
+    'bat':                      'bat',
+    'goblin':                   'goblin',
+    'Goblin Spear':             'Spear',
+    'troll':                    'troll',
+    'Remains of Camera Op.':    'Remains of Camera Op.',
+    'remains of rat':           'Remains of Rat',
+    'remains of rat prince':           'Remains of Rat Prince',
+    'remains of rat king':           'Remains of Rat King',
+    'remains of bat':           'Remains of Bat',
+    'remains of goblin':        'Remains of Goblin',
+    'remains of troll':         'Remains of Troll',
+    'Staff':                    'Staff',
+    'Merchants Bag':            'Merchants Bag',
+    'Fingerless Gloves':        'Fingerless Gloves',
+    'Dagger':                   'Dagger',
+    'Gold':                     'Gold',
+    'Cargo Shorts':             'Cargo Shorts',
+    'Cure Wounds':              (str(get_item(potion_colors_list)) + " Potion"),
+    'Restore Wounds':           (str(get_item(potion_colors_list)) + " Potion"),
+    'Foul Liquid':              (str(get_item(potion_colors_list)) + " Potion"),
     'Lightning Scroll':         ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
     'Fireball Scroll':          ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'"),
     'Confusion Scroll':         ("Scroll labeled '" + str(get_item(scroll_names_list)) + "'")
-    
     }
     
     return names_list
+
     
 def get_item(item_list, index=0):
     #return a random item from a list, and remove that item from the list.
@@ -256,15 +264,13 @@ def get_item(item_list, index=0):
 def get_game_variables(constants, names_list, colors_list):
     
     #Build player entity
-    fighter_component = Fighter(hp=100, defense=1, power=2, speed=5)
+    fighter_component = Fighter(hp=100, defense=0, power=1, speed=5)
     inventory_component = Inventory(24)
     level_component = Level()
     equipment_component = Equipment()
     player = Entity(0, 0, 256, libtcod.white, "Player", blocks=True, render_order=RenderOrder.ACTOR,
                     fighter=fighter_component, inventory=inventory_component, level=level_component,
                     equipment=equipment_component)
-    player.conditions.append(Poison(target=player, active=True, duration=5, damage=2))
-    player.conditions.append(Healing(target=player, active=True, duration=10, healing=1))
     player.character_name = constants['player_name']
     entities = [player]
 
@@ -280,8 +286,7 @@ def get_game_variables(constants, names_list, colors_list):
                         effect="Great for slashing, medicore at stabbing.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)       
+        player.equipment.list.append(item)       
         
         
         #shield
@@ -290,8 +295,7 @@ def get_game_variables(constants, names_list, colors_list):
                         effect="Helpful at preventing incoming attacks.")
         equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
         item = Entity(0, 0, 375, colors_list[names_list['Shield']], 'Shield', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
+        player.equipment.list.append(item)
         
         #10 gold
         item_component = Item(use_function=None, stackable=True, count=20,
@@ -306,10 +310,9 @@ def get_game_variables(constants, names_list, colors_list):
         item_component = Item(use_function=None, stackable=False,
                         description="A two-handed (but actually one-handed) wooden staff,",
                         effect="Perfect for smacking things with.")
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
+        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
         item = Entity(0, 0, 372, libtcod.sky, 'Staff', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)       
+        player.equipment.list.append(item)      
         
         #merchants bag
         item_component = Item(use_function=None, stackable=False,
@@ -317,8 +320,7 @@ def get_game_variables(constants, names_list, colors_list):
                         effect="Increases carrying capacity by 24.")
         equippable_component = Equippable(EquipmentSlots.ACC1, capacity_bonus=24)
         item = Entity(0, 0, 364, libtcod.darker_orange, 'Merchants Bag', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
+        player.equipment.list.append(item) 
         
         #100 gold
         item_component = Item(use_function=None, stackable=True, count=100,
@@ -333,10 +335,9 @@ def get_game_variables(constants, names_list, colors_list):
         item_component = Item(use_function=None, stackable=False,
                         description="A small, rusty dagger. Probably unsafe to handle.",
                         effect="This thing was made for doing stabs.")
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
         item = Entity(0, 0, 368, libtcod.sky, 'Dagger', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)       
+        player.equipment.list.append(item)       
         
         #fingerless gloves
         item_component = Item(use_function=None, stackable=False,
@@ -344,8 +345,7 @@ def get_game_variables(constants, names_list, colors_list):
                         effect="Increases speed by 3")
         equippable_component = Equippable(EquipmentSlots.ACC1, speed_bonus=3)
         item = Entity(0, 0, 382, libtcod.darker_orange, 'Fingerless Gloves', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
+        player.equipment.list.append(item)  
         
         #30 gold
         item_component = Item(use_function=None, stackable=True, count=30,
@@ -362,8 +362,7 @@ def get_game_variables(constants, names_list, colors_list):
                         effect="Increases carrying capacity by 8.")
         equippable_component = Equippable(EquipmentSlots.ACC1, capacity_bonus=8)
         item = Entity(0, 0, 395, libtcod.darker_orange, 'Cargo Shorts', equippable=equippable_component, item=item_component)
-        player.inventory.add_item(item, names_list)
-        player.equipment.toggle_equip(item)  
+        player.equipment.list.append(item)  
         
         #10 gold
         item_component = Item(use_function=None, stackable=True, count=10,
