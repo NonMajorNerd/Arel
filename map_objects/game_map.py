@@ -104,7 +104,7 @@ class GameMap:
                     #don't place boss monsters in rooms 1-3
                     coin = randint(0, 100)
                     if coin >49:
-                        boss_placed = self.place_boss(entities, new_x, new_y)
+                        boss_placed = self.place_boss(entities, new_x, new_y, w, h)
                     else:
                         self.place_entities(new_room, entities, names_list, render_colors_list)
                         self.place_junk(new_room, entities)
@@ -118,7 +118,7 @@ class GameMap:
 
         #ensure a boss was placed if needed
         if self.dungeon_level == 5 and boss_placed == False:
-            boss_placed = self.place_boss(entities, new_x, new_y)
+            boss_placed = self.place_boss(entities, new_x, new_y, w, h)
 
         self.clean_map()
     
@@ -148,45 +148,51 @@ class GameMap:
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
         entities.append(down_stairs)        
 
-    def place_boss(self, entities, center_x, center_y):
+    def place_boss(self, entities, center_x, center_y, w, h):
         #populate a boss room dependant on dungeon level
             
         if self.dungeon_level == 5:
-            #Spawn one rat king, 1d4 rat princes, 1d6+1 rats
+            #Spawn one rat king, some rats and princes
             
             fighter_component = Fighter(hp=40, defense=0, power=6, speed=5, xp=100)
             ai_component = RatKing(randomfactor=50, ratchanceperturn=20, princechanceperturn=30)
             x = center_x
             y = center_y
                 
-            monster = Entity(x, y, 331, libtcod.light_violet, 'rat king', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, 
+            monster = Entity(x, y, 331, libtcod.lighter_blue, 'rat king', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, 
                 ai=ai_component)
             
             entities.append(monster)
             
-            for rats in range(1, randint(1,7)+1):
-                fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=5)
+            for rats in range(1, randint(1,4)+1):
+                fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                 ai_component = BasicMonster()
                 spot_blocked = True
                 while spot_blocked:
-                    x = center_x + randint(1,5)
-                    y = center_y + randint(1,5)
-                    if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                        if not x > self.width or y > self.height or self.tiles[x][y].block_sight or self.tiles[x][y].empty_space:
-                            spot_blocked = False
+                    rx = randint(-w+1, w-1)
+                    ry = randint(-h+1, h-1)
+                    print('rats; ' + str(x + rx) + "," + str(y + ry))
+
+                    if 0 < x + rx < self.width and 0 < y + ry < self.height:
+                        if not any([entity for entity in entities if entity.x == x+rx and entity.y == y+ry and entity.ai]):
+                            if not self.tiles[x + rx][y + ry].block_sight or self.tiles[x+rx][y+ry].empty_space:
+                                spot_blocked = False
+                                
                 monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                 entities.append(monster)
                 
-            for princes in range(1, randint(1,5)): 
+            for princes in range(1, randint(1,3)): 
                 fighter_component = Fighter(hp=15, defense=0, power=8, speed=8, xp=30)
                 ai_component = BasicMonster()
                 spot_blocked = True
                 while spot_blocked:
-                    x = center_x + randint(1,5)
-                    y = center_y + randint(1,5)
-                    if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                        if not x > self.width or y > self.height or self.tiles[x][y].block_sight or self.tiles[x][y].empty_space:
-                            spot_blocked = False
+                    rx = randint(-w+1, w-1)
+                    ry = randint(-h+1, h-1)
+                    print('princes; ' + str(x + rx) + "," + str(y + ry))
+                    if 0 < x + rx < self.width and 0 < y + ry < self.height:
+                        if not any([entity for entity in entities if entity.x == x+rx and entity.y == y+ry and entity.ai]):
+                            if not self.tiles[x + rx][y + ry].block_sight or self.tiles[x+rx][y+ry].empty_space:
+                                spot_blocked = False
                 monster = Entity(x, y, 330, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                 entities.append(monster)
                 
@@ -448,19 +454,19 @@ class GameMap:
                 monster_choice = random_choice_from_dict(monster_chances)
 
                 if monster_choice == 'rat':
-                    fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=5)
+                    fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                     ai_component = BasicMonster()
 
                     monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                    chance_for_swarm = 50
+                    chance_for_swarm = 40
                     swarm_check = randint(0, 100)
                     if swarm_check <= chance_for_swarm:
-                        for i in range(1, randint(0,4)+1):
+                        for i in range(1, randint(0,3)+1):
                             rx = randint(room.x1 + 1, room.x2 - 1)
                             ry = randint(room.y1 + 1, room.y2 - 1)
                             if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
-                                fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=5)
+                                fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                                 ai_component = BasicMonster()
                                 monster = Entity(rx, ry, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
@@ -479,14 +485,14 @@ class GameMap:
                             rx = randint(room.x1 + 1, room.x2 - 1)
                             ry = randint(room.y1 + 1, room.y2 - 1)
                             if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
-                                fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=5)
+                                fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                                 ai_component = BasicMonster()
                                 monster = Entity(rx, ry, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
                                 entities.append(monster)
 
                 elif monster_choice == 'bat':
-                    fighter_component = Fighter(hp=10, defense=0, power=3, speed=10, xp=10)
+                    fighter_component = Fighter(hp=9, defense=0, power=3, speed=10, xp=10)
                     ai_component = RandomWalk(randomfactor=66)
 
                     monster = Entity(x, y, 305, libtcod.Color(191, 191, 191), 'bat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)

@@ -114,15 +114,16 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         player.move(dx, dy)
 
                         fov_recompute = True
-                        dijkstra_recompute = True
-
+                        #dijkstra_recompute = True
+                        
+                    #player_turn_end(player, player_turn_results, game_map, constants)
                     game_state = GameStates.ENEMY_TURN
                 else:
                     if game_map.tiles[destination_x][destination_y].door:
                         if not game_map.tiles[destination_x][destination_y].door.is_open:
                             game_map.tiles[destination_x][destination_y].door.toggle_open(game_map, destination_x, destination_y)
                             fov_recompute = True
-                            dijkstra_recompute = True
+                            #dijkstra_recompute = True
                             fov_map = initialize_fov(game_map)
                     
                 player_turn_end(player, player_turn_results, game_map, constants)
@@ -235,8 +236,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     player_turn_end(player, player_turn_results, game_map, constants)
                     game_state = GameStates.ENEMY_TURN
                 else:
-               
-
                     game_state = previous_game_state
                 
             else:   
@@ -246,18 +245,14 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         if show_inventory:
             player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list, message_log, constants))
 
-        #if drop_inventory:
-        #    previous_game_state = game_state
-        #    game_state = GameStates.DROP_INVENTORY
-
-        if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
-                player.inventory.items):
-            item = player.inventory.items[inventory_index]
-
-            if game_state == GameStates.SHOW_INVENTORY:
-                player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, message_log=message_log))
-            elif game_state == GameStates.DROP_INVENTORY:
-                player_turn_results.extend(player.inventory.drop_item(item))
+        #if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
+        #        player.inventory.items):
+        #    item = player.inventory.items[inventory_index]
+        #
+        #    if game_state == GameStates.SHOW_INVENTORY:
+        #        player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, message_log=message_log))
+        #    elif game_state == GameStates.DROP_INVENTORY:
+        #        player_turn_results.extend(player.inventory.drop_item(item))
 
         if take_stairs and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
@@ -372,16 +367,24 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 message_log.add_message(message)
 
             if item_added:
+                print('item added')
                 entities.remove(item_added)
-
+                
+                player_turn_end(player, player_turn_results, game_map, constants)
                 game_state = GameStates.ENEMY_TURN
 
             if item_consumed:
+                print('item consumed')
+                
+                player_turn_end(player, player_turn_results, game_map, constants)
                 game_state = GameStates.ENEMY_TURN
 
             if item_dropped:
+                print('item dropped')
+                
                 entities.append(item_dropped)
-
+                
+                player_turn_end(player, player_turn_results, game_map, constants)
                 game_state = GameStates.ENEMY_TURN
 
             if equip:

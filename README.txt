@@ -82,6 +82,10 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     * Change log *
     **************
 	
+	03/15/21
+		Small bug fixes and cosmetics in the inventory
+		AI and spawning tweaks
+		
 	03/14/21
 		Rebalanced item spawn rates, monster spawn rates, monster stats
 		All monster and player stats rebalanced

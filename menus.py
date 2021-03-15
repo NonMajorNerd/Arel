@@ -603,6 +603,7 @@ def origin_options(constants):
             
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
+  
             
         elif key.vk == libtcod.KEY_RIGHT:
             if index == 0:
@@ -814,11 +815,15 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
     mouse = libtcod.Mouse()
 
     while True:
+
            
         numequip = (len(player.equipment.list) - player.equipment.list.count(None))
         numitems = len(player.inventory.items)
         numpages = int((numitems + numequip)/ itemsperpage) + 1
         
+        if numitems == 0 and numequip == 0:
+            return results
+                
         libtcod.console_set_default_foreground(0, screen_lightgray)
         libtcod.console_set_default_background(0, screen_darkgray)
 
@@ -844,11 +849,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                     libtcod.console_set_default_background(0, screen_lightgray)
                 libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, " ")
         
-        #re-draw (clear) possible action items
-        libtcod.console_set_default_background(0, screen_darkgray)
-        libtcod.console_set_default_foreground(0, screen_lightgray)
-        libtcod.console_print_ex(0, 31, 32, libtcod.BKGND_SET, libtcod.LEFT, "[Enter] to use or equip")
-        libtcod.console_print_ex(0, 31, 34, libtcod.BKGND_SET, libtcod.LEFT, "[A]pply [D]rop [T]hrow")
+        
         
         #if it needs sorted, sort it.
         if needs_sort:
@@ -864,8 +865,11 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
 
             player.equipment.list = sorted(player.equipment.list, key=myattrgetter(strkey, "name")) 
             player.inventory.items = sorted(player.inventory.items, key=myattrgetter(strkey, "name")) 
-
-                   
+            
+            if not (sort == "name" or sort == "type"):
+                player.equipment.list.reverse()
+                player.inventory.items.reverse()
+                
         #first inventory row
         y = 13  
         
@@ -974,6 +978,17 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                     libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
                     y+=1  
                 
+        #re-draw (clear) possible action items
+        libtcod.console_set_default_background(0, screen_darkgray)
+        libtcod.console_set_default_foreground(0, screen_lightgray)
+        libtcod.console_print_ex(0, 31, 32, libtcod.BKGND_SET, libtcod.LEFT, "[Enter] to use or (d)equip")
+        libtcod.console_print_ex(0, 31, 34, libtcod.BKGND_SET, libtcod.LEFT, "[A]pply [D]rop [T]hrow")
+        
+        #draw relevant action items
+        libtcod.console_set_default_foreground(0, libtcod.light_green)
+        libtcod.console_print_ex(0, 39, 34, libtcod.BKGND_SET, libtcod.LEFT, "[D]rop")
+        if (item.item and item.item.use_function) or item.equippable: libtcod.console_print_ex(0, 31, 32, libtcod.BKGND_SET, libtcod.LEFT, "[Enter] to use or (d)equip")
+        
         #Render changes
         libtcod.console_flush()   
         
@@ -1085,6 +1100,19 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         elif key.vk == libtcod.KEY_UP:
             if index > 0: index -= 1
             if line == 13 and currentpage > 1: currentpage -= 1
+  
+        elif chr(key.c) == "d":
+            (item.x, item.y) = (player.x, player.y)
+            entities.append(item)
+            index = 0 
+            currentpage = 1
+            if system == "inventory":
+                player.inventory.items.remove(item)
+            elif system == "equipment":
+                player.equipment.list.remove(item)
+            else: 
+                print("dafuq? " + str(system)) 
+
 
 def sort_menu():
     

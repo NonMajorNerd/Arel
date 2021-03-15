@@ -212,11 +212,12 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                     if player.turn_count < 4:
                         libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the numpad or arrow keys to move.")
                    
-                    elif player.turn_count < 8:
+                    elif player.turn_count < 9:
+                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
+                        
+                    elif player.turn_count < 14:
                         libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [x] to examine creatures or items on the ground.")
                    
-                    elif player.turn_count < 10:
-                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
                         
                     else:
                  
@@ -370,11 +371,11 @@ def context_menu(gmw, gmh, entity, names_list):
     #if len(strname)%2 != 0: charx -= 1
     
     libtcod.console_print_ex(0, charx, y+1, libtcod.BKGND_SET, libtcod.CENTER, chr(entity.char)) 
-    print("x:" + str(x) + " y:" + str(y) + " w:" + str(w) + " (" + str(int(w/2)) + ") h:" + str(h) + " px" + str(px) + " cx:" + str(charx) + " modlen:" + str(len(strname)%2))
+    #print("x:" + str(x) + " y:" + str(y) + " w:" + str(w) + " (" + str(int(w/2)) + ") h:" + str(h) + " px" + str(px) + " cx:" + str(charx) + " modlen:" + str(len(strname)%2))
     
     printy += 1
     strhealth = "OOPS"
-    print(str(entity.fighter.hp / entity.fighter.max_hp))
+    #print(str(entity.fighter.hp / entity.fighter.max_hp))
     if entity.fighter.hp > entity.fighter.max_hp * 0.90:
         libtcod.console_set_default_foreground(0, libtcod.dark_green)
         strhealth = "Healthy"

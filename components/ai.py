@@ -109,7 +109,7 @@ class RatKing:
     def take_turn(self, target, fov_map, game_map, entities, constants):
         results = []
         monster = self.owner
-        
+                            
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
             chance = randint(0, 100) 
             if chance <= self.randomfactor:
@@ -128,15 +128,16 @@ class RatKing:
         dice = randint(0, 100)
             
         if dice < self.ratchanceperturn:
-            fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=5)
+            fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
             ai_component = BasicMonster()
             spot_blocked = True
             while spot_blocked:
-                x = self.owner.x + randint(1,5)
-                y = self.owner.y + randint(1,5)
-                if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                    if not x > game_map.width or y > game_map.height or game_map.tiles[x][y].block_sight or game_map.tiles[x][y].empty_space:
-                        spot_blocked = False
+                x = self.owner.x + randint(-1,1)
+                y = self.owner.y + randint(-1,1)
+                if x < game_map.width and y < game_map.height:
+                    if not any([entity for entity in entities if entity.x == x and entity.y == y and entity.fighter]):
+                            if not game_map.tiles[x][y].block_sight or game_map.tiles[x][y].empty_space:
+                                spot_blocked = False
             monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
             entities.append(monster)
             
@@ -145,11 +146,12 @@ class RatKing:
             ai_component = BasicMonster()
             spot_blocked = True
             while spot_blocked:
-                x = self.owner.x + randint(1,5)
-                y = self.owner.y + randint(1,5)
-                if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                    if not x > game_map.width or y > game_map.height or game_map.tiles[x][y].block_sight or game_map.tiles[x][y].empty_space:
-                        spot_blocked = False
+                x = self.owner.x + randint(-1,1)
+                y = self.owner.y + randint(-1,1)
+                if x < game_map.width and y < game_map.height:
+                    if not any([entity for entity in entities if entity.x == x and entity.y == y and entity.fighter]):
+                            if not game_map.tiles[x][y].block_sight or game_map.tiles[x][y].empty_space:
+                                spot_blocked = False
             monster = Entity(x, y, 330, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
             entities.append(monster)
 

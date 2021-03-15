@@ -12,3 +12,4 @@ class GameStates(Enum):
     KEYTARGETING = 9
     KICKING = 10
     CLOSING = 11
+    FIRING = 12
