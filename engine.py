@@ -144,6 +144,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             
         elif pickup and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
+          
                 if entity.item and entity.x == player.x and entity.y == player.y:
                     pickup_results = player.inventory.add_item(entity, names_list)
                     player_turn_results.extend(pickup_results)

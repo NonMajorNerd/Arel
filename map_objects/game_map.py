@@ -578,8 +578,12 @@ class GameMap:
                                   item=item_component)
 
                 entities.append(item)
-
-                    
+                
+                item_component = Item(use_function=None, stackable=False,
+                                description="A two-handed (but actually one-handed) wooden staff, perfect for whacking things with.")
+                equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+                item = Entity(x, y, 372, libtcod.sky, 'Staff', equippable=equippable_component, item=item_component)
+                entities.append(item)    
 
     def is_blocked(self, x, y):
         return self.tiles[x][y].blocked

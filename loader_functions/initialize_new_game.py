@@ -283,8 +283,7 @@ def get_game_variables(constants, names_list, colors_list):
         
         #sword
         item_component = Item(use_function=None, stackable=False,
-                        description="A short, one-handed sword.",
-                        effect="Great for slashing, medicore at stabbing.")
+                        description="A short, one-handed sword.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)       
@@ -292,8 +291,7 @@ def get_game_variables(constants, names_list, colors_list):
         
         #shield
         item_component = Item(use_function=None, stackable=False,
-                        description="A small, round, metal shield.",
-                        effect="Helpful at preventing incoming attacks.")
+                        description="A small, round, metal shield.")
         equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
         item = Entity(0, 0, 375, colors_list[names_list['Shield']], 'Shield', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)
@@ -309,8 +307,7 @@ def get_game_variables(constants, names_list, colors_list):
         player.char = 262
         #staff
         item_component = Item(use_function=None, stackable=False,
-                        description="A two-handed (but actually one-handed) wooden staff,",
-                        effect="Perfect for smacking things with.")
+                        description="A two-handed (but actually one-handed) wooden staff, perfect for whacking things with.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
         item = Entity(0, 0, 372, libtcod.sky, 'Staff', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)      

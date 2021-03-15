@@ -831,7 +831,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "                      ")
         libtcod.console_set_default_foreground(0, screen_midgray)
         libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "Page " + str(currentpage) + " of " + str(numpages))
-        libtcod.console_print_ex(0, 44, 36, libtcod.BKGND_SET, libtcod.LEFT, "Cap. " + str(numitems) + " of " + str(player.inventory.max_capacity))
+        libtcod.console_print_ex(0, 44, 36, libtcod.BKGND_SET, libtcod.LEFT, "Cap. " + str(numitems + numequip) + " of " + str(player.inventory.max_capacity))
         
         libtcod.console_print_ex(0, 26, 5, libtcod.BKGND_SET, libtcod.LEFT, "[  None  ]") 
         libtcod.console_print_ex(0, 26, 7, libtcod.BKGND_SET, libtcod.LEFT, "[  None  ]") 
@@ -848,8 +848,6 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                 else: #odd
                     libtcod.console_set_default_background(0, screen_lightgray)
                 libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, " ")
-        
-        
         
         #if it needs sorted, sort it.
         if needs_sort:
@@ -948,11 +946,9 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         libtcod.console_set_default_background(0, screen_darkgray)
         libtcod.console_print_ex(0, 44, 13, libtcod.BKGND_SET, libtcod.CENTER, "                          ")
         
-        for y in range (15, 26+1):
+        for y in range (15, 32):
             libtcod.console_print_ex(0, 44, y, libtcod.BKGND_SET, libtcod.CENTER, "                          ")
-        
-        for y in range (28, 30+1):
-            libtcod.console_print_ex(0, 44, y, libtcod.BKGND_SET, libtcod.CENTER, "                          ")
+
         
         libtcod.console_set_default_background(0, screen_midgray)
         libtcod.console_set_default_foreground(0, libtcod.white)
@@ -970,6 +966,122 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
             libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
             y+=1           
             
+        if item.equippable:
+            libtcod.console_set_default_background(0, screen_darkgray)
+            libtcod.console_set_default_foreground(0, screen_lightgray)
+            
+            
+    
+            #if no eq to comapre to, the difference is just the bonus of the item in question
+            diff_atk = item.equippable.power_bonus
+            diff_def = item.equippable.defense_bonus
+            diff_mhp = item.equippable.max_hp_bonus
+            diff_spd = item.equippable.speed_bonus
+            diff_lck = item.equippable.luck_bonus
+            diff_cap = item.equippable.capacity_bonus
+            
+            comp = None
+            for eq in player.equipment.list:
+                if eq.equippable.slot == item.equippable.slot:
+                   comp = eq
+                   break
+                          
+            #if there is eq to compare to, and it's not the same item, list its stats, and the difference is comp - current
+            if comp and comp != item:
+                
+            
+                diff_atk = item.equippable.power_bonus - comp.equippable.power_bonus
+                diff_def = item.equippable.defense_bonus - comp.equippable.defense_bonus
+                diff_mhp = item.equippable.max_hp_bonus - comp.equippable.max_hp_bonus
+                diff_spd = item.equippable.speed_bonus - comp.equippable.speed_bonus 
+                diff_lck = item.equippable.luck_bonus - comp.equippable.luck_bonus
+                diff_cap = item.equippable.capacity_bonus - comp.equippable.capacity_bonus
+                
+                #print the comp stats
+                if True:
+                    x = 45
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    
+                    libtcod.console_print_ex(0, x, y+2, libtcod.BKGND_SET, libtcod.LEFT, comp.name)
+                    libtcod.console_print_ex(0, x, y+4, libtcod.BKGND_SET, libtcod.LEFT, "ATK 00")
+                    libtcod.console_print_ex(0, x, y+5, libtcod.BKGND_SET, libtcod.LEFT, "DEF 00")
+                    libtcod.console_print_ex(0, x, y+6, libtcod.BKGND_SET, libtcod.LEFT, "MHP 00")
+                    libtcod.console_print_ex(0, x, y+7, libtcod.BKGND_SET, libtcod.LEFT, "SPD 00")
+                    libtcod.console_print_ex(0, x, y+8, libtcod.BKGND_SET, libtcod.LEFT, "LCK 00")
+                    libtcod.console_print_ex(0, x, y+9, libtcod.BKGND_SET, libtcod.LEFT, "CAP 00")
+                    
+                    if diff_atk < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_atk > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+4, libtcod.BKGND_SET, libtcod.RIGHT, str(comp.equippable.power_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_def < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_def > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+5, libtcod.BKGND_SET, libtcod.RIGHT, str(comp.equippable.defense_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_mhp < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_mhp > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+6, libtcod.BKGND_SET, libtcod.RIGHT, str(comp.equippable.max_hp_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_spd < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_spd > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+7, libtcod.BKGND_SET, libtcod.RIGHT, str(comp.equippable.speed_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_lck < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_lck > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+8, libtcod.BKGND_SET, libtcod.RIGHT, str(comp.equippable.luck_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_cap < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_cap > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+9, libtcod.BKGND_SET, libtcod.RIGHT, str(comp.equippable.capacity_bonus))
+                    
+            x = 41
+            if comp and comp != item: x = 37
+            
+            libtcod.console_print_ex(0, x, y+2, libtcod.BKGND_SET, libtcod.LEFT, item.name)
+            libtcod.console_print_ex(0, x, y+4, libtcod.BKGND_SET, libtcod.LEFT, "ATK 00")
+            libtcod.console_print_ex(0, x, y+5, libtcod.BKGND_SET, libtcod.LEFT, "DEF 00")
+            libtcod.console_print_ex(0, x, y+6, libtcod.BKGND_SET, libtcod.LEFT, "MHP 00")
+            libtcod.console_print_ex(0, x, y+7, libtcod.BKGND_SET, libtcod.LEFT, "SPD 00")
+            libtcod.console_print_ex(0, x, y+8, libtcod.BKGND_SET, libtcod.LEFT, "LCK 00")
+            libtcod.console_print_ex(0, x, y+9, libtcod.BKGND_SET, libtcod.LEFT, "CAP 00")
+
+            #print the item stats    
+            if True:
+
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_atk > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_atk < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+4, libtcod.BKGND_SET, libtcod.RIGHT, str(item.equippable.power_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_def > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_def < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+5, libtcod.BKGND_SET, libtcod.RIGHT, str(item.equippable.defense_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_mhp > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_mhp < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+6, libtcod.BKGND_SET, libtcod.RIGHT, str(item.equippable.max_hp_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_spd > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_spd < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+7, libtcod.BKGND_SET, libtcod.RIGHT, str(item.equippable.speed_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_lck > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_lck < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+8, libtcod.BKGND_SET, libtcod.RIGHT, str(item.equippable.luck_bonus))
+                    
+                    libtcod.console_set_default_foreground(0, screen_lightgray)
+                    if diff_cap > 0: libtcod.console_set_default_foreground(0, libtcod.lighter_green)
+                    if diff_cap < 0: libtcod.console_set_default_foreground(0, libtcod.lighter_red)
+                    libtcod.console_print_ex(0, x+5, y+9, libtcod.BKGND_SET, libtcod.RIGHT, str(item.equippable.capacity_bonus))
             
         if names_list[item.name] == item.name: #only write the effect if its identified    
             if item.item.effect_lines:
