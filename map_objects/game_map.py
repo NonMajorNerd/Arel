@@ -133,9 +133,9 @@ class GameMap:
         h = int(rooms[len(rooms)-1].h / 2)
         spot_blocked = True
         while spot_blocked:
-            rx = randint(-w, w)
-            ry = randint(-h, h)
-            if not any([entity for entity in entities if entity.x == player.x+rx and entity.y == player.y+ry]):
+            rx = randint(-w+1, w-1)
+            ry = randint(-h+1, h-1)
+            if not any([entity for entity in entities if entity.x == player.x+rx and entity.y == player.y+ry and entity.fighter]):
                 if not self.tiles[player.x + rx][player.y + ry].block_sight or self.tiles[player.x+rx][player.y+ry].empty_space:
                     spot_blocked = False
         
@@ -473,7 +473,7 @@ class GameMap:
                                 entities.append(monster)
                                 
                 elif monster_choice == 'rat_prince':
-                    fighter_component = Fighter(hp=15, defense=0, power=8, speed=8, xp=30)
+                    fighter_component = Fighter(hp=15, defense=0, power=8, speed=8, xp=40)
                     ai_component = BasicMonster()
 
                     monster = Entity(x, y, 330, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
@@ -505,7 +505,7 @@ class GameMap:
                     equipment_component = Equipment()
                     monster_inv = Inventory(3)
                     
-                    fighter_component = Fighter(hp=20, defense=0, power=8, speed=5, xp=35)
+                    fighter_component = Fighter(hp=20, defense=0, power=8, speed=5, xp=30)
                     ai_component = BasicMonster()
 
                     monster = Entity(x, y, 295, libtcod.Color(107, 164, 107), 'goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, 
@@ -531,7 +531,7 @@ class GameMap:
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 item_choice = random_choice_from_dict(item_chances)
                 if item_choice == 'none':
-                    x=1
+                    a=1
                     
                 if item_choice == 'cure_wounds':
                     item_component = Item(use_function=heal, stackable=False, amount=20,
@@ -578,12 +578,7 @@ class GameMap:
                                   item=item_component)
 
                 entities.append(item)
-                
-                item_component = Item(use_function=None, stackable=False,
-                                description="A two-handed (but actually one-handed) wooden staff, perfect for whacking things with.")
-                equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
-                item = Entity(x, y, 372, libtcod.sky, 'Staff', equippable=equippable_component, item=item_component)
-                entities.append(item)    
+
 
     def is_blocked(self, x, y):
         return self.tiles[x][y].blocked

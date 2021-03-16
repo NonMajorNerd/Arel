@@ -67,6 +67,8 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     *  To-Do List  *
     ****************
     
+		*Add score to death screen
+		*Add score saving, high-score tables
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
 		*Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)
 		*Build support for two-handed weapons
