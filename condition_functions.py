@@ -5,7 +5,7 @@ from game_messages import Message
 
 class Poison:
     def __init__(self, target=None, active=True, duration=5, damage=2):
-        
+        self.name = "Poison"
         self.char = "P"
         self.bgcolor = libtcod.Color(0, 255, 0)
         self.fgcolor = libtcod.Color(255, 0, 0)
@@ -24,11 +24,16 @@ class Poison:
     def enact(self, **kwargs):
         results = []
         
+        #{'damage':          {'dead': self.owner, 'xp': self.xp} }
+        
         if self.timer < self.duration +1:
             if self.target.fighter:
-                results.append({'damage': self.target.fighter.take_damage(self.damage)})
-                if self.target.name == "Player":
-                    results.append({ 'message': Message("You take " +  str(self.damage) + ' damage from poison.', libtcod.red)})
+                if self.target.fighter.hp > 0:
+                    results.append({'damage': self.target.fighter.take_damage(self.damage)})
+                    if self.target.name == "Player":
+                        results.append({ 'message': Message("You take " +  str(self.damage) + ' damage from poison.', libtcod.red)})
+                    else:
+                        results.append({ 'message': Message(self.target.name + " takes " +  str(self.damage) + ' damage from poison.', libtcod.lighter_red)})
             else:
                 print("Poision damage enacted on a non-fighter creature ... ")
             self.timer += 1
@@ -39,7 +44,7 @@ class Poison:
         
 class Healing:
     def __init__(self, target=None, active=True, duration=10, healing=1):
-    
+        self.name = "Healing"
         self.char = "H"
         self.bgcolor = libtcod.Color(255, 255, 0)
         self.fgcolor = libtcod.Color(0, 0, 0)

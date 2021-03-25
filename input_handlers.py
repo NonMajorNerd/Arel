@@ -21,6 +21,8 @@ def handle_keys(key, game_state):
         return  player_pick_dir(key, strkey='kick')
     elif game_state == GameStates.CLOSING:
         return  player_pick_dir(key, strkey='close')
+    elif game_state == GameStates.FIRING:
+        return  player_pick_dir(key, strkey='fire')
         
     return {}
 
@@ -74,6 +76,10 @@ def handle_player_turn_keys(key):
             return {'move': (-1, -1)}
         elif key.vk == libtcod.KEY_RIGHT:
             return {'move': (1, 1)}
+            
+        elif key_char == '/': #might be vk
+            return {'show_help': True}   
+            
     else:
         if key.vk == libtcod.KEY_KP9:
             return {'move': (1, -1)}
@@ -96,6 +102,9 @@ def handle_player_turn_keys(key):
             
     if key_char == 'c':
         return {'close': True}
+        
+    elif key_char == 'f':
+        return {'fire': True}
         
     elif key_char == 'g':
         return {'pickup': True}

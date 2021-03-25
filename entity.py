@@ -16,7 +16,7 @@ class Entity:
     """
     def __init__(self, x, y, char, color, name, blocks=False,
         render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inventory=None, stairs=None,
-        level=None, equipment=None, equippable=None):
+        level=None, equipment=None, equippable=None, ammo=None):
         self.x = x
         self.y = y
         self.char = char
@@ -32,6 +32,7 @@ class Entity:
         self.level = level
         self.equipment = equipment
         self.equippable = equippable
+        self.ammo = ammo
         self.conditions = []
 
         if self.name == "Player":

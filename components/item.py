@@ -2,7 +2,7 @@ import textwrap
 
 class Item:
     def __init__(self, use_function=None, targeting=False, targeting_message=None, stackable=False, count=1,
-        description="No Description", effect=None, flammable=False, **kwargs):
+        description="No Description", effect=None, flammable=False, ammo=None, range=0, **kwargs):
         
         self.use_function = use_function            #what, if any, is this items "use" function?
         self.targeting = targeting                      #does this item require targeting when used?
@@ -12,6 +12,8 @@ class Item:
         self.count = count                              #how many of this item are in this specific 'stack'?
         
         self.flammable = flammable                    #is this item flammable?
+        self.ammo = ammo
+        self.range = range
         
         self.description_lines = textwrap.wrap("  " + description, 26)               #description for display in the inventory system
         if len(self.description_lines) > 8:

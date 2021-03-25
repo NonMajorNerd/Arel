@@ -1225,7 +1225,6 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
             else: 
                 print("dafuq? " + str(system)) 
 
-
 def sort_menu():
     
     sort = "Alphabetical"
@@ -1920,3 +1919,103 @@ def character_screen(player, entities, constants, dungeon_level, names_list, col
 
 def message_box(con, header, width, screen_width, screen_height):
     menu(con, header, [], width, screen_width, screen_height)
+
+
+def help_menu():
+    
+    results = []
+    
+    #UI Color Defaults
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+    
+    #print static UI elements
+    if True:
+        print('Static layout elements go here')
+        #backgrounds and border
+        for y in range (2, 39):
+            for x in range (1, 59):
+                libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, " ")
+                if y == 2 or y == 11 or y == 38:
+                    libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+       
+        for x in range(1, 12):
+            libtcod.console_print_ex(0, x, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+            
+        for y in range(2, 39):
+            libtcod.console_print_ex(0, 1, y, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+            libtcod.console_print_ex(0, 58, y, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+        
+        
+        #corners, T pieces
+        libtcod.console_print_ex(0, 1, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(201))
+        libtcod.console_print_ex(0, 11, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+        libtcod.console_print_ex(0, 11, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+        libtcod.console_print_ex(0, 58, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+        libtcod.console_print_ex(0, 1, 11, libtcod.BKGND_SET, libtcod.LEFT, chr(199))
+        libtcod.console_print_ex(0, 58, 11, libtcod.BKGND_SET, libtcod.LEFT, chr(182))
+        libtcod.console_print_ex(0, 1, 38, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+        libtcod.console_print_ex(0, 58, 38, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+        
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    while True:
+        
+        print('Dynamic layout elements go here')
+        
+        #Render changes
+        libtcod.console_flush()   
+        
+        #Check for input
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        
+        if key.vk == libtcod.KEY_ESCAPE:
+            return results
+            
+        elif chr(key.c) == "s":
+            x = 1
+
+def menu_template():
+    
+    results = []
+    
+    #UI Color Defaults
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+
+    
+    #print static UI elements
+    if True:
+        print('Static layout elements go here')
+        
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    while True:
+        
+        print('Dynamic layout elements go here')
+        
+        #Render changes
+        libtcod.console_flush()   
+        
+        #Check for input
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        
+        if key.vk == libtcod.KEY_ESCAPE:
+            return results
+            
+        elif chr(key.c) == "s":
+            x = 1

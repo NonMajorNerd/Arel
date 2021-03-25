@@ -127,7 +127,7 @@ class GameMap:
         self.create_doors()
 
         #make the first camera man!!!
-        fighter_component = Fighter(hp=15, defense=0, power=0, speed=5)
+        fighter_component = Fighter(hp=5, defense=0, power=0, speed=5)
         ai_component = CameraMan()
         w = int(rooms[len(rooms)-1].w / 2) 
         h = int(rooms[len(rooms)-1].h / 2)

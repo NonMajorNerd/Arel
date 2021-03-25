@@ -7,6 +7,9 @@ from components.item import Item
 from components.fighter import Fighter
 from components.inventory import Inventory
 from components.level import Level
+from components.ammo import Ammo
+from ammo_functions import BasicShot, PoisonShot
+
 
 from condition_functions import Poison, Healing
 
@@ -158,7 +161,9 @@ def get_render_colors():
     'Cyan Potion':                  libtcod.Color(0, 100, 100),
     'Sword':                        libtcod.light_sky,
     'Shield':                       libtcod.darker_orange,
-    'Gold':                         libtcod.dark_yellow
+    'Gold':                         libtcod.dark_yellow,
+    'Short Bow':                    libtcod.brass,
+    'Arrow':                        libtcod.desaturated_amber
     }
     
     return colors_list
@@ -218,7 +223,9 @@ def get_unidentified_names():
     'Targeter':                 'Targeter',
     'Sword':                    'Sword',
     'Shield':                   'Shield',
-    'Camera Op.':                'Camera Op.',
+    'Short Bow':                'Short Bow',
+    'Arrow':                    'Arrow',
+    'Camera Op.':               'Camera Op.',
     'rat':                      'rat',
     'rat prince':               'rat prince',
     'rat king':                 'rat king',
@@ -226,7 +233,7 @@ def get_unidentified_names():
     'goblin':                   'goblin',
     'Goblin Spear':             'Spear',
     'troll':                    'troll',
-    'Remains of Camera Op.':    'Remains of Camera Op.',
+    'remains of Camera Op.':    'Remains of Camera Op.',
     'remains of rat':           'Remains of Rat',
     'remains of rat prince':    'Remains of Rat Prince',
     'remains of rat king':      'Remains of Rat King',
@@ -280,6 +287,22 @@ def get_game_variables(constants, names_list, colors_list):
     
     if origin == "Adventurer":
         player.char = 258
+        
+        #HEKIN ARROW?
+        #hit_component =  BasicShot(damage=2)
+        #ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        #ammo_component = Ammo(hit_function=PoisonShot(2, 1, 10), retrievable=True)
+        #item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+        #                description="Arrow. Pewpew!")
+        #item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+        #player.inventory.items.append(item)    
+        
+        #HEKIN BOW
+        #item_component = Item(use_function=None, stackable=False, flammable=True, ammo="Arrow", range=5,
+        #                description="A small, low-range bow.")
+        #equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
+        #item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
+        #player.equipment.list.append(item)       
         
         #sword
         item_component = Item(use_function=None, stackable=False,
