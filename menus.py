@@ -460,6 +460,65 @@ def game_options(constants):
         elif key.vk == libtcod.KEY_UP:
             if index > 0: index -= 1                
             
+
+def m1m2_menu(x=1, y=1, optionslist=[]):
+
+    if optionslist == []: return False
+   
+    results = []
+    
+    #UI Color Defaults
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+
+    #find the longest string in options list to define menu width
+    max_len = -1
+    for opt in optionslist:
+        if len(opt) > max_len:
+            max_len = len(opt)
+  
+    w = max_len + 5
+    h = 5
+  
+    print('x: ' + str(x) + ';; y: ' + str(y))
+    print('w: ' + str(w) + ';; h: ' + str(h))
+
+    #print static UI elements
+    if True:
+    
+        
+        libtcod.console_set_default_foreground(0, libtcod.black)
+        libtcod.console_set_default_background(0, screen_darkgray)
+
+        for ix in range (x, w):
+            for iy in range(y, h):
+                libtcod.console_print_ex(0, ix, iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+
+
+
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    while True:
+        
+        #Render changes
+        libtcod.console_flush()   
+        
+        #Check for input
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        
+        if key.vk == libtcod.KEY_ESCAPE:
+            return results
+            
+        elif chr(key.c) == "s":
+            x = 1
+
             
 def origin_options(constants):
  
@@ -1107,6 +1166,8 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         #Check for input
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
         
+        print(str(key.vk))
+        
         if key.vk == libtcod.KEY_ESCAPE or chr(key.c) == "i":
             #results.append({'ignore': 0})
             return results
@@ -1173,7 +1234,8 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
              
             needs_sort = True
             
-        elif key.vk == libtcod.KEY_ENTER:
+        #todo : fix str(key.vk) == "49"
+        elif key.vk == libtcod.KEY_ENTER or str(key.vk) == "49": 
             if item.item.use_function:
                 results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list))
                 return results 
@@ -1203,13 +1265,13 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
             else:
                 print("Not sure what to do here? Menu line 919 ... key enter on a non-usable, non-equippable item?")
                 
-        elif key.vk == libtcod.KEY_DOWN:
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
             cap = numitems -1
             if currentpage == 1: cap += numequip
             if index < cap: index += 1
             if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
 
-        elif key.vk == libtcod.KEY_UP:
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
             if index > 0: index -= 1
             if line == 13 and currentpage > 1: currentpage -= 1
   

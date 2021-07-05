@@ -13,6 +13,7 @@ from menus import main_menu, message_box, inventory_menu, character_screen, game
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 from equipment_slots import EquipmentSlots
+from ammo_functions import m1m2
 
 from random import randint
 import copy
@@ -250,7 +251,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             if game_map.tiles[kickx][kicky].door: fov_recompute = True
                 
                 if previous_game_state == GameStates.PLAYERS_TURN:
-                    player_turn_end(player, player_turn_results, game_map, constants, entitie, message_log)
+                    player_turn_end(player, player_turn_results, game_map, constants, entities, message_log)
                     game_state = GameStates.ENEMY_TURN
                 else:
                     game_state = previous_game_state
@@ -305,11 +306,27 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 #ranged_weapon should be assigned when game_state goes from player_turn to firing..
                 #check "for eq in player.equipment.list:" loop near line 310 engine.py on error
                 if not ranged_weapon:
-                    print("dafuq? ... line 254 engine.py .. no ranged weapon?!")
+                    print("dafuq? ... line 309 engine .. no ranged weapon?!")
 
                 #get direction from the player_turn_results 'fire' key    
                 dx, dy = fire
-              
+                
+                #find the equipped quiver - if any - to pass to m1m2
+                eqquiver = None
+                if len(player.equipment.list) > 0:
+                    for eq in player.equipment.list:
+                        if eq.name == "Quiver": 
+                            eqquiver = eq
+                            break
+                            
+           
+                if not m1m2(called_from="Map", quiver=eqquiver, player=player) == None:
+                    #returns the item to shoot .. already confirmed that it's in the inventory
+                    #do something with it
+                    a=1
+                else:
+                    print("m1m2 == None")
+                    
                 #look for ammo
                 ammo = None
                 for i in player.inventory.items:
@@ -369,6 +386,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     previous_game_state = game_state
                     game_state = GameStates.FIRING
                 else:
+                    #hip firing goes here
                     message_log.add_message(Message('You do not have a ranged weapon equipped.', libtcod.lighter_red))
                     
         

@@ -66,24 +66,36 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     ****************
     *  To-Do List  *
     ****************
-    
+	
+		*Add left/right (KP4/KP6) in menus to naviage pages
 		*Add communicable conditions
 		*Add score to death screen
 		*Add score saving, high-score tables
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
 		*Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)
 		*Build support for two-handed weapons
+		*Penis-shaped yogurt-shooting baton
 		*Update accessory system
 		*Fix fireball scroll displaying true name of unidentified burned items 
 		*Add description_list and effects_list
 		*Add a check/return so if a list is searched and there is no result, it returns a default .. eg if names list does not have a name for this item, just return the default name.
+		*WAP Fatigue
 		*Expand scoring system
 		*Build a check for 'is there a camera op? if not, spawn one nearby (but outside of player FoV)'
+		*Extend ranged weapon systems
+			*accuracy??
+			*capability to hip-fire at reduced accuaracy/damage?
+			*reduced damage if firing at range 1?
 		*Certainly a ton of other things	
+		
 		
     **************
     * Change log *
     **************
+	
+	4/22/21
+		Blocked out core systems and logic for more robust ammo usability
+		Added the Quiver item
 	
 	03/24/21
 		Added ranged weaponry, ammo typess
@@ -141,3 +153,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Fixed the order-of-operations in target seraching when kicking (mainly fixes kicking things through open doorways)
 		
 		Fixed spawn rates    
+
+
+
+*The current TEMPORARY menu_background.png file is the sole property of Wizards of the Coast (© 1993-2021 Wizards of the Coast LLC, a subsidiary of Hasbro, Inc. All Rights Reserved.)*

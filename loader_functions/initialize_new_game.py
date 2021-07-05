@@ -25,6 +25,8 @@ from map_objects.game_map import GameMap
 
 from render_functions import RenderOrder
 
+from item_functions import use_quiver
+
 def load_customfont():
     #The index of the first custom tile in the file
     a = 256
@@ -74,7 +76,7 @@ def get_constants():
     options_player_damage_scale = 100
     options_xp_multiplier = 1
     options_luck_scale = 100
-    options_death_delete_save = True
+    options_death_delete_save = True #not a thing
     options_tutorial_enabled = True
     options_inventory_sort = "Alpha"
     
@@ -163,7 +165,8 @@ def get_render_colors():
     'Shield':                       libtcod.darker_orange,
     'Gold':                         libtcod.dark_yellow,
     'Short Bow':                    libtcod.brass,
-    'Arrow':                        libtcod.desaturated_amber
+    'Arrow':                        libtcod.desaturated_amber,
+    'Quiver':                       libtcod.desaturated_amber
     }
     
     return colors_list
@@ -225,6 +228,7 @@ def get_unidentified_names():
     'Shield':                   'Shield',
     'Short Bow':                'Short Bow',
     'Arrow':                    'Arrow',
+    'Quiver':                   'Quiver',
     'Camera Op.':               'Camera Op.',
     'rat':                      'rat',
     'rat prince':               'rat prince',
@@ -288,6 +292,16 @@ def get_game_variables(constants, names_list, colors_list):
     if origin == "Adventurer":
         player.char = 258
         
+        #HEKIN QUIVER
+ 
+        #item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
+        #                description="A quiver for storing arrows.",
+        #                effect="Currently empty.")
+        #equippable_component = Equippable(EquipmentSlots.ACC1, contents="")
+        #item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', equippable=equippable_component, item=item_component)
+        #player.equipment.list.append(item)       
+        
+        
         #HEKIN ARROW?
         #hit_component =  BasicShot(damage=2)
         #ammo_component = Ammo(hit_function=hit_component, retrievable=True)
@@ -298,7 +312,7 @@ def get_game_variables(constants, names_list, colors_list):
         #player.inventory.items.append(item)    
         
         #HEKIN BOW
-        #item_component = Item(use_function=None, stackable=False, flammable=True, ammo="Arrow", range=5,
+        #item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
         #                description="A small, low-range bow.")
         #equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
         #item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
