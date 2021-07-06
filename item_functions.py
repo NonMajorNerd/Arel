@@ -2,7 +2,9 @@ import libtcodpy as libtcod
 
 from components.ai import ConfusedMonster
 from fov_functions import initialize_fov
+from menus import m1m2_menu
 import condition_functions
+
 
 from game_messages import Message
 
@@ -110,6 +112,26 @@ def cast_fireball(*args, **kwargs):
                 results.append({'message': Message('The {0} is destroyed in the fire!'.format(entity.name, damage), libtcod.orange)})
                 entities.remove(entity)
     return results
+
+def use_quiver(*args, **kwargs):
+    player = args[0]
+
+    results = []
+    
+    ammo_list =[]
+
+    for i in player.inventory.items:
+        print(str(i.name))
+        if i.item.ammo:
+            ammo_list.append(i.name)
+
+    print(str(ammo_list))
+
+    if len(ammo_list) == 0:
+        print("no ammo")
+
+    m1m2_menu(x=15, y=15, w=15, h=5, numoptions=3, optionslist=ammo_list)
+
 
 
 def cast_confuse(*args, **kwargs):

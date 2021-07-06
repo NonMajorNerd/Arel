@@ -1,6 +1,71 @@
+from components.ammo import Ammo
 import libtcodpy as libtcod
 from game_messages import Message
 from condition_functions import Poison
+from menus import m1m2_menu
+
+def Fire_And_Preference(called_from=None, player=None, constants=None):
+    if not called_from: print("Error; ammo_functions line 7.. F&P without called from")
+    if not constants: print("Error; ammo_functions line 7.. F&P without constants")
+    
+    ammo_list =[]
+
+    for i in player.inventory.items:
+        print(str(i.name))
+        if i.item.ammo:
+            ammo_list.append(i.name)
+
+    print(str(ammo_list))
+
+    if len(ammo_list) == 0:
+        print("no ammo")
+        return None
+
+    pref = constants['options_ammo_preference']
+    print('pref: ' + str(pref))
+
+    if called_from == "Map":
+
+        if pref == None:
+
+            numoptions = 4
+
+            #find the longest string in options list to define menu width
+            max_len = -1
+            for opt in ammo_list:
+                if len(opt) > max_len:
+                    max_len = len(opt)
+
+            w = max_len + 5
+            if w < 15: w = 15
+
+            h = numoptions + 2
+
+            x = player.x + 1
+            y = player.y - (h+1)
+
+            if x + w >= constants['screen_width'] -1:
+                x -= (w+1)
+
+            while y <= 1:
+                y += 1
+
+            pref = m1m2_menu(x, y, w, h, numoptions, ammo_list)
+
+        constants['options_ammo_preference'] = pref
+        return (str(pref))
+
+    elif called_from == "Inventory":
+        return 4
+        #presuming the quiver is calling this..
+        #the arrow/ammo will use its entity.item "Use_Function()" to assign/overwrite preference
+
+        #preference = m1()
+
+    else:
+        print("huh?")
+
+
 
 class BasicShot:
     def __init__(self, damage):

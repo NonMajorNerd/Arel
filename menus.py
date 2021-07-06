@@ -461,11 +461,11 @@ def game_options(constants):
             if index > 0: index -= 1                
             
 
-def m1m2_menu(x=1, y=1, optionslist=[]):
+def m1m2_menu(x=1, y=1, w=None, h=None, numoptions=3, optionslist=[]):
 
     if optionslist == []: return False
    
-    results = []
+    results = None
     
     #UI Color Defaults
     screen_yellow = libtcod.Color(255,255,102)
@@ -477,36 +477,58 @@ def m1m2_menu(x=1, y=1, optionslist=[]):
     screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
     screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
 
-    #find the longest string in options list to define menu width
-    max_len = -1
-    for opt in optionslist:
-        if len(opt) > max_len:
-            max_len = len(opt)
-  
-    w = max_len + 5
-    h = 5
-  
-    print('x: ' + str(x) + ';; y: ' + str(y))
-    print('w: ' + str(w) + ';; h: ' + str(h))
+    inv_index = 0
+    m1_index = 0
+
+    #dynamic positioning is set up in ammo_functions line ~44..
+    #for some reason it causes rendering issues. Locking it to (1,1) seems to fix it inexplicably 
+    x = 1 
+    y = 1
 
     #print static UI elements
     if True:
-    
-        
+
         libtcod.console_set_default_foreground(0, libtcod.black)
         libtcod.console_set_default_background(0, screen_darkgray)
 
-        for ix in range (x, w):
-            for iy in range(y, h):
+        for ix in range (x, w+1):
+            for iy in range(y, h+2):
                 libtcod.console_print_ex(0, ix, iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
 
-
+        libtcod.console_set_default_foreground(0, screen_lightgray)
+        libtcod.console_print_ex(0, x+1, y+h-1, libtcod.BKGND_NONE, libtcod.LEFT, "Esc to Cancel")
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
+    libtcod.console_set_default_foreground(0, libtcod.black)
+
     while True:
-        
+
+        for iy in range (1, numoptions+1):
+            for ix in range (x+1, w):
+                if iy %2 == 0:
+                    libtcod.console_set_default_background(0, screen_lightgray)
+                    libtcod.console_print_ex(0, ix, y+iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+                else:
+                    libtcod.console_set_default_background(0, screen_midgray)
+                    libtcod.console_print_ex(0, ix, y+iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+
+        if len(optionslist) < numoptions:
+            for opt in optionslist: 
+                libtcod.console_print_ex(0, x+1, y+1+m1_index, libtcod.BKGND_NONE, libtcod.LEFT, str(opt))
+        else:
+            for i in range (0, numoptions):     
+                libtcod.console_print_ex(0, x+1, y+1+i, libtcod.BKGND_NONE, libtcod.LEFT, str(optionslist[inv_index + i]))
+
+        current_option = optionslist[inv_index + m1_index]
+        libtcod.console_set_default_background(0, screen_green)
+
+        for iw in range(x+1, w-len(current_option)):
+            current_option = current_option + " "
+
+        libtcod.console_print_ex(0, x+1, y+1+m1_index, libtcod.BKGND_SET, libtcod.LEFT, current_option)
+
         #Render changes
         libtcod.console_flush()   
         
@@ -515,9 +537,26 @@ def m1m2_menu(x=1, y=1, optionslist=[]):
         
         if key.vk == libtcod.KEY_ESCAPE:
             return results
-            
-        elif chr(key.c) == "s":
-            x = 1
+
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+            if m1_index == 0:
+                if inv_index > 0:
+                    inv_index -= 1
+
+            else:
+                m1_index -= 1
+
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+            if m1_index < len(optionslist) -1:
+                if m1_index == numoptions-1:
+                    if inv_index < len(optionslist)-numoptions:
+                        inv_index += 1
+                    
+                else:
+                    m1_index += 1
+
+        elif key.vk == libtcod.KEY_ENTER:
+            return current_option.strip()
 
             
 def origin_options(constants):
@@ -684,8 +723,7 @@ def origin_options(constants):
                     origin = "Merchant"
                     
                 elif origin == "Tourist":
-                    origin = "Criminal"
-            
+                    origin = "Criminal"      
 
 def character_name(constants):
 

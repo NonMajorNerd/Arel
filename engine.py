@@ -13,7 +13,7 @@ from menus import main_menu, message_box, inventory_menu, character_screen, game
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 from equipment_slots import EquipmentSlots
-from ammo_functions import m1m2
+from ammo_functions import Fire_And_Preference
 
 from random import randint
 import copy
@@ -311,40 +311,31 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 #get direction from the player_turn_results 'fire' key    
                 dx, dy = fire
                 
-                #find the equipped quiver - if any - to pass to m1m2
-                eqquiver = None
-                if len(player.equipment.list) > 0:
-                    for eq in player.equipment.list:
-                        if eq.name == "Quiver": 
-                            eqquiver = eq
-                            break
+                FnP = Fire_And_Preference(called_from="Map", player=player, constants=constants)
+                if str(FnP) == "None":
+                    print("No ammo.")
+                    break
+                else:
+                    print("at engine: " + str(FnP))
+
+                    ammo = None
+
+                    for i in player.inventory.items:
+                        if i.name == FnP:
+                            ammo = i
+                            print ('pref: ' + str(i.name) + '  x' + str(i.item.count))
+                            if i.item.count == 1: constants['options_ammo_preference'] = None
+                            player.inventory.remove_item(i)
                             
-           
-                if not m1m2(called_from="Map", quiver=eqquiver, player=player) == None:
-                    #returns the item to shoot .. already confirmed that it's in the inventory
-                    #do something with it
-                    a=1
-                else:
-                    print("m1m2 == None")
-                    
-                #look for ammo
-                ammo = None
-                for i in player.inventory.items:
-                    if ranged_weapon.item.ammo == i.name:
-                        ammo = i
-                        player.inventory.remove_item(i)
-                        break
-                        
-                if not ammo:
-                    message_log.add_message(Message('You do not have the ammo needed.', libtcod.lighter_red))
-                
-                else:
+                            break
+
                     hit = False
                     lost = False
+
                     #loop through the range of the weapon in question
                     for r in range(1, ranged_weapon.item.range+2):
                         if hit or lost: break
-                     
+                        
                         sx = player.x + (dx * r)
                         sy = player.y + (dy * r)
                         
@@ -353,6 +344,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
                             if ammo.item.ammo.retrievable: 
                                 ia = copy.deepcopy(ammo)
+                                ia.item.count = 1
                                 (ix, iy) = (sx-dx, sy-dy)
                                 (ia.x, ia.y) = (ix, iy)
                                 print("        (" + str(ix) + "," + str(iy) + ")")
@@ -375,7 +367,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:   
             
                 for eq in player.equipment.list:
-                    print(str(eq.equippable.slot))
                     
                     if eq.equippable.slot == EquipmentSlots.MAIN_HAND or eq.equippable.slot == EquipmentSlots.OFF_HAND:
                         if eq.item.range > 0:

@@ -79,6 +79,7 @@ def get_constants():
     options_death_delete_save = True #not a thing
     options_tutorial_enabled = True
     options_inventory_sort = "Alpha"
+    options_ammo_preference = None #no default ammo selected
     
     colors = {
         'dark_wall': libtcod.Color(34, 34, 68),
@@ -119,7 +120,8 @@ def get_constants():
         'options_luck_scale': options_luck_scale,
         'options_death_delete_save': options_death_delete_save,
         'options_tutorial_enabled': options_tutorial_enabled,
-        'options_inventory_sort': options_inventory_sort
+        'options_inventory_sort': options_inventory_sort,
+        'options_ammo_preference': options_ammo_preference
     }
 
     return constants
@@ -228,6 +230,11 @@ def get_unidentified_names():
     'Shield':                   'Shield',
     'Short Bow':                'Short Bow',
     'Arrow':                    'Arrow',
+    'Pos. Arrow':               'Pos. Arrow',
+    '1 Arrow':                  '1 Arrow',
+    '2 Arrow':                  '2 Arrow',
+    '3 Arrow':                  '3 Arrow',
+    '4 Arrow':                  '4 Arrow',
     'Quiver':                   'Quiver',
     'Camera Op.':               'Camera Op.',
     'rat':                      'rat',
@@ -294,36 +301,66 @@ def get_game_variables(constants, names_list, colors_list):
         
         #HEKIN QUIVER
  
-        #item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
-        #                description="A quiver for storing arrows.",
-        #                effect="Currently empty.")
-        #equippable_component = Equippable(EquipmentSlots.ACC1, contents="")
-        #item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', equippable=equippable_component, item=item_component)
-        #player.equipment.list.append(item)       
+        item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
+                        description="A quiver for storing arrows.",
+                        effect="Currently empty.")
+        item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', item=item_component)
+        player.inventory.items.append(item)       
         
         
         #HEKIN ARROW?
-        #hit_component =  BasicShot(damage=2)
-        #ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        #ammo_component = Ammo(hit_function=PoisonShot(2, 1, 10), retrievable=True)
-        #item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-        #                description="Arrow. Pewpew!")
-        #item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
-        #player.inventory.items.append(item)    
+        hit_component =  PoisonShot(2, 1, 10)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Pos. Arrow', item=item_component)
+        player.inventory.items.append(item)    
         
+        #HEKIN ARROW?
+        hit_component =  BasicShot(2)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+        player.inventory.items.append(item) 
+
+        #HEKIN ARROW?
+        hit_component =  BasicShot(2)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], '2 Arrow', item=item_component)
+        player.inventory.items.append(item) 
+
+        #HEKIN ARROW?
+        hit_component =  BasicShot(2)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], '3 Arrow', item=item_component)
+        player.inventory.items.append(item) 
+
+        #HEKIN ARROW?
+        hit_component =  BasicShot(2)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], '4 Arrow', item=item_component)
+        player.inventory.items.append(item) 
+
         #HEKIN BOW
-        #item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
-        #                description="A small, low-range bow.")
-        #equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
-        #item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
-        #player.equipment.list.append(item)       
+        item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
+                        description="A small, low-range bow.")
+        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
+        item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
+        player.equipment.list.append(item)       
         
         #sword
         item_component = Item(use_function=None, stackable=False,
                         description="A short, one-handed sword.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
-        player.equipment.list.append(item)       
+        #player.equipment.list.append(item)       
         
         
         #shield

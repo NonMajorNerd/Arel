@@ -40,8 +40,7 @@ def kill_player(player, game_map, constants):
         libtcod.console_print_ex(0, 30, 5, libtcod.BKGND_NONE, libtcod.CENTER, constants['options_difficulty'] + " " + constants['options_origin'])
         
         libtcod.console_set_default_foreground(0, screen_purple)
-        libtcod.console_print_ex(0, 30, 6, libtcod.BKGND_NONE, libtcod.CENTER, str(player.turn_count) + " Turns")
-        libtcod.console_print_ex(0, 30, 7, libtcod.BKGND_NONE, libtcod.CENTER, "Dungeon Level " + str(game_map.dungeon_level))
+        libtcod.console_print_ex(0, 30, 6, libtcod.BKGND_NONE, libtcod.CENTER, str(player.turn_count) + " Turns, Dungeon Level " + str(game_map.dungeon_level))
         libtcod.console_print_ex(0, 30, 7, libtcod.BKGND_NONE, libtcod.CENTER, str(player.score) + " Points")
         
         libtcod.console_set_default_foreground(0, screen_blue)
