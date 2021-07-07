@@ -200,24 +200,24 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
             MAP_WIDTH = game_map.width
             
             if game_map.dungeon_level < 3:
-                libtcod.console_set_default_background(0, libtcod.lighter_blue)
+                libtcod.console_set_default_background(0, libtcod.lighter_yellow)
                 libtcod.console_set_default_foreground(0, libtcod.black)
                 
                 if player.y >= MAP_HEIGHT/2: #player on bottom half of the screen
                     (tx, ty) = (58, 2)
                 else: #player on top half of the map
-                    (tx, ty) = (58, 32)
+                    (tx, ty) = (58, 31)
                     
                 if game_state != GameStates.KEYTARGETING:
                     if player.turn_count < 4:
                         libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the numpad or arrow keys to move.")
                    
                     elif player.turn_count < 9:
-                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
+                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack with a melee ")
+                        libtcod.console_print_ex(0, tx, ty+1, libtcod.BKGND_SET, libtcod.RIGHT, "weapon, or press [f] to fire a ranged weapon.")
                         
                     elif player.turn_count < 14:
                         libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [x] to examine creatures or items on the ground.")
-                   
                         
                     else:
                  

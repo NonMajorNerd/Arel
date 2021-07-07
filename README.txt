@@ -72,10 +72,8 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     *  To-Do List  *
     ****************
 	
-		*Rebalance item drops to account for bows, arrows..*
+		*Rebalance item drops to account for bows, arrows..
 
-		*Add context tooltip hints for ranged weapon system
-		*Add left/right (KP4/KP6) in menus to naviage pages
 		*Add communicable conditions
 		*Add score saving, high-score tables
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
@@ -99,9 +97,10 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     **************
 	
 	07/05/21
-		Bug fixes around ranged weaponry
+		Bug fixes around ranged weapon systems
 		Fixed a bug which was causing new games to use the constants, names and colors lists from previous games from the same execution
 		Added keypad control to all menus
+		Fixed the autosave / loading system
 
 	07/06/21
 		Note that 'arrow' items will drop regardless of origin choice, but 'bow' items will NOT spawn and can not be obtained if you do not start as a ranger.
