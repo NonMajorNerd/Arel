@@ -8,7 +8,7 @@ from fov_functions import initialize_fov, recompute_fov
 from game_messages import Message, message_log_history
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
-from loader_functions.initialize_new_game import get_constants, get_game_variables, get_unidentified_names, get_render_colors
+from loader_functions.initialize_new_game import get_constants, get_game_variables, get_unidentified_names, get_render_colors, load_customfont
 from loader_functions.data_loaders import load_game, save_game
 from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options, intro, character_name, help_menu
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
@@ -28,7 +28,7 @@ def player_turn_end(player, player_turn_results, game_map, constants, entities, 
             if entity.fighter.hp > 0:
                 for con in entity.conditions:
                     if con.active:
-                        print ('enacting ' + con.name + 'on ' + entity.name)
+                        print ('enacting ' + con.name + ' on ' + entity.name + " which has " + str(entity.fighter.hp) + " hp.")
                         player_turn_results.extend(con.enact())
                         
     #process turn results for conditions
@@ -85,7 +85,8 @@ def player_turn_end(player, player_turn_results, game_map, constants, entities, 
                 message_log.add_message(message)
                 
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, colors_list):
-
+    
+    
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
@@ -312,6 +313,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 #get direction from the player_turn_results 'fire' key    
                 dx, dy = fire
                 
+                current_pref = constants['options_ammo_preference']
+
                 FnP = Fire_And_Preference(player=player, constants=constants)
                 if str(FnP) == "None":
                     message_log.add_message(Message('You do not have anything to shoot.', libtcod.light_red))
@@ -320,7 +323,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     print("Canceled")
 
                 else:
-                    message_log.add_message(Message('You have updated your default ammo preference.', libtcod.light_gray))
+                    if FnP != current_pref: message_log.add_message(Message('You have updated your default ammo preference.', libtcod.light_gray))
 
                     ammo = None
 
@@ -330,13 +333,14 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             print ('pref: ' + str(i.name) + '  x' + str(i.item.count))
                             if i.item.count == 1:
                                 constants['options_ammo_preference'] = None
-                                for i in player.inventory.items:
-                                    if i.name == 'Quiver':
-                                        i.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 
+                                
+                                for q in player.inventory.items:
+                                    if q.name == 'Quiver':
+                                        q.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 
                                         break
                                 print("pref reset at engine 329")
+
                             player.inventory.remove_item(i)
-                            
                             break
 
                     hit = False
@@ -622,9 +626,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 
 def main():
+
     constants = get_constants()
     names_list = get_unidentified_names()
     colors_list = get_render_colors()
+    load_customfont()
 
     libtcod.console_set_custom_font('fontplus.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW, 16, 30)
     
@@ -668,6 +674,10 @@ def main():
             if show_load_error_message and (new_game or load_saved_game or exit_game):
                 show_load_error_message = False
             elif new_game:
+                constants = get_constants()
+                names_list = get_unidentified_names()
+                colors_list = get_render_colors()
+
                 if intro(constants):
                     if not game_options(constants) == "nah":
                         if not origin_options(constants) == "nah":

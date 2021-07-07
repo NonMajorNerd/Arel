@@ -66,9 +66,9 @@ class Inventory:
                         ammo_list.append(i.name)
 
                 if len(ammo_list) == 0:
-                    print("no ammo ... inventory line 64")
+                    results.append({'message': Message('You do not have any ammo to select with your quiver.', libtcod.light_red)})
                     return results
-                
+                    
                 pref = m1m2_menu(x=31, y=21, w=25, h=8, numoptions=8, optionslist=ammo_list)
 
                 constants['options_ammo_preference'] = pref

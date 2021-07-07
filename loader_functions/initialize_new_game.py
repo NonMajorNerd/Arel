@@ -2,6 +2,8 @@
 import tcod as libtcod
 from random import randint
 
+from tcod.constants import FONT_LAYOUT_TCOD
+
 from components.equipment import Equipment
 from components.equippable import Equippable
 from components.item import Item
@@ -41,8 +43,6 @@ def load_customfont():
 
 
 def get_constants():
-
-    load_customfont()
 
     window_title = "A'Rel"
 
@@ -129,8 +129,6 @@ def get_constants():
     }
 
     return constants
-    
-    #random.choice[colors_list['Scrolls']]
     
 def get_render_colors():
     colors_list = {

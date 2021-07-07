@@ -193,7 +193,7 @@ def intro(constants):
         
         libtcod.console_flush()
         
-        if key.vk == libtcod.KEY_ENTER:
+        if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:
             if step == 10:
                 return True
             else:
@@ -356,7 +356,7 @@ def game_options(constants):
             
         libtcod.console_flush()
 
-        if key.vk == libtcod.KEY_ENTER:            
+        if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:            
         
             if difficulty == "Newcomer":
                 constants['options_enemy_damage_scale'] = 80
@@ -393,7 +393,7 @@ def game_options(constants):
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
             
-        elif key.vk == libtcod.KEY_RIGHT:
+        elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
             if index == 0:
                 if difficulty == "Newcomer":
                     difficulty = "Classic"
@@ -421,7 +421,7 @@ def game_options(constants):
             #if index == 6:
                 #constants['options_death_delete_save'] = not constants['options_death_delete_save']
                 
-        elif key.vk == libtcod.KEY_LEFT:
+        elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
             if index == 0:  
                 if difficulty == "Classic":
                     difficulty = "Newcomer"
@@ -449,7 +449,7 @@ def game_options(constants):
             #if index == 6:
             #    constants['options_death_delete_save'] = not constants['options_death_delete_save']         
                
-        elif key.vk == libtcod.KEY_DOWN:
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
             if index == 0:
                 index += 1
             elif index > 0:
@@ -457,7 +457,7 @@ def game_options(constants):
                     if index < 5:
                         index += 1
             
-        elif key.vk == libtcod.KEY_UP:
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
             if index > 0: index -= 1                
             
 
@@ -569,7 +569,7 @@ def m1m2_menu(x=1, y=1, w=None, h=None, numoptions=3, optionslist=[]):
                 else:
                     m1_index += 1
 
-        elif key.vk == libtcod.KEY_ENTER:
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:
             return current_option.strip()
 
             
@@ -659,8 +659,11 @@ def origin_options(constants):
             libtcod.console_set_default_foreground(0, screen_yellow)               
             libtcod.console_print_ex(0, 36, 12, libtcod.BKGND_SET, libtcod.LEFT, ">>")
             
+
         libtcod.console_set_default_foreground(0, screen_lightgray)  
+
         if origin == "Adventurer":
+            
             libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(258))
             
             desc = "A classic sword-and-shield adventurer, you are more suited to the challenge my dungeon than most. We'll see how much of a difference that makes."
@@ -719,14 +722,14 @@ def origin_options(constants):
             
         libtcod.console_flush()
 
-        if key.vk == libtcod.KEY_ENTER:                       
+        if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:                       
             break
             
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
   
             
-        elif key.vk == libtcod.KEY_RIGHT:
+        elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
             if index == 0:
                 if origin == "Adventurer":
                     origin = "Ranger"
@@ -740,7 +743,7 @@ def origin_options(constants):
                 elif origin == "Criminal":
                     origin = "Tourist"
       
-        elif key.vk == libtcod.KEY_LEFT:
+        elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
             if index == 0:  
                 if origin == "Ranger":
                     origin = "Adventurer"
@@ -841,7 +844,7 @@ def character_name(constants):
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
             
-        elif key.vk == libtcod.KEY_ENTER:            
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:            
             constants['player_name'] = charname
             return True
                 
@@ -1293,8 +1296,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
              
             needs_sort = True
             
-        #todo : fix str(key.vk) == "49"
-        elif key.vk == libtcod.KEY_ENTER or str(key.vk) == "49": 
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER: 
             if item.item.use_function:
                 results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list, constants=constants))
                 return results 
@@ -1837,11 +1839,11 @@ def OLD_inventory_menu(player, entities, fov_map, names_list, colors_list, messa
             #results.append({'ignore': 0})
             return results
    
-        elif key.vk == libtcod.KEY_DOWN:
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
             if index < numitems-1: index += 1
             if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
 
-        elif key.vk == libtcod.KEY_UP:
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
             if index > 0: index -= 1
             if line == 13 and currentpage > 1: currentpage -= 1
             

@@ -98,6 +98,11 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     * Change log *
     **************
 	
+	07/05/21
+		Bug fixes around ranged weaponry
+		Fixed a bug which was causing new games to use the constants, names and colors lists from previous games from the same execution
+		Added keypad control to all menus
+
 	07/06/21
 		Note that 'arrow' items will drop regardless of origin choice, but 'bow' items will NOT spawn and can not be obtained if you do not start as a ranger.
 		Please also note that the drop rates for arrows (and their impact on the drop rate of other items) has not been tuned or balanced at this time.
