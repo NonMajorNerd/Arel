@@ -1,6 +1,7 @@
 import tcod as libtcod
 
 from game_states import GameStates
+from ammo_functions import Fire_And_Preference
 
 def handle_keys(key, game_state):
     if game_state == GameStates.PLAYERS_TURN:
@@ -27,6 +28,7 @@ def handle_keys(key, game_state):
     return {}
 
 def player_pick_dir(key, strkey='None'):
+
     key_char = chr(key.c)
 
     # Movement keys

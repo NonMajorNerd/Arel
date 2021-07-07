@@ -113,8 +113,14 @@ def cast_fireball(*args, **kwargs):
                 entities.remove(entity)
     return results
 
+def use_arrow(*args, **kwargs):
+    #this function will be assigned to all arrow items
+    #when you 'use' an arrow in the inventory, this will be called to assign the preference to the selected arrow
+    return 1
+
 def use_quiver(*args, **kwargs):
     player = args[0]
+    constants = kwargs.get('constants')
 
     results = []
     
@@ -125,12 +131,11 @@ def use_quiver(*args, **kwargs):
         if i.item.ammo:
             ammo_list.append(i.name)
 
-    print(str(ammo_list))
-
     if len(ammo_list) == 0:
         print("no ammo")
+        return 0
 
-    m1m2_menu(x=15, y=15, w=15, h=5, numoptions=3, optionslist=ammo_list)
+    constants['options_ammo_preference'] = m1m2_menu(x=31, y=21, w=25, h=8, numoptions=8, optionslist=ammo_list)
 
 
 

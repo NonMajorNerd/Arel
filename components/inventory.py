@@ -1,7 +1,9 @@
 import libtcodpy as libtcod
+import textwrap
 
 from game_messages import Message
 from entity import get_ent_name
+from ammo_functions import m1m2_menu
 
 class Inventory:
     def __init__(self, capacity):
@@ -50,10 +52,35 @@ class Inventory:
 
         return results
 
-    def use(self, item_entity, names_list, colors_list, **kwargs):
+    def use(self, item_entity, names_list, colors_list, constants, **kwargs):
         results = []
         used = False
-        
+            
+        #special-case handling for the quiver 'item'
+        if True:
+            if item_entity.name == 'Quiver':
+                ammo_list = []
+
+                for i in self.items:
+                    if i.item.ammo:
+                        ammo_list.append(i.name)
+
+                if len(ammo_list) == 0:
+                    print("no ammo ... inventory line 64")
+                    return results
+                
+                pref = m1m2_menu(x=31, y=21, w=25, h=8, numoptions=8, optionslist=ammo_list)
+
+                constants['options_ammo_preference'] = pref
+
+                if pref == None:
+                    item_entity.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 
+                else:
+                    item_entity.item.effect_lines = textwrap.wrap("  Your firing preference is " + pref + ".", 26)
+                    results.append({'message': Message('You have updated your default ammo preference.', libtcod.light_gray)})
+
+                return results
+                
         item_component = item_entity.item
         
         if item_component.use_function is None:
@@ -70,12 +97,13 @@ class Inventory:
             else:
                 kwargs = {**item_component.function_kwargs, **kwargs}
                 item_use_results = item_component.use_function(self.owner, **kwargs)
-
-                for item_use_result in item_use_results:
-                    if item_use_result.get('consumed'):
-                        self.remove_item(item_entity)
-                used = True
-                results.extend(item_use_results)
+                if item_use_results:
+                    for item_use_result in item_use_results:
+                        if item_use_result.get('consumed'):
+                            self.remove_item(item_entity)
+                    used = True
+                
+                    results.extend(item_use_results)
 
         #if the item was used, it is automatically identified. Update the 'names_list' with the real name of the item.
         if used:
@@ -90,7 +118,7 @@ class Inventory:
     def remove_item(self, item):
         if item.item.stackable and item.item.count > 1:
                 item.item.count -=1
-        else:
+        else:       
             self.items.remove(item)
 
 

@@ -1,3 +1,4 @@
+#from input_handlers import player_pick_dir
 import tcod as libtcod
 from random import randint
 
@@ -9,7 +10,7 @@ from components.inventory import Inventory
 from components.level import Level
 from components.ammo import Ammo
 from ammo_functions import BasicShot, PoisonShot
-
+from item_functions import use_arrow
 
 from condition_functions import Poison, Healing
 
@@ -26,6 +27,9 @@ from map_objects.game_map import GameMap
 from render_functions import RenderOrder
 
 from item_functions import use_quiver
+
+global constants
+global player
 
 def load_customfont():
     #The index of the first custom tile in the file
@@ -230,11 +234,7 @@ def get_unidentified_names():
     'Shield':                   'Shield',
     'Short Bow':                'Short Bow',
     'Arrow':                    'Arrow',
-    'Pos. Arrow':               'Pos. Arrow',
-    '1 Arrow':                  '1 Arrow',
-    '2 Arrow':                  '2 Arrow',
-    '3 Arrow':                  '3 Arrow',
-    '4 Arrow':                  '4 Arrow',
+    'Poison Arrow':              'Poison Arrow',
     'Quiver':                   'Quiver',
     'Camera Op.':               'Camera Op.',
     'rat':                      'rat',
@@ -296,72 +296,22 @@ def get_game_variables(constants, names_list, colors_list):
     #Starting Inventory, sprite
     origin = constants['options_origin']
     
+    #HEKIN QUIVER
+    item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
+                    description="A quiver for storing arrows.",
+                    effect="Firing preference is currently unassigned.")
+    item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', item=item_component)
+    player.inventory.items.append(item)    
+
     if origin == "Adventurer":
         player.char = 258
-        
-        #HEKIN QUIVER
- 
-        item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
-                        description="A quiver for storing arrows.",
-                        effect="Currently empty.")
-        item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', item=item_component)
-        player.inventory.items.append(item)       
-        
-        
-        #HEKIN ARROW?
-        hit_component =  PoisonShot(2, 1, 10)
-        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-                       description="Arrow. Pewpew!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Pos. Arrow', item=item_component)
-        player.inventory.items.append(item)    
-        
-        #HEKIN ARROW?
-        hit_component =  BasicShot(2)
-        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-                       description="Arrow. Pewpew!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
-        player.inventory.items.append(item) 
-
-        #HEKIN ARROW?
-        hit_component =  BasicShot(2)
-        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-                       description="Arrow. Pewpew!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], '2 Arrow', item=item_component)
-        player.inventory.items.append(item) 
-
-        #HEKIN ARROW?
-        hit_component =  BasicShot(2)
-        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-                       description="Arrow. Pewpew!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], '3 Arrow', item=item_component)
-        player.inventory.items.append(item) 
-
-        #HEKIN ARROW?
-        hit_component =  BasicShot(2)
-        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-                       description="Arrow. Pewpew!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], '4 Arrow', item=item_component)
-        player.inventory.items.append(item) 
-
-        #HEKIN BOW
-        item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
-                        description="A small, low-range bow.")
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
-        item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
-        player.equipment.list.append(item)       
         
         #sword
         item_component = Item(use_function=None, stackable=False,
                         description="A short, one-handed sword.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
-        #player.equipment.list.append(item)       
-        
+        player.equipment.list.append(item)       
         
         #shield
         item_component = Item(use_function=None, stackable=False,
@@ -377,6 +327,33 @@ def get_game_variables(constants, names_list, colors_list):
         player.inventory.add_item(item, names_list)
         player.gold_collected = 20
         
+    elif origin == "Ranger":
+        player.char = 257
+       
+        #3x Pos. Arrow
+        hit_component =  PoisonShot(2, 1, 10)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=use_arrow(), stackable=True, count=3, ammo=ammo_component, flammable=True, range=0,
+                       description="Poison-coated arrow. Icky!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Poison Arrow', item=item_component)
+        player.inventory.items.append(item)    
+        
+        #10x. Arrow
+        hit_component =  BasicShot(2)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+        player.inventory.items.append(item) 
+
+        #Bow
+        item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
+                        description="A small, low-range bow.")
+        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
+        item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
+        player.equipment.list.append(item)       
+        
+
     elif origin == "Merchant":
         player.char = 262
         #staff

@@ -12,6 +12,7 @@ class Item:
         self.count = count                              #how many of this item are in this specific 'stack'?
         
         self.flammable = flammable                    #is this item flammable?
+        
         self.ammo = ammo
         self.range = range
         
@@ -19,7 +20,7 @@ class Item:
         if len(self.description_lines) > 8:
             for line in self.description_lines:
                     print(str(line))
-            raise Exception("Item effect text is too long. Effect text must wrap to 3 lines or fewer at 26 characters per line to fit in the inventory design.")
+            raise Exception("Item description text is too long. Description text must wrap to 8 lines or fewer at 26 characters per line to fit in the inventory design.")
         
         self.effect_lines = None
         if effect: 

@@ -1,6 +1,10 @@
 import tcod as libtcod
 from random import randint, choice
 
+from entity import Entity
+
+from game_messages import Message
+
 from components.ai import BasicMonster, RandomWalk, CameraMan, RatKing
 from components.equipment import Equipment
 from components.equipment import EquipmentSlots
@@ -9,14 +13,11 @@ from components.item import Item
 from components.inventory import Inventory
 from components.fighter import Fighter
 from components.stairs import Stairs
+from components.ammo import Ammo
 
+from item_functions import cast_confuse, cast_fireball, cast_lightning, heal, poison_potion, restore_wounds, use_arrow
+from ammo_functions import BasicShot, PoisonShot
 from condition_functions import Poison, Healing
-
-from entity import Entity
-
-from game_messages import Message
-
-from item_functions import cast_confuse, cast_fireball, cast_lightning, heal, poison_potion, restore_wounds
 
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile, Door
@@ -433,7 +434,7 @@ class GameMap:
             #'fireball_scroll': 1,
             #'confusion_scroll': 1
             
-            'none': from_dungeon_level([[10, 1], [10,2], [5,3]], self.dungeon_level),
+            #'none': from_dungeon_level([[10, 1], [10,2], [5,3]], self.dungeon_level),
             'cure_wounds': from_dungeon_level([[5,2], [5,3], [5,4], [5,5] ,[5,6] ,[5,7] ,[5,8] ,[5,9] ,[5,10]], self.dungeon_level),
             'foul_liquid': from_dungeon_level([[5, 1], [5,2], [5,3], [5,4], [5,5] ,[5,6] ,[5,7] ,[5,8] ,[5,9] ,[5,10]], self.dungeon_level),
             'restore_wounds': from_dungeon_level([[5, 1], [5,2], [5,3], [5,4], [5,5] ,[5,6] ,[5,7] ,[5,8] ,[5,9] ,[5,10]], self.dungeon_level),
@@ -442,6 +443,7 @@ class GameMap:
             'lightning_scroll': from_dungeon_level([[10,4], [15,5] ,[20,6] ,[20,7] ,[20,8] ,[20,9] ,[20,10]], self.dungeon_level),
             'fireball_scroll': from_dungeon_level([[10,6] ,[15,7] ,[20,8] ,[20,9] ,[25,10]], self.dungeon_level),
             'confusion_scroll': from_dungeon_level([[2,3], [5,4], [10,5] ,[10,6] ,[10,7] ,[15,8] ,[15,9] ,[20,10]], self.dungeon_level),
+            'arrows': 10
         }
 
         for i in range(number_of_monsters):
@@ -532,7 +534,6 @@ class GameMap:
                 item_choice = random_choice_from_dict(item_chances)
                 if item_choice == 'none':
                     a=1
-                    
                 if item_choice == 'cure_wounds':
                     item_component = Item(use_function=heal, stackable=False, amount=20,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
@@ -572,12 +573,23 @@ class GameMap:
                     item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Confusion Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                                   
-                else:
+                elif item_choice == 'lightning_scroll':
                     item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5, flammable=True)
                     item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Lightning Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
 
-                entities.append(item)
+                elif item_choice == 'arrows':
+                    arrow_count = randint(1, 10)
+                    hit_component =  BasicShot(2)
+                    ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+                    item_component = Item(use_function=None, stackable=True, count=arrow_count, ammo=ammo_component, flammable=True, range=0,
+                                description="Arrow. Pewpew!")
+                    item = Entity(x, y, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+
+                else:
+                    print("Unhandled item spawn choice .. " + str(item_choice) + " .. game_map line 585.")
+
+                if item_choice != 'none': entities.append(item)
 
 
     def is_blocked(self, x, y):

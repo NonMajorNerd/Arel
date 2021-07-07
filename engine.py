@@ -1,4 +1,5 @@
 import tcod as libtcod
+import textwrap
 
 #imports
 from death_functions import kill_monster, kill_player
@@ -311,12 +312,15 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 #get direction from the player_turn_results 'fire' key    
                 dx, dy = fire
                 
-                FnP = Fire_And_Preference(called_from="Map", player=player, constants=constants)
+                FnP = Fire_And_Preference(player=player, constants=constants)
                 if str(FnP) == "None":
-                    print("No ammo.")
-                    break
+                    message_log.add_message(Message('You do not have anything to shoot.', libtcod.light_red))
+
+                elif str(FnP) == "exit":
+                    print("Canceled")
+
                 else:
-                    print("at engine: " + str(FnP))
+                    message_log.add_message(Message('You have updated your default ammo preference.', libtcod.light_gray))
 
                     ammo = None
 
@@ -324,7 +328,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         if i.name == FnP:
                             ammo = i
                             print ('pref: ' + str(i.name) + '  x' + str(i.item.count))
-                            if i.item.count == 1: constants['options_ammo_preference'] = None
+                            if i.item.count == 1:
+                                constants['options_ammo_preference'] = None
+                                for i in player.inventory.items:
+                                    if i.name == 'Quiver':
+                                        i.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 
+                                        break
+                                print("pref reset at engine 329")
                             player.inventory.remove_item(i)
                             
                             break
@@ -347,7 +357,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                                 ia.item.count = 1
                                 (ix, iy) = (sx-dx, sy-dy)
                                 (ia.x, ia.y) = (ix, iy)
-                                print("        (" + str(ix) + "," + str(iy) + ")")
                                 entities.append(ia)
                                 break
                         else:

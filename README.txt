@@ -41,13 +41,18 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 			1  2  3 		sD  D  sR 
     
 	[c] Close
-		press [c] and then a directional key as outlined above to close objects.
+		Press [c] and then a directional key as outlined above to close objects.
 	
+	[f] fire
+		Press [f] and then a directional key as outlined above to fire an equipped ranged weapon.
+			*If you do not have a default ammo preference selected, you will be prompted to select one.
+			*You may also change your default ammo preference by using the Quiver in your inventory.
+
     [i] Inventory
         Press [i] to open your inventory
-            press [i] or [esc] to close the inventory
+            *Press [i] or [esc] to close the inventory
             
-			Within the inventory menu you can use the arrow keys to move and [Enter] to select/use/(d)equip an item, or you can use the mouse and left-click to select/use/(d)equip an item.
+			*Within the inventory menu you can use the arrow keys to move and [Enter] to select/use/(d)equip an item, or you can use the mouse and left-click to select/use/(d)equip an item.
     
     [k] Kick
         Press [k] and then a directional key as outlined above to kick.
@@ -59,14 +64,17 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
         Press [s] to open your stats menu
         Press [esc] to close the stats menu
 		
-	[x] Examine/Target
-		Press [x] to enter targeting mode, then use the arrow keys to select a cell/target to examine.
-		Press [esc] to leave targeting mode.
+	[x] Examine
+		Press [x] to enter examine mode, then use the arrow keys to examine the map and your surroundings.
+		Press [esc] to leave examine mode.
  
     ****************
     *  To-Do List  *
     ****************
 	
+		*Rebalance item drops to account for bows, arrows..*
+
+		*Add context tooltip hints for ranged weapon system
 		*Add left/right (KP4/KP6) in menus to naviage pages
 		*Add communicable conditions
 		*Add score saving, high-score tables
@@ -90,6 +98,15 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     * Change log *
     **************
 	
+	07/06/21
+		Note that 'arrow' items will drop regardless of origin choice, but 'bow' items will NOT spawn and can not be obtained if you do not start as a ranger.
+		Please also note that the drop rates for arrows (and their impact on the drop rate of other items) has not been tuned or balanced at this time.
+
+		Completed base code for quiver and ammo preference system
+		Added the 'Ranger' origin and gear
+		Updated Ranger starting sprite
+		Added firing controls to the ReadMe, as well as a few other changes to the ReadMe control descriptions
+
 	07/05/21
 		Base code for quiver / preference system designed and implemented
 
