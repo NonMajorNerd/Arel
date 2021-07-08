@@ -1,3 +1,4 @@
+import pygame
 import tcod as libtcod
 import textwrap
 
@@ -101,7 +102,12 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     
     player_turn_results = []
     
+    pygame.mixer.init()
+    pygame.mixer.music.load('audio/sfx/bgchatter.mp3')
+    pygame.mixer.music.play(-1)
+
     while not libtcod.console_is_window_closed():
+
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
@@ -476,7 +482,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     message, game_state = kill_player(dead_entity, game_map, constants)
                 else:
                     if dead_entity.fighter:
-
+                        
+                        if dead_entity.name == "Camera Op.":
+                            boo = pygame.mixer.Sound('audio/sfx/boo1.mp3')
+                            pygame.mixer.Sound.play(boo)
+                            
                         score_gained = int(dead_entity.fighter.xp * constants['options_xp_multiplier'] * constants['xp_to_score_ratio'])   
 
                         #assign the camera operator to the cam variable
@@ -692,6 +702,7 @@ def main():
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_error_message = True
+
             elif exit_game:
                 break
 
