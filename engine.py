@@ -1,4 +1,4 @@
-import pygame
+#import pygame
 import tcod as libtcod
 import textwrap
 
@@ -102,9 +102,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     
     player_turn_results = []
     
-    pygame.mixer.init()
-    pygame.mixer.music.load('audio/sfx/bgchatter.mp3')
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.init()
+    #pygame.mixer.music.load('audio/sfx/bgchatter.mp3')
+    #pygame.mixer.music.play(-1)
 
     while not libtcod.console_is_window_closed():
 
@@ -443,7 +443,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 target_x, target_y = left_click
 
                 item_use_results = player.inventory.use(targeting_item, entities=entities, fov_map=fov_map,
-                                                        target_x=target_x, target_y=target_y, names_list=names_list, colors_list=colors_list)
+                                                        target_x=target_x, target_y=target_y, names_list=names_list, colors_list=colors_list, constants=constantsa)
                 player_turn_results.extend(item_use_results)
             elif right_click:
                 player_turn_results.append({'targeting_cancelled': True})
@@ -483,9 +483,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 else:
                     if dead_entity.fighter:
                         
-                        if dead_entity.name == "Camera Op.":
-                            boo = pygame.mixer.Sound('audio/sfx/boo1.mp3')
-                            pygame.mixer.Sound.play(boo)
+                        #if dead_entity.name == "Camera Op.":
+                        #    boo = pygame.mixer.Sound('audio/sfx/boo1.mp3')
+                        #    pygame.mixer.Sound.play(boo)
                             
                         score_gained = int(dead_entity.fighter.xp * constants['options_xp_multiplier'] * constants['xp_to_score_ratio'])   
 
