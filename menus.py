@@ -1,3 +1,4 @@
+from numpy import SHIFT_DIVIDEBYZERO
 import tcod as libtcod
 import textwrap
 import operator
@@ -944,8 +945,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
     mouse = libtcod.Mouse()
 
     while True:
-
-           
+   
         numequip = (len(player.equipment.list) - player.equipment.list.count(None))
         numitems = len(player.inventory.items)
         numpages = int((numitems + numequip)/ itemsperpage) + 1
@@ -955,8 +955,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                 
         libtcod.console_set_default_foreground(0, screen_lightgray)
         libtcod.console_set_default_background(0, screen_darkgray)
-
-        
+  
         libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "                      ")
         libtcod.console_set_default_foreground(0, screen_midgray)
         libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "Page " + str(currentpage) + " of " + str(numpages))
@@ -1041,6 +1040,29 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                     libtcod.console_print_ex(0, 3, y, libtcod.BKGND_NONE, libtcod.LEFT, get_name_string(itm, names_list))    
                     y += 1   
                 
+        mx = mouse.cx
+        my = mouse.cy
+
+        # elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+        #     cap = numitems -1
+        #     if currentpage == 1: cap += numequip
+        #     if index < cap: index += 1
+        #     if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
+
+        # elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+        #     if index > 0: index -= 1
+        #     if line == 13 and currentpage > 1: currentpage -= 1
+
+
+        #if the mouse is in the right position, use mouseindex
+        if my >= 13 and my < (13 + itemsperpage):
+            if mx >= 3 and mx < 30:
+                mouse_index = my-13
+                cap = numitems -1
+                if currentpage == 1: cap += numequip
+                if mouse_index <= cap: index = mouse_index
+
+        #iindex = index
         #green selection line
         strname = ""
         iindex = index
@@ -1055,7 +1077,6 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         else:
             system = "inventory"
             iindex = index - numequip
-        
         
         #get the item at the current index
         item = get_item_at(system, currentpage, iindex, player)
@@ -1229,8 +1250,10 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         libtcod.console_flush()   
         
         #Check for input
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-        
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)    
+
+        left_click = mouse.lbutton_pressed
+
         if key.vk == libtcod.KEY_ESCAPE or chr(key.c) == "i":
             #results.append({'ignore': 0})
             return results
@@ -1296,10 +1319,30 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
              
             needs_sort = True
             
-        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER: 
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER or left_click: 
+            
+            # if left_click:
+            #     if not (my >= 13 and my < (13 + itemsperpage)): break
+            #     if not(mx >= 3 and mx < 30): break
+
             if item.item.use_function:
-                results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list, constants=constants))
-                return results 
+                use = None
+                if item.name == 'Quiver':
+                    use = False
+                    ammo_list = []
+                    for i in player.inventory.items:
+                        if i.item.ammo:
+                            ammo_list.append(i.name)
+
+                    if len(ammo_list) == 0:
+                        print('no ammo')
+                    else:
+                        use = True
+                
+                print(str(use))
+                if use == None or use == True:
+                    results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list, constants=constants)) 
+                    return results 
                 
             elif item.equippable:
                 #player.equipment.toggle_equip(item)
@@ -1315,11 +1358,9 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                         player.inventory.remove_item(equipped)
                         #message_log.add_message(Message('You equipped the {0}.'.format(equipped.name)))
                         
-                    # TODO :: Check carrying cap after dequipping items ..
-                        # if numitems > carrying cap .. gamestate = burdened
-                        # if game_state = burdened then can only access inventory
+
                     if dequipped:
-                        # if the item in question has a capacity bonus
+                        # TODO if the item in question has a capacity bonus
                         #   then if removing that capacity bonus puts player over capacity
                         #       do not allow them to remove it
 
@@ -1444,7 +1485,7 @@ def sort_menu():
 
             
 def get_item_at(system, page, index, player):
-    
+
     numequip = len(player.equipment.list) #- player.equipment.list.count(None))
     numitems = len(player.inventory.items) #+ numequip
 
@@ -1713,7 +1754,7 @@ def OLD_inventory_menu(player, entities, fov_map, names_list, colors_list, messa
             libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
             y+=1           
             
-        if item.item.effect_lines: # TODO :: Build in check for unidentified items 
+        if item.item.effect_lines:
             y += 1 #start the effect text after the description text ends.
             for l in item.item.effect_lines:
                 libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 

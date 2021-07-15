@@ -48,9 +48,12 @@ def get_constants():
 
     screen_width = 60
     screen_height = 40
+        
+    tick = 0
+    tick_speed = 4
 
     bar_width = 20
-    panel_height = 7
+    panel_height = 4
     panel_y = screen_height - panel_height
 
     message_x = bar_width + 2
@@ -58,7 +61,7 @@ def get_constants():
     message_height = panel_height - 1
 
     map_width = 60
-    map_height = 33
+    map_height = screen_height - panel_height
 
     room_max_size = 10
     room_min_size = 6
@@ -84,7 +87,8 @@ def get_constants():
     options_tutorial_enabled = True
     options_inventory_sort = "Alpha"
     options_ammo_preference = None #no default ammo selected
-    
+
+
     colors = {
         'dark_wall': libtcod.Color(34, 34, 68),
         'dark_ground': libtcod.Color(17, 17, 34),
@@ -96,6 +100,8 @@ def get_constants():
         'window_title': window_title,
         'screen_width': screen_width,
         'screen_height': screen_height,
+        'tick': tick,
+        'tick_speed': tick_speed,
         'bar_width': bar_width,
         'panel_height': panel_height,
         'panel_y': panel_y,
@@ -236,6 +242,7 @@ def get_unidentified_names():
     'Quiver':                   'Quiver',
     'Camera Op.':               'Camera Op.',
     'rat':                      'rat',
+    'rat swarm':                'rat swarm',
     'rat prince':               'rat prince',
     'rat king':                 'rat king',
     'bat':                      'bat',
@@ -302,7 +309,7 @@ def get_game_variables(constants, names_list, colors_list):
     player.inventory.items.append(item)    
 
     if origin == "Adventurer":
-        player.char = 258
+        player.char = 256
         
         #sword
         item_component = Item(use_function=None, stackable=False,
@@ -326,7 +333,7 @@ def get_game_variables(constants, names_list, colors_list):
         player.gold_collected = 20
         
     elif origin == "Ranger":
-        player.char = 257
+        player.char = 258
        
         #3x Pos. Arrow
         hit_component =  PoisonShot(2, 1, 10)
@@ -353,7 +360,7 @@ def get_game_variables(constants, names_list, colors_list):
         
 
     elif origin == "Merchant":
-        player.char = 262
+        player.char = 260
         #staff
         item_component = Item(use_function=None, stackable=False,
                         description="A two-handed (but actually one-handed) wooden staff, perfect for whacking things with.")
@@ -377,7 +384,7 @@ def get_game_variables(constants, names_list, colors_list):
         player.gold_collected = 100
         
     elif origin == "Criminal":
-        player.char = 260
+        player.char = 262
         #dagger
         item_component = Item(use_function=None, stackable=False,
                         description="A small, rusty dagger. Probably unsafe to handle.",
@@ -402,7 +409,7 @@ def get_game_variables(constants, names_list, colors_list):
         player.gold_collected = 30
         
     elif origin == "Tourist":
-        player.char = 256
+        player.char = 264
         #cargo shorts
         item_component = Item(use_function=None, stackable=False,
                         description="These are more pockets than they are shorts, which you're ok with.",

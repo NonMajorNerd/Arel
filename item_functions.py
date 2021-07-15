@@ -108,7 +108,6 @@ def cast_fireball(*args, **kwargs):
                 results.append({'message': Message('The {0} gets burned for {1} hit points.'.format(entity.name, damage), libtcod.orange)})
                 results.extend(entity.fighter.take_damage(damage))
             elif entity.item and entity.item.flammable:
-                #TODO :: Fix unidentified items displaying identified name when burned this way
                 results.append({'message': Message('The {0} is destroyed in the fire!'.format(entity.name, damage), libtcod.orange)})
                 entities.remove(entity)
     return results
@@ -132,12 +131,10 @@ def use_quiver(*args, **kwargs):
             ammo_list.append(i.name)
 
     if len(ammo_list) == 0:
-        print("no ammo")
-        return 0
+        print("quiver used; no ammo")
+        return ("nah")
 
     constants['options_ammo_preference'] = m1m2_menu(x=31, y=21, w=25, h=8, numoptions=8, optionslist=ammo_list)
-
-
 
 def cast_confuse(*args, **kwargs):
     entities = kwargs.get('entities')

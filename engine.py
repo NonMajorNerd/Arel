@@ -1,6 +1,7 @@
-#import pygame
+import pygame
 import tcod as libtcod
 import textwrap
+import time
 
 #imports
 from death_functions import kill_monster, kill_player
@@ -29,7 +30,6 @@ def player_turn_end(player, player_turn_results, game_map, constants, entities, 
             if entity.fighter.hp > 0:
                 for con in entity.conditions:
                     if con.active:
-                        print ('enacting ' + con.name + ' on ' + entity.name + " which has " + str(entity.fighter.hp) + " hp.")
                         player_turn_results.extend(con.enact())
                         
     #process turn results for conditions
@@ -84,7 +84,20 @@ def player_turn_end(player, player_turn_results, game_map, constants, entities, 
                 message = kill_monster(dead_entity, player)
                     
                 message_log.add_message(message)
+
+def render_refresh(con, panel, mouse, entities, player, game_map, fov_map, fov_recompute, message_log, constants, game_state, names_list, colors_list):
+    if fov_recompute:
+        recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'],
+                        constants['fov_algorithm'])
                 
+    render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
+                constants['screen_width'], constants['screen_height'], constants['bar_width'],
+                constants['panel_height'], constants['panel_y'], mouse, constants['colors'], constants['options_tutorial_enabled'], game_state, names_list, colors_list, constants['tick'], constants['tick_speed'])
+
+    libtcod.console_flush()
+
+    clear_all(con, entities)        
+
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants, names_list, colors_list):
     
     
@@ -105,8 +118,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     #pygame.mixer.init()
     #pygame.mixer.music.load('audio/sfx/bgchatter.mp3')
     #pygame.mixer.music.play(-1)
+    pygame.init()
 
     while not libtcod.console_is_window_closed():
+
+        constants['tick'] = int(pygame.time.get_ticks()/100)
 
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
@@ -116,7 +132,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                  
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
                    constants['screen_width'], constants['screen_height'], constants['bar_width'],
-                   constants['panel_height'], constants['panel_y'], mouse, constants['colors'], constants['options_tutorial_enabled'], game_state, names_list, colors_list)
+                   constants['panel_height'], constants['panel_y'], mouse, constants['colors'], constants['options_tutorial_enabled'], game_state, names_list, colors_list, constants['tick'], constants['tick_speed'])
 
         fov_recompute = False
  
@@ -151,6 +167,32 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         right_click = mouse_action.get('right_click')
 
         player_turn_results = []
+
+
+        # TODO :: work on auto-walker ..
+        # code below almost works.. but a-star will never END on the targeted tile, so checking for mx/my == px/py will not work
+        #not sure how to solve for this at the moment.
+
+        if left_click:
+            (mx, my) = (mouse.cx, mouse.cy)
+
+            if (mx, my) == (player.x, player.y):
+                player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list, message_log, constants))
+
+        #     print(str((mx,my)))
+        #     if libtcod.map_is_in_fov(fov_map, mx, my):
+        #         spot = Entity(mx, my, 0, libtcod.black, 'spot')
+        #         while (True):
+        #             if player.x != mx and player.y != my:
+        #                 player.move_astar(spot, entities, game_map)
+        #                 player_turn_end(player, player_turn_results, game_map, constants, entities, message_log)
+        #                 fov_recompute = True
+        #                 render_refresh(con, panel, mouse, entities, player, game_map, fov_map, fov_recompute, message_log, constants, game_state, names_list, colors_list)
+        #                 time.sleep(0.0255)
+        #             else:
+        #                 break
+                
+                        
 
         if move:
             if game_state == GameStates.PLAYERS_TURN: 
@@ -215,17 +257,17 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:
                 message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
 
-        if key_targeting:
+        elif key_targeting:
             previous_game_state = game_state
             game_state = GameStates.KEYTARGETING
             #create 'targeting' entity
             targeter = Entity(player.x, player.y, 233, (204,153,51), 'Targeter', blocks=False, render_order=RenderOrder.TARGETING)
             entities.append(targeter)
         
-        if messagelog:
+        elif messagelog:
             message_log_history(message_log)
             
-        if kick:
+        elif kick:
             if game_state == GameStates.KICKING:
                 
                 dx, dy = kick
@@ -234,7 +276,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 
                 target = None
                 for entity in entities:
-                    if entity.x == kickx and entity.y == kicky:
+                    if entity.x == kickx and entity.y == kicky and entity.stairs == False:
                         target = entity
                         break
                     
@@ -268,10 +310,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 previous_game_state = game_state
                 game_state = GameStates.KICKING
                 
-        if help:
+        elif help:
             help_menu()
 
-        if close:
+        elif close:
             if game_state == GameStates.CLOSING:
                 
                 dx, dy = close
@@ -308,7 +350,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 previous_game_state = game_state
                 game_state = GameStates.CLOSING
         
-        if fire:
+        elif fire:
             if game_state == GameStates.FIRING:
                 
                 #ranged_weapon should be assigned when game_state goes from player_turn to firing..
@@ -400,7 +442,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     message_log.add_message(Message('You do not have a ranged weapon equipped.', libtcod.lighter_red))
                     
         
-        if show_inventory:
+        elif show_inventory:
             player_turn_results.extend(inventory_menu(player, entities, fov_map, names_list, colors_list, message_log, constants))
 
         #if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
@@ -412,7 +454,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         #    elif game_state == GameStates.DROP_INVENTORY:
         #        player_turn_results.extend(player.inventory.drop_item(item))
 
-        if take_stairs and game_state == GameStates.PLAYERS_TURN:
+        elif take_stairs and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
                 if entity.stairs and entity.x == player.x and entity.y == player.y:
                     entities = game_map.next_floor(player, message_log, constants, names_list, colors_list)
@@ -424,7 +466,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:
                 message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
 
-        if level_up:
+        elif level_up:
             if level_up == 'hp':
                 player.fighter.base_max_hp += 20
                 player.fighter.hp += 20
@@ -435,7 +477,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             game_state = previous_game_state
 
-        if show_character_screen:
+        elif show_character_screen:
             player_turn_results.extend(character_screen(player, entities, constants, game_map.dungeon_level, names_list, colors_list))
 
         if game_state == GameStates.TARGETING:
@@ -443,7 +485,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 target_x, target_y = left_click
 
                 item_use_results = player.inventory.use(targeting_item, entities=entities, fov_map=fov_map,
-                                                        target_x=target_x, target_y=target_y, names_list=names_list, colors_list=colors_list, constants=constantsa)
+                                                        target_x=target_x, target_y=target_y, names_list=names_list, colors_list=colors_list, constants=constants)
                 player_turn_results.extend(item_use_results)
             elif right_click:
                 player_turn_results.append({'targeting_cancelled': True})
@@ -551,27 +593,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if equip:
                 print("equip outside of inventory?!")
-                
-                #equip_results = player.equipment.toggle_equip(equip)
-                #print (equip.name)
-                #
-                #for equip_result in equip_results:
-                #    equipped = equip_result.get('equipped')
-                #    dequipped = equip_result.get('dequipped')
-                #
-                #    if equipped:
-                #        player.inventory.remove_item(equipped, names_list)
-                #        message_log.add_message(Message('You equipped the {0}.'.format(equipped.name)))
-                #        
-                #
-                #    # TODO :: Check carrying cap after dequipping items ..
-                #        # if numitems > carrying cap .. gamestate = burdened
-                #        # if game_state = burdened then can only access inventory
-                #    if dequipped:
-                #        player.inventory.add_item(dequipped, names_list)
-                #        message_log.add_message(Message('You dequipped the {0}.'.format(dequipped.name)))
-                #
-                #game_state = GameStates.ENEMY_TURN
 
             if targeting:
                 previous_game_state = GameStates.PLAYERS_TURN
@@ -592,12 +613,16 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 leveled_up = player.level.add_xp(axp)
                 message_log.add_message(Message('You gain {0} experience points.'.format(axp)))
                 
-
                 if leveled_up:
                     previous_game_state = game_state
                     game_state = GameStates.LEVEL_UP
 
         if game_state == GameStates.ENEMY_TURN:   
+            
+            for e in entities:
+                if libtcod.map_is_in_fov(fov_map, e.x, e.y):
+                    print (e.name + "; (" + str(e.x) + "," + str(e.y) + ")")
+            
             enemy_turn_results = []
             for entity in entities:
                 #proccess AI and turns
@@ -605,11 +630,18 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     if entity.ai:                 
                         if entity.fighter:
                             if player.fighter: #if player isn't dead ..
-                                entity.fighter.timer += entity.fighter.speed
+
+                                entity.fighter.timer = entity.fighter.timer + entity.fighter.speed
+
                                 while entity.fighter.timer >= player.fighter.speed:
+
                                     enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities, constants)
-                                    entity.fighter.timer -= player.fighter.speed
-                                    
+
+                                    entity.fighter.timer = entity.fighter.timer - player.fighter.speed
+
+                                    render_refresh(con, panel, mouse, entities, player, game_map, fov_map, fov_recompute, message_log, constants, game_state, names_list, colors_list)
+                                    time.sleep(0.0255)
+
                                     if enemy_turn_results != None:
                                         for enemy_turn_result in enemy_turn_results:
                                             message = enemy_turn_result.get('message')

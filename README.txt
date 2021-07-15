@@ -25,6 +25,8 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
  
  Python v3+  			(https://www.python.org/downloads/)
  Python tcod Library	(https://python-tcod.readthedocs.io/en/latest/installation.html)
+ Python pygame library  (https://www.pygame.org/wiki/GettingStarted)
+						
  
  **************
  *  Controls  *
@@ -73,6 +75,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     ****************
 	
 		*Rebalance item drops to account for bows, arrows..
+		*Update help menu / readme for mouse support and other controls
 
 		*Add communicable conditions
 		*Add score saving, high-score tables
@@ -96,7 +99,15 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     * Change log *
     **************
 	
-	07/05/21
+	07/15/21
+		Got rid of message log
+		Added turn order timeline
+		Added mouse support for NPC context menus and tooltips
+		Added mouse support for inventory
+		Added 2-frame animations for all pc/npc sprites
+		Added a help menu
+
+	07/07/21
 		Bug fixes around ranged weapon systems
 		Fixed a bug which was causing new games to use the constants, names and colors lists from previous games from the same execution
 		Added keypad control to all menus
