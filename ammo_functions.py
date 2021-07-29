@@ -1,6 +1,58 @@
 import libtcodpy as libtcod
+import textwrap
+
+from components.ammo import Ammo
 from game_messages import Message
 from condition_functions import Poison
+from menus import m1m2_menu
+#from loader_functions.initialize_new_game import constants, player
+
+def Fire_And_Preference(player=None, constants=None):
+    if not constants: print("Error; ammo_functions line 7.. F&P without constants")
+    
+    ammo_list =[]
+
+    for i in player.inventory.items:
+        if i.item.ammo:
+            ammo_list.append(i.name)
+
+    if len(ammo_list) == 0:
+        return None
+
+    pref = constants['options_ammo_preference']
+
+    if pref == None:
+
+        numoptions = 4
+
+        #find the longest string in options list to define menu width
+        max_len = -1
+        for opt in ammo_list:
+            if len(opt) > max_len:
+                max_len = len(opt)
+
+        w = max_len + 4
+
+        h = numoptions + 3
+
+        x = player.x + 1
+        y = player.y - (h+1)
+        if x + w >= constants['screen_width'] -2: x = player.x - (w+2)
+        if y < 1: y = 1
+
+        pref = m1m2_menu(x, y, w, h, numoptions, ammo_list)
+
+    if pref != 'exit': constants['options_ammo_preference'] = pref
+    
+    for i in player.inventory.items:
+        if i.name == 'Quiver':
+            if pref == None:
+                i.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 
+            else:
+                i.item.effect_lines = textwrap.wrap("  Your firing preference is " + pref + ".", 26)
+    
+    return (str(pref))
+
 
 class BasicShot:
     def __init__(self, damage):

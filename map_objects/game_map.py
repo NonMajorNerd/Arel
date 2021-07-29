@@ -1,6 +1,10 @@
 import tcod as libtcod
 from random import randint, choice
 
+from entity import Entity
+
+from game_messages import Message
+
 from components.ai import BasicMonster, RandomWalk, CameraMan, RatKing
 from components.equipment import Equipment
 from components.equipment import EquipmentSlots
@@ -9,14 +13,11 @@ from components.item import Item
 from components.inventory import Inventory
 from components.fighter import Fighter
 from components.stairs import Stairs
+from components.ammo import Ammo
 
+from item_functions import cast_confuse, cast_fireball, cast_lightning, heal, poison_potion, restore_wounds, use_arrow
+from ammo_functions import BasicShot, PoisonShot
 from condition_functions import Poison, Healing
-
-from entity import Entity
-
-from game_messages import Message
-
-from item_functions import cast_confuse, cast_fireball, cast_lightning, heal, poison_potion, restore_wounds
 
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile, Door
@@ -107,10 +108,9 @@ class GameMap:
                         boss_placed = self.place_boss(entities, new_x, new_y, w, h)
                     else:
                         self.place_entities(new_room, entities, names_list, render_colors_list)
-                        self.place_junk(new_room, entities)
                 else:
                     self.place_entities(new_room, entities, names_list, render_colors_list)
-                    self.place_junk(new_room, entities)
+
                     
                 # finally, append the new room to the list
                 rooms.append(new_room)
@@ -139,7 +139,7 @@ class GameMap:
                 if not self.tiles[player.x + rx][player.y + ry].block_sight or self.tiles[player.x+rx][player.y+ry].empty_space:
                     spot_blocked = False
         
-        cameraman = Entity(player.x +rx, player.y +ry, 301, libtcod.Color(191, 191, 191), 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
+        cameraman = Entity(player.x +rx, player.y +ry, 270, libtcod.Color(191, 191, 191), 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
                         fighter=fighter_component, ai=ai_component)
         entities.append(cameraman)  
         
@@ -374,30 +374,6 @@ class GameMap:
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
-
-    def place_junk(self, room, entities):
-    
-        # Get a random number of junk items    
-        number_of_junks = randint(-1, 2) + 1
-        
-        # Get a random type of junk
-        junk_symbol = randint(0, 3)
-        
-        if junk_symbol == 0:
-            junk_char = 249
-        elif junk_symbol == 1:
-            junk_char = 250
-        else:
-            junk_char = 255
-        
-        for i in range(number_of_junks):
-            # Choose a random location in the room
-            x = randint(room.x1 + 2, room.x2 - 2)
-            y = randint(room.y1 + 2, room.y2 - 2)
-            
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                new_junk = Entity(x, y, junk_char, (51,51,102), 'Junk', render_order=RenderOrder.JUNK, blocks=False)
-                entities.append(new_junk)
             
     def place_entities(self, room, entities, names_list, colors_list):
         max_monsters_per_room = from_dungeon_level([[2, 1], [3, 6], [4, 10]], self.dungeon_level)
@@ -406,7 +382,8 @@ class GameMap:
         number_of_monsters = randint(0, max_monsters_per_room)
         
         # Get a random number of items
-        number_of_items = randint(0, max_items_per_room)
+        #number_of_items = randint(0, max_items_per_room)
+        number_of_items = 0
 
         monster_chances = {
             'rat': from_dungeon_level([[40, 1], [30, 2], [25, 3], [10, 4], [15, 5]], self.dungeon_level),
@@ -433,7 +410,7 @@ class GameMap:
             #'fireball_scroll': 1,
             #'confusion_scroll': 1
             
-            'none': from_dungeon_level([[10, 1], [10,2], [5,3]], self.dungeon_level),
+            #'none': from_dungeon_level([[10, 1], [10,2], [5,3]], self.dungeon_level),
             'cure_wounds': from_dungeon_level([[5,2], [5,3], [5,4], [5,5] ,[5,6] ,[5,7] ,[5,8] ,[5,9] ,[5,10]], self.dungeon_level),
             'foul_liquid': from_dungeon_level([[5, 1], [5,2], [5,3], [5,4], [5,5] ,[5,6] ,[5,7] ,[5,8] ,[5,9] ,[5,10]], self.dungeon_level),
             'restore_wounds': from_dungeon_level([[5, 1], [5,2], [5,3], [5,4], [5,5] ,[5,6] ,[5,7] ,[5,8] ,[5,9] ,[5,10]], self.dungeon_level),
@@ -442,6 +419,7 @@ class GameMap:
             'lightning_scroll': from_dungeon_level([[10,4], [15,5] ,[20,6] ,[20,7] ,[20,8] ,[20,9] ,[20,10]], self.dungeon_level),
             'fireball_scroll': from_dungeon_level([[10,6] ,[15,7] ,[20,8] ,[20,9] ,[25,10]], self.dungeon_level),
             'confusion_scroll': from_dungeon_level([[2,3], [5,4], [10,5] ,[10,6] ,[10,7] ,[15,8] ,[15,9] ,[20,10]], self.dungeon_level),
+            'arrows': 10
         }
 
         for i in range(number_of_monsters):
@@ -457,7 +435,7 @@ class GameMap:
                     fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                    monster = Entity(x, y, 272, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
                     chance_for_swarm = 40
                     swarm_check = randint(0, 100)
@@ -468,15 +446,15 @@ class GameMap:
                             if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
                                 fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                                 ai_component = BasicMonster()
-                                monster = Entity(rx, ry, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                                swarm = Entity(rx, ry, 272, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                                entities.append(monster)
+                                entities.append(swarm)
                                 
                 elif monster_choice == 'rat_prince':
                     fighter_component = Fighter(hp=15, defense=0, power=8, speed=8, xp=40)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 330, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                    monster = Entity(x, y, 274, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
                     chance_for_swarm = 10
                     swarm_check = randint(0, 100)
@@ -487,15 +465,15 @@ class GameMap:
                             if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
                                 fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                                 ai_component = BasicMonster()
-                                monster = Entity(rx, ry, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                                swarm = Entity(rx, ry, 272, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                                entities.append(monster)
+                                entities.append(swarm)
 
                 elif monster_choice == 'bat':
                     fighter_component = Fighter(hp=9, defense=0, power=3, speed=10, xp=10)
                     ai_component = RandomWalk(randomfactor=66)
 
-                    monster = Entity(x, y, 305, libtcod.Color(191, 191, 191), 'bat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                    monster = Entity(x, y, 278, libtcod.Color(191, 191, 191), 'bat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                     
                 elif monster_choice == 'goblin':
                 
@@ -508,7 +486,7 @@ class GameMap:
                     fighter_component = Fighter(hp=20, defense=0, power=8, speed=5, xp=30)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 295, libtcod.Color(107, 164, 107), 'goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, 
+                    monster = Entity(x, y, 280, libtcod.Color(107, 164, 107), 'goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, 
                         ai=ai_component, inventory=monster_inv, equipment=equipment_component)
                     monster.equipment.list.append(monster_weapon) 
                     
@@ -519,8 +497,7 @@ class GameMap:
                     fighter_component = Fighter(hp=30, defense=1, power=10, speed=3, xp=80)
                     ai_component = BasicMonster()
 
-                    monster = Entity(x, y, 296, libtcod.Color(242, 221, 131), 'troll', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-
+                    monster = Entity(x, y, 282, libtcod.Color(242, 221, 131), 'troll', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
                 entities.append(monster)
 
@@ -532,7 +509,6 @@ class GameMap:
                 item_choice = random_choice_from_dict(item_chances)
                 if item_choice == 'none':
                     a=1
-                    
                 if item_choice == 'cure_wounds':
                     item_component = Item(use_function=heal, stackable=False, amount=20,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
@@ -572,12 +548,23 @@ class GameMap:
                     item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Confusion Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                                   
-                else:
+                elif item_choice == 'lightning_scroll':
                     item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5, flammable=True)
                     item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Lightning Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
 
-                entities.append(item)
+                elif item_choice == 'arrows':
+                    arrow_count = randint(1, 10)
+                    hit_component =  BasicShot(2)
+                    ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+                    item_component = Item(use_function=None, stackable=True, count=arrow_count, ammo=ammo_component, flammable=True, range=0,
+                                description="Arrow. Pewpew!")
+                    item = Entity(x, y, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+
+                else:
+                    print("Unhandled item spawn choice .. " + str(item_choice) + " .. game_map line 585.")
+
+                if item_choice != 'none': entities.append(item)
 
 
     def is_blocked(self, x, y):

@@ -1,6 +1,9 @@
+from time import time
 import tcod as libtcod
 
 from enum import Enum
+
+from tcod import constants
 
 from game_states import GameStates
  
@@ -67,36 +70,37 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
                              '{0}: {1}/{2}'.format(name, int(value), int(maximum)))
 
 def render_tooltip(x, y, text):
-    if 0 > x > self.width or 0 > y > self.height:
-        raise Exception("Render tooltip range is out of screen area. (" + str(x) + "," + str(y) + ")")
     
     if len(text) + 2 > 58:
         print(text)
         raise Exception("Tooltip text is too long. Must be 58 characters or less, string was " + (str(len(text))) + " characters.")
     
-    ttcon = libtcod.console.Console(len(text)+2, 3)
+    ttcon = libtcod.console.Console(len(text)+4, 3)
     libtcod.console_set_default_background(ttcon, libtcod.Color(102,102,102))
     libtcod.console_set_default_foreground(ttcon, libtcod.black)
     
     libtcod.console_clear(ttcon)
     
     libtcod.console_print_ex(ttcon, 0, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(201))
-    libtcod.console_print_ex(ttcon, len(text)+1, 0, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    libtcod.console_print_ex(ttcon, len(text)+3, 0, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
     libtcod.console_print_ex(ttcon, 0, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
-    libtcod.console_print_ex(ttcon, len(text)+1, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+    libtcod.console_print_ex(ttcon, len(text)+3, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
     libtcod.console_print_ex(ttcon, 0, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
-    libtcod.console_print_ex(ttcon, len(text)+1, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
-    for tx in range(1, len(text)+1):
+    libtcod.console_print_ex(ttcon, len(text)+3, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+    for tx in range(1, len(text)+3):
         libtcod.console_print_ex(ttcon, tx, 0, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
         libtcod.console_print_ex(ttcon, tx, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
-        
-    libtcod.console_print_ex(ttcon, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, str(text))
+
+    libtcod.console_set_default_foreground(ttcon, libtcod.white)    
+    libtcod.console_print_ex(ttcon, 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, str(text).capitalize())
     
+    while ((y-3) < 1): y=+1
+    while ((x+len(text)+4) > 59): x-=1
     libtcod.console_blit(ttcon, 0, 0, 0, 0, 0, x, y)
 
 def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
-               bar_width, panel_height, panel_y, mouse, colors, options_tutorial_enabled, game_state, names_list, colors_list):
-               
+               bar_width, panel_height, panel_y, mouse, colors, options_tutorial_enabled, game_state, names_list, colors_list, tick, tick_speed):
+
     if fov_recompute:
     # Draw all the tiles in the game map
         for y in range(game_map.height):
@@ -117,6 +121,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                         
                         if game_map.tiles[x][y-1].block_sight == False and game_map.tiles[x][y+1].empty_space:
                             #floor above, empty space below
+                            
                             libtcod.console_set_char_background(con, x, y, (0,0,0), libtcod.BKGND_SET)
                             libtcod.console_set_char_foreground(con, x, y, colors.get('light_wall'))
                         
@@ -173,8 +178,8 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     # Draw all entities in the list
     for entity in entities_in_render_order:
-        draw_entity(con, entity, fov_map, game_map)
-                
+        draw_entity(con, entity, fov_map, game_map, tick, tick_speed)
+
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
     libtcod.console_set_default_background(panel, libtcod.black)
@@ -195,29 +200,30 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                     
     #print mouse x/y
     #libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, (str(mouse.cx) + "," + str(mouse.cy)))
+    
     if options_tutorial_enabled:
             MAP_HEIGHT = game_map.height
             MAP_WIDTH = game_map.width
             
             if game_map.dungeon_level < 3:
-                libtcod.console_set_default_background(0, libtcod.lighter_blue)
+                libtcod.console_set_default_background(0, libtcod.lighter_yellow)
                 libtcod.console_set_default_foreground(0, libtcod.black)
                 
                 if player.y >= MAP_HEIGHT/2: #player on bottom half of the screen
                     (tx, ty) = (58, 2)
                 else: #player on top half of the map
-                    (tx, ty) = (58, 32)
+                    (tx, ty) = (58, MAP_HEIGHT-2)
                     
                 if game_state != GameStates.KEYTARGETING:
                     if player.turn_count < 4:
                         libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Use the numpad or arrow keys to move.")
                    
                     elif player.turn_count < 9:
-                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack them.")
+                        libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "You can move into creatures to attack with a melee ")
+                        libtcod.console_print_ex(0, tx, ty+1, libtcod.BKGND_SET, libtcod.RIGHT, "weapon, or press [f] to fire a ranged weapon.")
                         
                     elif player.turn_count < 14:
                         libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [x] to examine creatures or items on the ground.")
-                   
                         
                     else:
                  
@@ -244,19 +250,19 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                                     libtcod.console_print_ex(0, tx, ty, libtcod.BKGND_SET, libtcod.RIGHT, "Press [c] and then a direction to close an open door.")
                                                        
     # Print the game messages, one line at a time
-    y = 1
-    for message in message_log.messages:
-        libtcod.console_set_default_foreground(panel, message.color)
-        libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
-        y += 1
+    # y = 1
+    # for message in message_log.messages:
+    #     libtcod.console_set_default_foreground(panel, message.color)
+    #     libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
+    #     y += 1
 
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
                libtcod.light_red, libtcod.darker_red)
-    libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT,
-                             'Dungeon level: {0}'.format(game_map.dungeon_level))
-    libtcod.console_print_ex(panel, 1, 4, libtcod.BKGND_NONE, libtcod.LEFT,
-                             'Turn : {0}'.format(player.turn_count))
-                             
+    # libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT,
+    #                          'Dungeon level: {0}'.format(game_map.dungeon_level))
+    # libtcod.console_print_ex(panel, 1, 4, libtcod.BKGND_NONE, libtcod.LEFT,
+    #                          'Turn : {0}'.format(player.turn_count))
+
     #print condition icons       
     if len(player.conditions) > 0:
         ind = 0
@@ -267,25 +273,81 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                 libtcod.console_set_char_foreground(panel, 1+ind, 2, condition.fgcolor)
                 ind += 1
                
+    #timeline
+    libtcod.console_set_default_foreground(panel, libtcod.dark_gray)
+    libtcod.console_print_ex(panel, 22, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(195) )     #195 >
+    libtcod.console_print_ex(panel, 58, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(180) )     #180 <
+    for x in range(23, 58):
+        libtcod.console_print_ex(panel, x, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(196) )  #196 -
+
+    libtcod.console_set_default_foreground(panel, libtcod.white)
+    libtcod.console_print_ex(panel, 23, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(player.char) )     #player char
+    
+    turn_order = []
+    for ent in entities:
+        if not ent.name == player.name and ent.ai and libtcod.map_is_in_fov(fov_map, ent.x, ent.y):
+            temp_enemy_timer = ent.fighter.timer + ent.fighter.speed
+            while temp_enemy_timer >= player.fighter.speed:
+                turn_order.append(ent)
+                temp_enemy_timer -= player.fighter.speed
+
+    x = 25
+    for ent in turn_order:
+        if x < 58:
+            libtcod.console_print_ex(panel, x, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(ent.char+1))
+            x = x + 2  
+
+    #check for timeline highlighting
+    if mouse.cy == 37:
+        if mouse.cx >= 25 and mouse.cx <= 57:
+            timeline_index = (mouse.cx - 25)
+            if mouse.cx %2 == 0: timeline_index -= 1
+            timeline_index = int(timeline_index / 2)
+        else:
+            timeline_index = 99
+
+        if timeline_index <= len(turn_order)-1 and tick%tick_speed<2:
+            ent = turn_order[timeline_index]
+            libtcod.console_set_default_foreground(0, libtcod.lighter_yellow)
+            libtcod.console_print_ex(0, ent.x, ent.y, libtcod.BKGND_NONE, libtcod.LEFT, chr(ent.char))
+
+            # TODO :: Look at this... this code was an attempt to highlight each occurance of a highlighted creature in the timeline
+            #so if you highlight a rat, and he gets two turns, I wanted both of his sprites on the timeline to highlight.
+            #didn't work, but it did manage to highlight the specific sprite you were hovering over on the timeline.
+
+            # for e in turn_order:
+            #     if e == turn_order[timeline_index]:
+            #         ex = 25 + (2*timeline_index)
+            #         libtcod.console_set_default_foreground(panel, libtcod.lighter_yellow)
+            #         libtcod.console_print_ex(panel, ex, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(ent.char))
+
+    for ent in entities:
+        if libtcod.map_is_in_fov(fov_map, ent.x, ent.y) and ent.x == mouse.cx and ent.y == mouse.cy and ent.name != "Targeter" and ent.name != "Player":
+                if ent.fighter:
+                    #print a context menu for the lil guy
+                    context_menu(game_map.width, game_map.height, ent, names_list)
+                    break
+                else:
+                    render_tooltip(ent.x+1, ent.y-1, ent.name)
+
+
     if game_state == GameStates.KEYTARGETING:
         targeter = None
         for ent in entities:
             if ent.name == 'Targeter':
                 targeter = ent
         if not targeter == None:
-            libtcod.console_set_default_foreground(panel, libtcod.light_gray)
+            #libtcod.console_set_default_foreground(panel, libtcod.light_gray)
             libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                                  get_all_at(targeter.x, targeter.y, entities, fov_map, game_map, names_list))
             for ent in entities:
-                if ent.x == targeter.x and ent.y == targeter.y and ent.name != "Targeter" and ent.name != "Player" and ent.fighter:
-                    #print a context menu for the lil guy
-                    context_menu(game_map.width, game_map.height, ent, names_list)
-                    
-                    
-    #print names of item(s) under mouse
-    libtcod.console_set_default_foreground(panel, libtcod.light_gray)
-    libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                             get_names_under_mouse(mouse, entities, fov_map, names_list))
+                if libtcod.map_is_in_fov(fov_map, ent.x, ent.y) and ent.x == targeter.x and ent.y == targeter.y and ent.name != "Targeter" and ent.name != "Player":
+                    if ent.fighter:
+                        #print a context menu for the lil guy
+                        context_menu(game_map.width, game_map.height, ent, names_list)
+                        break
+                    else:
+                        render_tooltip(ent.x+1, ent.y-1, ent.name)
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
@@ -306,11 +368,15 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     elif game_state == GameStates.LEVEL_UP:
         level_up_menu(con, 'Level up! Choose a stat to raise:', player, 40, screen_width, screen_height)
 
-    elif game_state == GameStates.CHARACTER_SCREEN:
+    elif game_state == GameStates.CHARACTER_SCREEN: 
         character_screen(player, 30, 10, screen_width, screen_height)
 
 def context_menu(gmw, gmh, entity, names_list):
-    
+
+    if not entity.fighter:
+        print("Context menu called, but entity " + entity.name + " has no fighter component.")
+        return
+
     h = 8
     if len(entity.conditions) > 0: h += 2
     if entity.equipment and len(entity.equipment.list) > 0: h += 2
@@ -448,10 +514,14 @@ def clear_all(con, entities):
         clear_entity(con, entity)
 
 
-def draw_entity(con, entity, fov_map, game_map):
+def draw_entity(con, entity, fov_map, game_map, tick, tick_speed):
     if libtcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
+        charmod = 0
+        if entity.ai or entity.name == "Player":
+            mod = tick % tick_speed
+            if mod < 2: charmod = 1
         libtcod.console_set_default_foreground(con, entity.color)
-        libtcod.console_put_char(con, entity.x, entity.y, entity.char, libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, entity.x, entity.y, (entity.char+charmod), libtcod.BKGND_NONE)
 
 
 def clear_entity(con, entity):

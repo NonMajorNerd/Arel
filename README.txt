@@ -25,6 +25,8 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
  
  Python v3+  			(https://www.python.org/downloads/)
  Python tcod Library	(https://python-tcod.readthedocs.io/en/latest/installation.html)
+ Python pygame library  (https://www.pygame.org/wiki/GettingStarted)
+						
  
  **************
  *  Controls  *
@@ -41,13 +43,18 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 			1  2  3 		sD  D  sR 
     
 	[c] Close
-		press [c] and then a directional key as outlined above to close objects.
+		Press [c] and then a directional key as outlined above to close objects.
 	
+	[f] fire
+		Press [f] and then a directional key as outlined above to fire an equipped ranged weapon.
+			*If you do not have a default ammo preference selected, you will be prompted to select one.
+			*You may also change your default ammo preference by using the Quiver in your inventory.
+
     [i] Inventory
         Press [i] to open your inventory
-            press [i] or [esc] to close the inventory
+            *Press [i] or [esc] to close the inventory
             
-			Within the inventory menu you can use the arrow keys to move and [Enter] to select/use/(d)equip an item, or you can use the mouse and left-click to select/use/(d)equip an item.
+			*Within the inventory menu you can use the arrow keys to move and [Enter] to select/use/(d)equip an item, or you can use the mouse and left-click to select/use/(d)equip an item.
     
     [k] Kick
         Press [k] and then a directional key as outlined above to kick.
@@ -59,16 +66,18 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
         Press [s] to open your stats menu
         Press [esc] to close the stats menu
 		
-	[x] Examine/Target
-		Press [x] to enter targeting mode, then use the arrow keys to select a cell/target to examine.
-		Press [esc] to leave targeting mode.
+	[x] Examine
+		Press [x] to enter examine mode, then use the arrow keys to examine the map and your surroundings.
+		Press [esc] to leave examine mode.
  
     ****************
     *  To-Do List  *
     ****************
-    
+	
+		*Rebalance item drops to account for bows, arrows..
+		*Update help menu / readme for mouse support and other controls
+
 		*Add communicable conditions
-		*Add score to death screen
 		*Add score saving, high-score tables
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
 		*Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)
@@ -79,11 +88,46 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		*Add a check/return so if a list is searched and there is no result, it returns a default .. eg if names list does not have a name for this item, just return the default name.
 		*Expand scoring system
 		*Build a check for 'is there a camera op? if not, spawn one nearby (but outside of player FoV)'
+		*Extend ranged weapon systems
+			*accuracy??
+			*capability to hip-fire at reduced accuaracy/damage?
+			*reduced damage if firing at range 1?
 		*Certainly a ton of other things	
+		
 		
     **************
     * Change log *
     **************
+	
+	07/15/21
+		Got rid of message log
+		Added turn order timeline
+		Added mouse support for NPC context menus and tooltips
+		Added mouse support for inventory
+		Added 2-frame animations for all pc/npc sprites
+		Added a help menu
+
+	07/07/21
+		Bug fixes around ranged weapon systems
+		Fixed a bug which was causing new games to use the constants, names and colors lists from previous games from the same execution
+		Added keypad control to all menus
+		Fixed the autosave / loading system
+
+	07/06/21
+		Note that 'arrow' items will drop regardless of origin choice, but 'bow' items will NOT spawn and can not be obtained if you do not start as a ranger.
+		Please also note that the drop rates for arrows (and their impact on the drop rate of other items) has not been tuned or balanced at this time.
+
+		Completed base code for quiver and ammo preference system
+		Added the 'Ranger' origin and gear
+		Updated Ranger starting sprite
+		Added firing controls to the ReadMe, as well as a few other changes to the ReadMe control descriptions
+
+	07/05/21
+		Base code for quiver / preference system designed and implemented
+
+	04/22/21
+		Blocked out core systems and logic for more robust ammo usability
+		Added the Quiver item
 	
 	03/24/21
 		Added ranged weaponry, ammo typess
@@ -141,3 +185,6 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Fixed the order-of-operations in target seraching when kicking (mainly fixes kicking things through open doorways)
 		
 		Fixed spawn rates    
+
+
+*The current TEMPORARY menu_background.png file is the sole property of Wizards of the Coast (© 1993-2021 Wizards of the Coast LLC, a subsidiary of Hasbro, Inc. All Rights Reserved.)*

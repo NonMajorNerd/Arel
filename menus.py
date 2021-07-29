@@ -1,3 +1,4 @@
+from numpy import SHIFT_DIVIDEBYZERO
 import tcod as libtcod
 import textwrap
 import operator
@@ -193,7 +194,7 @@ def intro(constants):
         
         libtcod.console_flush()
         
-        if key.vk == libtcod.KEY_ENTER:
+        if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:
             if step == 10:
                 return True
             else:
@@ -356,7 +357,7 @@ def game_options(constants):
             
         libtcod.console_flush()
 
-        if key.vk == libtcod.KEY_ENTER:            
+        if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:            
         
             if difficulty == "Newcomer":
                 constants['options_enemy_damage_scale'] = 80
@@ -393,7 +394,7 @@ def game_options(constants):
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
             
-        elif key.vk == libtcod.KEY_RIGHT:
+        elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
             if index == 0:
                 if difficulty == "Newcomer":
                     difficulty = "Classic"
@@ -421,7 +422,7 @@ def game_options(constants):
             #if index == 6:
                 #constants['options_death_delete_save'] = not constants['options_death_delete_save']
                 
-        elif key.vk == libtcod.KEY_LEFT:
+        elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
             if index == 0:  
                 if difficulty == "Classic":
                     difficulty = "Newcomer"
@@ -449,7 +450,7 @@ def game_options(constants):
             #if index == 6:
             #    constants['options_death_delete_save'] = not constants['options_death_delete_save']         
                
-        elif key.vk == libtcod.KEY_DOWN:
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
             if index == 0:
                 index += 1
             elif index > 0:
@@ -457,9 +458,121 @@ def game_options(constants):
                     if index < 5:
                         index += 1
             
-        elif key.vk == libtcod.KEY_UP:
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
             if index > 0: index -= 1                
             
+
+def m1m2_menu(x=1, y=1, w=None, h=None, numoptions=3, optionslist=[]):
+
+    if optionslist == []: return False
+   
+    results = None
+    
+    #UI Color Defaults
+    screen_yellow = libtcod.Color(255,255,102)
+    screen_blue = libtcod.Color(102,178,255)
+    screen_red = libtcod.Color(254,95,85)
+    screen_green = libtcod.Color(178,255,102)
+    screen_purple = libtcod.Color(102,46,155)
+    screen_darkgray = libtcod.Color(102,102,102)    #background gray
+    screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
+    screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
+
+    inv_index = 0
+    m1_index = 0
+
+    if h == numoptions: h += 3
+    if w < 18: w = 18
+    #print static UI elements
+    if True:
+        libtcod.console_set_default_foreground(0, libtcod.black)
+        libtcod.console_set_default_background(0, screen_darkgray)
+
+        for ix in range (x, x+w+1):
+            for iy in range(y, y+h+1):
+                libtcod.console_print_ex(0, ix, iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+
+        #corners, T pieces
+        libtcod.console_print_ex(0, x, y, libtcod.BKGND_SET, libtcod.LEFT, chr(201))     # Top Left Corner  |'
+        libtcod.console_print_ex(0, x+w, y, libtcod.BKGND_SET, libtcod.LEFT, chr(187))   # Top Right Corner `|
+        libtcod.console_print_ex(0, x, y+h, libtcod.BKGND_SET, libtcod.LEFT, chr(200))   # Bottom Left Corner |_
+        libtcod.console_print_ex(0, x+w, y+h, libtcod.BKGND_SET, libtcod.LEFT, chr(188)) # Bottom Right Corner _|       
+
+        for ix in range(x+1, x+w):
+            libtcod.console_print_ex(0, ix, y, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+            libtcod.console_print_ex(0, ix, y+h, libtcod.BKGND_SET, libtcod.LEFT, chr(205))
+
+        for iy in range(y+1, y+h):
+            libtcod.console_print_ex(0, x, iy, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+            libtcod.console_print_ex(0, x+w, iy, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
+
+
+        libtcod.console_set_default_foreground(0, screen_lightgray)
+        libtcod.console_print_ex(0, int(x+(w/2)), y+h-2, libtcod.BKGND_NONE, libtcod.CENTER, "[Enter] to Select")
+        libtcod.console_print_ex(0, int(x+(w/2)), y+h-1, libtcod.BKGND_NONE, libtcod.CENTER, "[Esc] to Cancel")
+
+        libtcod.console_set_default_foreground(0, screen_yellow)
+        libtcod.console_print_ex(0, int(x+(w/2)), y, libtcod.BKGND_NONE, libtcod.CENTER, "Firing Preference")
+
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    libtcod.console_set_default_foreground(0, libtcod.black)
+
+    while True:
+        for iy in range (1, numoptions+1):
+            for ix in range (x+1, x+w):
+                if iy %2 == 0:
+                    libtcod.console_set_default_background(0, screen_midgray)
+                    libtcod.console_print_ex(0, ix, y+iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+                else:
+                    libtcod.console_set_default_background(0, screen_lightgray)
+                    libtcod.console_print_ex(0, ix, y+iy, libtcod.BKGND_SET, libtcod.LEFT, " ")
+
+        if len(optionslist) < numoptions:
+            for opt in optionslist: 
+                libtcod.console_print_ex(0, x+1, y+1+optionslist.index(opt), libtcod.BKGND_NONE, libtcod.LEFT, str(opt))
+        else:
+            for i in range (0, numoptions):     
+                libtcod.console_print_ex(0, x+1, y+1+i, libtcod.BKGND_NONE, libtcod.LEFT, str(optionslist[inv_index + i]))
+
+        current_option = optionslist[inv_index + m1_index]
+        libtcod.console_set_default_background(0, screen_green)
+
+        for iw in range(x+1, x+(w-len(current_option))):
+            current_option = current_option + " "
+
+        libtcod.console_print_ex(0, x+1, y+1+m1_index, libtcod.BKGND_SET, libtcod.LEFT, current_option)
+
+        #Render changes
+        libtcod.console_flush()   
+        
+        #Check for input
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        
+        if key.vk == libtcod.KEY_ESCAPE:
+            return('exit')
+
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+            if m1_index == 0:
+                if inv_index > 0:
+                    inv_index -= 1
+
+            else:
+                m1_index -= 1
+
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+            if m1_index < len(optionslist) -1:
+                if m1_index == numoptions-1:
+                    if inv_index < len(optionslist)-numoptions:
+                        inv_index += 1
+                    
+                else:
+                    m1_index += 1
+
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:
+            return current_option.strip()
+
             
 def origin_options(constants):
  
@@ -547,8 +660,11 @@ def origin_options(constants):
             libtcod.console_set_default_foreground(0, screen_yellow)               
             libtcod.console_print_ex(0, 36, 12, libtcod.BKGND_SET, libtcod.LEFT, ">>")
             
+
         libtcod.console_set_default_foreground(0, screen_lightgray)  
+
         if origin == "Adventurer":
+            
             libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(258))
             
             desc = "A classic sword-and-shield adventurer, you are more suited to the challenge my dungeon than most. We'll see how much of a difference that makes."
@@ -556,7 +672,16 @@ def origin_options(constants):
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(369) + " Sword (+3 ATK)")
             libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(375) + " Shield (+1 DEF)")
             libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 20 Gold")
-             
+
+        elif origin == "Ranger":
+            libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(257))
+            
+            desc = "You used to make your living as a hunter, guide, or tracker. Let's see if you can hunt down a guide to get you off of this track."
+            
+            libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(377) + " Bow")
+            libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(378) + " Arrow x10")
+            libtcod.console_print_ex(0, 13, 24, libtcod.BKGND_NONE, libtcod.LEFT, chr(378) + " Poison Arrow x3")   
+
         elif origin == "Merchant":
             libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(262))
             desc = "Though not the typical fighting type yourself, you've seen your share of scuffs and challenges. Your ability to swindle and swoon may come in handy."
@@ -598,35 +723,40 @@ def origin_options(constants):
             
         libtcod.console_flush()
 
-        if key.vk == libtcod.KEY_ENTER:                       
+        if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:                       
             break
             
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
   
             
-        elif key.vk == libtcod.KEY_RIGHT:
+        elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
             if index == 0:
                 if origin == "Adventurer":
+                    origin = "Ranger"
+
+                elif origin == "Ranger":
                     origin = "Merchant"
-                    
+
                 elif origin == "Merchant":
                     origin = "Criminal"
                     
                 elif origin == "Criminal":
                     origin = "Tourist"
       
-        elif key.vk == libtcod.KEY_LEFT:
+        elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
             if index == 0:  
-                if origin == "Merchant":
+                if origin == "Ranger":
                     origin = "Adventurer"
+
+                elif origin == "Merchant":
+                    origin = "Ranger"
                     
                 elif origin == "Criminal":
                     origin = "Merchant"
                     
                 elif origin == "Tourist":
-                    origin = "Criminal"
-            
+                    origin = "Criminal"      
 
 def character_name(constants):
 
@@ -715,7 +845,7 @@ def character_name(constants):
         if key.vk == libtcod.KEY_ESCAPE:
             return "nah"
             
-        elif key.vk == libtcod.KEY_ENTER:            
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:            
             constants['player_name'] = charname
             return True
                 
@@ -815,8 +945,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
     mouse = libtcod.Mouse()
 
     while True:
-
-           
+   
         numequip = (len(player.equipment.list) - player.equipment.list.count(None))
         numitems = len(player.inventory.items)
         numpages = int((numitems + numequip)/ itemsperpage) + 1
@@ -826,8 +955,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                 
         libtcod.console_set_default_foreground(0, screen_lightgray)
         libtcod.console_set_default_background(0, screen_darkgray)
-
-        
+  
         libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "                      ")
         libtcod.console_set_default_foreground(0, screen_midgray)
         libtcod.console_print_ex(0, 31, 36, libtcod.BKGND_SET, libtcod.LEFT, "Page " + str(currentpage) + " of " + str(numpages))
@@ -894,7 +1022,6 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                 elif (e.equippable.slot) == EquipmentSlots.HELM: (ex, ey) = (47, 5)
                 elif (e.equippable.slot) == EquipmentSlots.ARMOR: (ex, ey) = (47, 7)
                 elif (e.equippable.slot) == EquipmentSlots.ACC2: (ex, ey) = (47, 9)
-                else: print(str(e.equippable.slot))
                 strname = names_list[e.name]
                 if len(strname) > 10: strname = left(strname, 10)
                 libtcod.console_print_ex(0, ex, ey, libtcod.BKGND_SET, libtcod.LEFT, "          ") 
@@ -913,6 +1040,29 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                     libtcod.console_print_ex(0, 3, y, libtcod.BKGND_NONE, libtcod.LEFT, get_name_string(itm, names_list))    
                     y += 1   
                 
+        mx = mouse.cx
+        my = mouse.cy
+
+        # elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+        #     cap = numitems -1
+        #     if currentpage == 1: cap += numequip
+        #     if index < cap: index += 1
+        #     if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
+
+        # elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+        #     if index > 0: index -= 1
+        #     if line == 13 and currentpage > 1: currentpage -= 1
+
+
+        #if the mouse is in the right position, use mouseindex
+        if my >= 13 and my < (13 + itemsperpage):
+            if mx >= 3 and mx < 30:
+                mouse_index = my-13
+                cap = numitems -1
+                if currentpage == 1: cap += numequip
+                if mouse_index <= cap: index = mouse_index
+
+        #iindex = index
         #green selection line
         strname = ""
         iindex = index
@@ -928,12 +1078,9 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
             system = "inventory"
             iindex = index - numequip
         
-        
         #get the item at the current index
         item = get_item_at(system, currentpage, iindex, player)
         line = 13 + (index%itemsperpage)
-        
-        #print("start " +str(start) + " // end " + str(end) + " // sys " + system + " // page " + str(currentpage) + " // iindex " + str(iindex) + " // real index " + str(index) + " // line " + str(line) + " // ne " + str(numequip) + " // ni " + str(numitems))
         
         #draw the green selection line
         strname += get_name_string(item, names_list)
@@ -969,8 +1116,6 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         if item.equippable:
             libtcod.console_set_default_background(0, screen_darkgray)
             libtcod.console_set_default_foreground(0, screen_lightgray)
-            
-            
     
             #if no eq to comapre to, the difference is just the bonus of the item in question
             diff_atk = item.equippable.power_bonus
@@ -1105,8 +1250,10 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
         libtcod.console_flush()   
         
         #Check for input
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-        
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)    
+
+        left_click = mouse.lbutton_pressed
+
         if key.vk == libtcod.KEY_ESCAPE or chr(key.c) == "i":
             #results.append({'ignore': 0})
             return results
@@ -1136,7 +1283,6 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                 for y in range(2, 39):
                     libtcod.console_print_ex(0, 1, y, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
                     libtcod.console_print_ex(0, 58, y, libtcod.BKGND_SET, libtcod.LEFT, chr(186))
-                
                 
                 #corners, T pieces
                 libtcod.console_print_ex(0, 1, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(201))
@@ -1173,10 +1319,30 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
              
             needs_sort = True
             
-        elif key.vk == libtcod.KEY_ENTER:
+        elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER or left_click: 
+            
+            # if left_click:
+            #     if not (my >= 13 and my < (13 + itemsperpage)): break
+            #     if not(mx >= 3 and mx < 30): break
+
             if item.item.use_function:
-                results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list))
-                return results 
+                use = None
+                if item.name == 'Quiver':
+                    use = False
+                    ammo_list = []
+                    for i in player.inventory.items:
+                        if i.item.ammo:
+                            ammo_list.append(i.name)
+
+                    if len(ammo_list) == 0:
+                        print('no ammo')
+                    else:
+                        use = True
+                
+                print(str(use))
+                if use == None or use == True:
+                    results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map, names_list=names_list, colors_list=colors_list, constants=constants)) 
+                    return results 
                 
             elif item.equippable:
                 #player.equipment.toggle_equip(item)
@@ -1192,24 +1358,26 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
                         player.inventory.remove_item(equipped)
                         #message_log.add_message(Message('You equipped the {0}.'.format(equipped.name)))
                         
-                    # TODO :: Check carrying cap after dequipping items ..
-                        # if numitems > carrying cap .. gamestate = burdened
-                        # if game_state = burdened then can only access inventory
+
                     if dequipped:
+                        # TODO if the item in question has a capacity bonus
+                        #   then if removing that capacity bonus puts player over capacity
+                        #       do not allow them to remove it
+
                         player.inventory.add_item(dequipped, names_list)
                         #message_log.add_message(Message('You dequipped the {0}.'.format(dequipped.name)))
             
                     needs_sort = True
             else:
-                print("Not sure what to do here? Menu line 919 ... key enter on a non-usable, non-equippable item?")
+                print("Not sure what to do here? Menu line 1297 ... key enter on a non-usable, non-equippable item?")
                 
-        elif key.vk == libtcod.KEY_DOWN:
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
             cap = numitems -1
             if currentpage == 1: cap += numequip
             if index < cap: index += 1
             if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
 
-        elif key.vk == libtcod.KEY_UP:
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
             if index > 0: index -= 1
             if line == 13 and currentpage > 1: currentpage -= 1
   
@@ -1317,7 +1485,7 @@ def sort_menu():
 
             
 def get_item_at(system, page, index, player):
-    
+
     numequip = len(player.equipment.list) #- player.equipment.list.count(None))
     numitems = len(player.inventory.items) #+ numequip
 
@@ -1586,7 +1754,7 @@ def OLD_inventory_menu(player, entities, fov_map, names_list, colors_list, messa
             libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
             y+=1           
             
-        if item.item.effect_lines: # TODO :: Build in check for unidentified items 
+        if item.item.effect_lines:
             y += 1 #start the effect text after the description text ends.
             for l in item.item.effect_lines:
                 libtcod.console_print_ex(0, 31, y, libtcod.BKGND_SET, libtcod.LEFT, l) 
@@ -1712,11 +1880,11 @@ def OLD_inventory_menu(player, entities, fov_map, names_list, colors_list, messa
             #results.append({'ignore': 0})
             return results
    
-        elif key.vk == libtcod.KEY_DOWN:
+        elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
             if index < numitems-1: index += 1
             if line == 36 and currentpage + 1 <= numpages: currentpage = currentpage + 1
 
-        elif key.vk == libtcod.KEY_UP:
+        elif key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
             if index > 0: index -= 1
             if line == 13 and currentpage > 1: currentpage -= 1
             
@@ -1920,7 +2088,6 @@ def character_screen(player, entities, constants, dungeon_level, names_list, col
 def message_box(con, header, width, screen_width, screen_height):
     menu(con, header, [], width, screen_width, screen_height)
 
-
 def help_menu():
     
     results = []
@@ -1996,7 +2163,16 @@ def menu_template():
     screen_midgray = libtcod.Color(158,158,158)     #dark lines gray    
     screen_lightgray = libtcod.Color(191,191,191)   #light lines gray, desc. text
 
-    
+    #corners, T pieces
+    # libtcod.console_print_ex(0, 1, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(201))
+    # libtcod.console_print_ex(0, 11, 1, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    # libtcod.console_print_ex(0, 11, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    # libtcod.console_print_ex(0, 58, 2, libtcod.BKGND_SET, libtcod.LEFT, chr(187))
+    # libtcod.console_print_ex(0, 1, 11, libtcod.BKGND_SET, libtcod.LEFT, chr(199))
+    # libtcod.console_print_ex(0, 58, 11, libtcod.BKGND_SET, libtcod.LEFT, chr(182))
+    # libtcod.console_print_ex(0, 1, 38, libtcod.BKGND_SET, libtcod.LEFT, chr(200))
+    # libtcod.console_print_ex(0, 58, 38, libtcod.BKGND_SET, libtcod.LEFT, chr(188))
+
     #print static UI elements
     if True:
         print('Static layout elements go here')

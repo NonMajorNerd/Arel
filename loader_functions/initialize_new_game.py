@@ -1,5 +1,8 @@
+#from input_handlers import player_pick_dir
 import tcod as libtcod
 from random import randint
+
+from tcod.constants import FONT_LAYOUT_TCOD
 
 from components.equipment import Equipment
 from components.equippable import Equippable
@@ -9,7 +12,7 @@ from components.inventory import Inventory
 from components.level import Level
 from components.ammo import Ammo
 from ammo_functions import BasicShot, PoisonShot
-
+from item_functions import use_arrow
 
 from condition_functions import Poison, Healing
 
@@ -25,6 +28,11 @@ from map_objects.game_map import GameMap
 
 from render_functions import RenderOrder
 
+from item_functions import use_quiver
+
+global constants
+global player
+
 def load_customfont():
     #The index of the first custom tile in the file
     a = 256
@@ -36,15 +44,16 @@ def load_customfont():
 
 def get_constants():
 
-    load_customfont()
-
     window_title = "A'Rel"
 
     screen_width = 60
     screen_height = 40
+        
+    tick = 0
+    tick_speed = 4
 
     bar_width = 20
-    panel_height = 7
+    panel_height = 4
     panel_y = screen_height - panel_height
 
     message_x = bar_width + 2
@@ -52,7 +61,7 @@ def get_constants():
     message_height = panel_height - 1
 
     map_width = 60
-    map_height = 33
+    map_height = screen_height - panel_height
 
     room_max_size = 10
     room_min_size = 6
@@ -74,10 +83,12 @@ def get_constants():
     options_player_damage_scale = 100
     options_xp_multiplier = 1
     options_luck_scale = 100
-    options_death_delete_save = True
+    options_death_delete_save = True #not a thing
     options_tutorial_enabled = True
     options_inventory_sort = "Alpha"
-    
+    options_ammo_preference = None #no default ammo selected
+
+
     colors = {
         'dark_wall': libtcod.Color(34, 34, 68),
         'dark_ground': libtcod.Color(17, 17, 34),
@@ -89,6 +100,8 @@ def get_constants():
         'window_title': window_title,
         'screen_width': screen_width,
         'screen_height': screen_height,
+        'tick': tick,
+        'tick_speed': tick_speed,
         'bar_width': bar_width,
         'panel_height': panel_height,
         'panel_y': panel_y,
@@ -117,12 +130,11 @@ def get_constants():
         'options_luck_scale': options_luck_scale,
         'options_death_delete_save': options_death_delete_save,
         'options_tutorial_enabled': options_tutorial_enabled,
-        'options_inventory_sort': options_inventory_sort
+        'options_inventory_sort': options_inventory_sort,
+        'options_ammo_preference': options_ammo_preference
     }
 
     return constants
-    
-    #random.choice[colors_list['Scrolls']]
     
 def get_render_colors():
     colors_list = {
@@ -163,7 +175,8 @@ def get_render_colors():
     'Shield':                       libtcod.darker_orange,
     'Gold':                         libtcod.dark_yellow,
     'Short Bow':                    libtcod.brass,
-    'Arrow':                        libtcod.desaturated_amber
+    'Arrow':                        libtcod.desaturated_amber,
+    'Quiver':                       libtcod.desaturated_amber
     }
     
     return colors_list
@@ -225,8 +238,11 @@ def get_unidentified_names():
     'Shield':                   'Shield',
     'Short Bow':                'Short Bow',
     'Arrow':                    'Arrow',
+    'Poison Arrow':              'Poison Arrow',
+    'Quiver':                   'Quiver',
     'Camera Op.':               'Camera Op.',
     'rat':                      'rat',
+    'rat swarm':                'rat swarm',
     'rat prince':               'rat prince',
     'rat king':                 'rat king',
     'bat':                      'bat',
@@ -285,24 +301,15 @@ def get_game_variables(constants, names_list, colors_list):
     #Starting Inventory, sprite
     origin = constants['options_origin']
     
+    #HEKIN QUIVER
+    item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
+                    description="A quiver for storing arrows.",
+                    effect="Firing preference is currently unassigned.")
+    item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', item=item_component)
+    player.inventory.items.append(item)    
+
     if origin == "Adventurer":
-        player.char = 258
-        
-        #HEKIN ARROW?
-        #hit_component =  BasicShot(damage=2)
-        #ammo_component = Ammo(hit_function=hit_component, retrievable=True)
-        #ammo_component = Ammo(hit_function=PoisonShot(2, 1, 10), retrievable=True)
-        #item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
-        #                description="Arrow. Pewpew!")
-        #item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
-        #player.inventory.items.append(item)    
-        
-        #HEKIN BOW
-        #item_component = Item(use_function=None, stackable=False, flammable=True, ammo="Arrow", range=5,
-        #                description="A small, low-range bow.")
-        #equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
-        #item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
-        #player.equipment.list.append(item)       
+        player.char = 256
         
         #sword
         item_component = Item(use_function=None, stackable=False,
@@ -310,7 +317,6 @@ def get_game_variables(constants, names_list, colors_list):
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)       
-        
         
         #shield
         item_component = Item(use_function=None, stackable=False,
@@ -326,8 +332,35 @@ def get_game_variables(constants, names_list, colors_list):
         player.inventory.add_item(item, names_list)
         player.gold_collected = 20
         
+    elif origin == "Ranger":
+        player.char = 258
+       
+        #3x Pos. Arrow
+        hit_component =  PoisonShot(2, 1, 10)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=use_arrow(), stackable=True, count=3, ammo=ammo_component, flammable=True, range=0,
+                       description="Poison-coated arrow. Icky!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Poison Arrow', item=item_component)
+        player.inventory.items.append(item)    
+        
+        #10x. Arrow
+        hit_component =  BasicShot(2)
+        ammo_component = Ammo(hit_function=hit_component, retrievable=True)
+        item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
+                       description="Arrow. Pewpew!")
+        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+        player.inventory.items.append(item) 
+
+        #Bow
+        item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
+                        description="A small, low-range bow.")
+        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
+        item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
+        player.equipment.list.append(item)       
+        
+
     elif origin == "Merchant":
-        player.char = 262
+        player.char = 260
         #staff
         item_component = Item(use_function=None, stackable=False,
                         description="A two-handed (but actually one-handed) wooden staff, perfect for whacking things with.")
@@ -351,7 +384,7 @@ def get_game_variables(constants, names_list, colors_list):
         player.gold_collected = 100
         
     elif origin == "Criminal":
-        player.char = 260
+        player.char = 262
         #dagger
         item_component = Item(use_function=None, stackable=False,
                         description="A small, rusty dagger. Probably unsafe to handle.",
@@ -376,7 +409,7 @@ def get_game_variables(constants, names_list, colors_list):
         player.gold_collected = 30
         
     elif origin == "Tourist":
-        player.char = 256
+        player.char = 264
         #cargo shorts
         item_component = Item(use_function=None, stackable=False,
                         description="These are more pockets than they are shorts, which you're ok with.",
