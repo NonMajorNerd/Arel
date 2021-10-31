@@ -2,6 +2,7 @@ from numpy import SHIFT_DIVIDEBYZERO
 import tcod as libtcod
 import textwrap
 import operator
+import _globals
 from game_messages import Message
 from random_utils import left, mid, right, myattrgetter
 from equipment_slots import EquipmentSlots
@@ -34,7 +35,7 @@ def menu(con, header, options, width, screen_width, screen_height):
     y = int(screen_height / 2 - height / 2) + 16
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
-def intro(constants):
+def intro():
 
     screen_yellow = libtcod.Color(255,255,102)
     screen_blue = libtcod.Color(102,178,255)
@@ -203,7 +204,7 @@ def intro(constants):
         if key.vk == libtcod.KEY_ESCAPE:          
             return True
 
-def game_options(constants):
+def game_options():
  
     index = 0
  
@@ -273,7 +274,7 @@ def game_options(constants):
 
         libtcod.console_set_default_foreground(0, libtcod.black)
         strtut = "Disabled"
-        if constants['options_tutorial_enabled']: strtut = "Enabled"
+        if _globals.constants['options_tutorial_enabled']: strtut = "Enabled"
         
         libtcod.console_print_ex(0, 32, 14, libtcod.BKGND_SET, libtcod.RIGHT, "Tutorial Tips:")
         libtcod.console_print_ex(0, 34, 14, libtcod.BKGND_SET, libtcod.LEFT, strtut)
@@ -305,13 +306,13 @@ def game_options(constants):
             desc=""
             libtcod.console_set_default_foreground(0, libtcod.black)
             libtcod.console_print_ex(0, 32, 16, libtcod.BKGND_SET, libtcod.RIGHT, "Enemy Damage:") 
-            libtcod.console_print_ex(0, 34, 16, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_enemy_damage_scale']) + "%")
+            libtcod.console_print_ex(0, 34, 16, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_enemy_damage_scale']) + "%")
             libtcod.console_print_ex(0, 32, 18, libtcod.BKGND_SET, libtcod.RIGHT, "Player Damage:")
-            libtcod.console_print_ex(0, 34, 18, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_player_damage_scale']) + "%")
+            libtcod.console_print_ex(0, 34, 18, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_player_damage_scale']) + "%")
             libtcod.console_print_ex(0, 32, 20, libtcod.BKGND_SET, libtcod.RIGHT, "Experience Multiplier:") 
-            libtcod.console_print_ex(0, 34, 20, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_xp_multiplier']) + "x")
+            libtcod.console_print_ex(0, 34, 20, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_xp_multiplier']) + "x")
             libtcod.console_print_ex(0, 32, 22, libtcod.BKGND_SET, libtcod.RIGHT, "Luck Scale:") 
-            libtcod.console_print_ex(0, 34, 22, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_luck_scale']) + "%")
+            libtcod.console_print_ex(0, 34, 22, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_luck_scale']) + "%")
             #libtcod.console_print_ex(0, 32, 24, libtcod.BKGND_SET, libtcod.RIGHT, "Delete Save on Death:") 
             #strdel = "No"
             #if constants['options_death_delete_save']: strdel = "Yes"
@@ -326,19 +327,19 @@ def game_options(constants):
             
         elif index == 2:
             libtcod.console_print_ex(0, 32, 16, libtcod.BKGND_SET, libtcod.RIGHT, "Enemy Damage:")
-            libtcod.console_print_ex(0, 34, 16, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_enemy_damage_scale']) + "%")
+            libtcod.console_print_ex(0, 34, 16, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_enemy_damage_scale']) + "%")
             
         elif index == 3:
             libtcod.console_print_ex(0, 32, 18, libtcod.BKGND_SET, libtcod.RIGHT, "Player Damage:")
-            libtcod.console_print_ex(0, 34, 18, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_player_damage_scale']) + "%")
+            libtcod.console_print_ex(0, 34, 18, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_player_damage_scale']) + "%")
             
         elif index == 4:
             libtcod.console_print_ex(0, 32, 20, libtcod.BKGND_SET, libtcod.RIGHT, "Experience Multiplier:")
-            libtcod.console_print_ex(0, 34, 20, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_xp_multiplier']) + "x")
+            libtcod.console_print_ex(0, 34, 20, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_xp_multiplier']) + "x")
             
         elif index == 5:
             libtcod.console_print_ex(0, 32, 22, libtcod.BKGND_SET, libtcod.RIGHT, "Luck Scale:")
-            libtcod.console_print_ex(0, 34, 22, libtcod.BKGND_SET, libtcod.LEFT, str(constants['options_luck_scale']) + "%")
+            libtcod.console_print_ex(0, 34, 22, libtcod.BKGND_SET, libtcod.LEFT, str(_globals.constants['options_luck_scale']) + "%")
             
             
         #elif index == 6:
@@ -360,34 +361,34 @@ def game_options(constants):
         if key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:            
         
             if difficulty == "Newcomer":
-                constants['options_enemy_damage_scale'] = 80
-                constants['options_player_damage_scale'] = 120
-                constants['options_xp_multiplier'] = round(1.5, 1)
-                constants['options_luck_scale'] = 150
-                #constants['options_death_delete_save'] = False
+                _globals.constants['options_enemy_damage_scale'] = 80
+                _globals.constants['options_player_damage_scale'] = 120
+                _globals.constants['options_xp_multiplier'] = round(1.5, 1)
+                _globals.constants['options_luck_scale'] = 150
+                #_globals.constants['options_death_delete_save'] = False
                 
             elif difficulty == "Classic":
-                constants['options_enemy_damage_scale'] = 100
-                constants['options_player_damage_scale'] = 100
-                constants['options_xp_multiplier'] = 1
-                constants['options_luck_scale'] = 100
-                #constants['options_death_delete_save'] = True
+                _globals.constants['options_enemy_damage_scale'] = 100
+                _globals.constants['options_player_damage_scale'] = 100
+                _globals.constants['options_xp_multiplier'] = 1
+                _globals.constants['options_luck_scale'] = 100
+                #_globals.constants['options_death_delete_save'] = True
                 
             elif difficulty == "Expert":
-                constants['options_enemy_damage_scale'] = 130
-                constants['options_player_damage_scale'] = 70
-                constants['options_xp_multiplier'] = round(.5, 1)
-                constants['options_luck_scale'] = 75
-                #constants['options_death_delete_save'] = True
+                _globals.constants['options_enemy_damage_scale'] = 130
+                _globals.constants['options_player_damage_scale'] = 70
+                _globals.constants['options_xp_multiplier'] = round(.5, 1)
+                _globals.constants['options_luck_scale'] = 75
+                #_globals.constants['options_death_delete_save'] = True
                 
             elif difficulty == "Sadist":
-                constants['options_enemy_damage_scale'] = 200
-                constants['options_player_damage_scale'] = 30
-                constants['options_xp_multiplier'] = round(.1, 1)
-                constants['options_luck_scale'] = 30
-                #constants['options_death_delete_save'] = True
+                _globals.constants['options_enemy_damage_scale'] = 200
+                _globals.constants['options_player_damage_scale'] = 30
+                _globals.constants['options_xp_multiplier'] = round(.1, 1)
+                _globals.constants['options_luck_scale'] = 30
+                #_globals.constants['options_death_delete_save'] = True
                 
-            constants['options_difficulty'] = difficulty
+            _globals.constants['options_difficulty'] = difficulty
                 
             break
             
@@ -405,22 +406,22 @@ def game_options(constants):
                 elif difficulty == "Sadist":
                     difficulty = "Custom"
             if index == 1: #tutorial tips
-                constants['options_tutorial_enabled'] = not constants['options_tutorial_enabled']
+                _globals.constants['options_tutorial_enabled'] = not _globals.constants['options_tutorial_enabled']
             if index == 2:
-                if constants['options_enemy_damage_scale'] < 990: constants['options_enemy_damage_scale'] += 10
+                if _globals.constants['options_enemy_damage_scale'] < 990: _globals.constants['options_enemy_damage_scale'] += 10
             if index == 3:
-                if constants['options_player_damage_scale'] < 990: constants['options_player_damage_scale'] += 10       
+                if _globals.constants['options_player_damage_scale'] < 990: _globals.constants['options_player_damage_scale'] += 10       
             if index == 4:
-                if constants['options_xp_multiplier'] < 100:
+                if _globals.constants['options_xp_multiplier'] < 100:
                     if key.shift:
-                        constants['options_xp_multiplier'] += 10
+                        _globals.constants['options_xp_multiplier'] += 10
                     else:
-                        constants['options_xp_multiplier'] = round(constants['options_xp_multiplier']+ 0.2, 1)
-                    if constants['options_xp_multiplier'] > 100: constants['options_xp_multiplier'] = 100
+                        _globals.constants['options_xp_multiplier'] = round(_globals.constants['options_xp_multiplier']+ 0.2, 1)
+                    if _globals.constants['options_xp_multiplier'] > 100: _globals.constants['options_xp_multiplier'] = 100
             if index == 5:
-                if constants['options_luck_scale'] < 990: constants['options_luck_scale'] += 10   
+                if _globals.constants['options_luck_scale'] < 990: _globals.constants['options_luck_scale'] += 10   
             #if index == 6:
-                #constants['options_death_delete_save'] = not constants['options_death_delete_save']
+                #_globals.constants['options_death_delete_save'] = not _globals.constants['options_death_delete_save']
                 
         elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
             if index == 0:  
@@ -433,20 +434,20 @@ def game_options(constants):
                 elif difficulty == "Custom":
                     difficulty = "Sadist"
             if index == 1:
-                constants['options_tutorial_enabled'] = not constants['options_tutorial_enabled']
+                _globals.constants['options_tutorial_enabled'] = not _globals.constants['options_tutorial_enabled']
             if index == 2:
-                if constants['options_enemy_damage_scale'] > 10: constants['options_enemy_damage_scale'] -= 10
+                if _globals.constants['options_enemy_damage_scale'] > 10: _globals.constants['options_enemy_damage_scale'] -= 10
             if index == 3:
-                if constants['options_player_damage_scale'] > 10: constants['options_player_damage_scale'] -= 10    
+                if _globals.constants['options_player_damage_scale'] > 10: _globals.constants['options_player_damage_scale'] -= 10    
             if index == 4:
-                if constants['options_xp_multiplier'] > 0.2:
+                if _globals.constants['options_xp_multiplier'] > 0.2:
                     if key.shift:
-                        constants['options_xp_multiplier'] = round(constants['options_xp_multiplier'] -10, 1)
+                        _globals.constants['options_xp_multiplier'] = round(_globals.constants['options_xp_multiplier'] -10, 1)
                     else:
-                        constants['options_xp_multiplier'] = round(constants['options_xp_multiplier'] - 0.2, 1)
-                    if constants['options_xp_multiplier'] < 0.2: constants['options_xp_multiplier'] = 0.2
+                        _globals.constants['options_xp_multiplier'] = round(_globals.constants['options_xp_multiplier'] - 0.2, 1)
+                    if _globals.constants['options_xp_multiplier'] < 0.2: _globals.constants['options_xp_multiplier'] = 0.2
             if index == 5:
-                if constants['options_luck_scale'] > 10: constants['options_luck_scale'] -= 10    
+                if _globals.constants['options_luck_scale'] > 10: _globals.constants['options_luck_scale'] -= 10    
             #if index == 6:
             #    constants['options_death_delete_save'] = not constants['options_death_delete_save']         
                
@@ -574,7 +575,7 @@ def m1m2_menu(x=1, y=1, w=None, h=None, numoptions=3, optionslist=[]):
             return current_option.strip()
 
             
-def origin_options(constants):
+def origin_options():
  
     index = 0
  
@@ -705,7 +706,7 @@ def origin_options(constants):
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(395) + " Cargo Shorts (+8 Carrying)")
             libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 10 Gold")
 
-        constants['options_origin'] = origin
+        _globals.constants['options_origin'] = origin
         
         libtcod.console_set_default_foreground(0, screen_green)
         if index == 0:
@@ -758,7 +759,7 @@ def origin_options(constants):
                 elif origin == "Tourist":
                     origin = "Criminal"      
 
-def character_name(constants):
+def character_name():
 
     charname = "Player"
 
@@ -846,7 +847,7 @@ def character_name(constants):
             return "nah"
             
         elif key.vk == libtcod.KEY_ENTER or key.vk == libtcod.KEY_KPENTER:            
-            constants['player_name'] = charname
+            _globals.constants['player_name'] = charname
             return True
                 
         elif key.vk == libtcod.KEY_BACKSPACE:
@@ -856,11 +857,11 @@ def character_name(constants):
             charname = str(charname + chr(key.c)).title()
             if len(charname) > 15: charname = left(charname, 15)
 
-def inventory_menu(player, entities, fov_map, names_list, colors_list, message_log, constants):
+def inventory_menu(player, message_log, fov_map):
     
     results = []
     
-    #UI Color Defaults
+    #UI Color Default
     screen_yellow = libtcod.Color(255,255,102)
     screen_blue = libtcod.Color(102,178,255)
     screen_red = libtcod.Color(254,95,85)
@@ -876,7 +877,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
     numitems = len(player.inventory.items)
     numequip = len(player.equipment.list) # - player.equipment.list.count('None')
     currentpage = 1
-    sort = constants['options_inventory_sort']
+    sort = _globals.constants['options_inventory_sort']
     needs_sort = True
     
     #Make sure there is inventory to display
@@ -1008,7 +1009,7 @@ def inventory_menu(player, entities, fov_map, names_list, colors_list, message_l
             if currentpage == 1:
                 for x in range (0 + (itemsperpage * (currentpage-1)), numequip):
                     itm = get_item_at("equipment", currentpage, x, player)
-                    libtcod.console_print_ex(0, 3, y, libtcod.BKGND_NONE, libtcod.LEFT, "> " + get_name_string(itm, names_list))    
+                    libtcod.console_print_ex(0, 3, y, libtcod.BKGND_NONE, libtcod.LEFT, "> " + get_name_string(itm, _globals.names_list))    
                     y += 1
                 
             #print in top menu

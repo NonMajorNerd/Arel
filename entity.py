@@ -1,11 +1,10 @@
 import libtcodpy as libtcod
-
+import random
 import math
+import _globals
 
 from components.item import Item
 from render_functions import RenderOrder
-
-import random
 
 def get_ent_name(ent, names_list):
     return names_list[ent.name]
@@ -80,7 +79,7 @@ class Entity:
         dy = int(round(dy / distance))
 
         if not (game_map.is_blocked(self.x + dx, self.y + dy) or
-                    get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
+                    get_blocking_entities_at_location(self.x + dx, self.y + dy)):
             self.move(dx, dy)
 
             
@@ -189,8 +188,8 @@ class Entity:
         libtcod.path_delete(my_path)
 
 
-def get_blocking_entities_at_location(entities, destination_x, destination_y):
-    for entity in entities:
+def get_blocking_entities_at_location(destination_x, destination_y):
+    for entity in _globals.entities:
         if entity.blocks and entity.x == destination_x and entity.y == destination_y:
             return entity
 

@@ -1,5 +1,6 @@
 import libtcodpy as libtcod
 import textwrap
+import _globals
 
 from game_messages import Message
 from entity import get_ent_name
@@ -19,7 +20,7 @@ class Inventory:
 
         return self.base_capacity + bonus
 
-    def add_item(self, item, names_list):
+    def add_item(self, item):
         results = []
 
         stacked = False
@@ -27,7 +28,7 @@ class Inventory:
             if i.name == item.name and i.item.stackable:
                 i.item.count += item.item.count
                 stacked = True
-                name = get_ent_name(item, names_list)
+                name = get_ent_name(item, _globals.names_list)
                 results.append({
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
@@ -41,7 +42,7 @@ class Inventory:
                     'message': Message('You cannot carry any more, your inventory is full', libtcod.yellow)
                 })
             else: 
-                name = get_ent_name(item, names_list)
+                name = _globals.get_from_dict(_globals.names_list, item)
                 results.append({
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
@@ -52,7 +53,7 @@ class Inventory:
 
         return results
 
-    def use(self, item_entity, names_list, colors_list, constants, **kwargs):
+    def use(self, item_entity, **kwargs):
         results = []
         used = False
             
@@ -71,7 +72,7 @@ class Inventory:
                     
                 pref = m1m2_menu(x=31, y=21, w=25, h=8, numoptions=8, optionslist=ammo_list)
 
-                constants['options_ammo_preference'] = pref
+                _globals.constants['options_ammo_preference'] = pref
 
                 if pref == None:
                     item_entity.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 

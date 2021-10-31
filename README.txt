@@ -93,6 +93,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 			*capability to hip-fire at reduced accuaracy/damage?
 			*reduced damage if firing at range 1?
 		*Certainly a ton of other things	
+		*FontPlus.PNG filepath is not correct (temp. fixed by moving file outside of PEPIS)
 		
 		
     **************
@@ -185,6 +186,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		Fixed the order-of-operations in target seraching when kicking (mainly fixes kicking things through open doorways)
 		
 		Fixed spawn rates    
+
 
 
 *The current TEMPORARY menu_background.png file is the sole property of Wizards of the Coast (© 1993-2021 Wizards of the Coast LLC, a subsidiary of Hasbro, Inc. All Rights Reserved.)*

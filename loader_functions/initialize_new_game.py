@@ -29,7 +29,7 @@ from map_objects.game_map import GameMap
 from render_functions import RenderOrder
 
 from item_functions import use_quiver
-
+import _globals
 global constants
 global player
 
@@ -285,7 +285,7 @@ def get_item(item_list, index=0):
     return item
     
 
-def get_game_variables(constants, names_list, colors_list):
+def get_game_variables():
     
     #Build player entity
     fighter_component = Fighter(hp=100, defense=0, power=1, speed=5)
@@ -295,17 +295,17 @@ def get_game_variables(constants, names_list, colors_list):
     player = Entity(0, 0, 256, libtcod.white, "Player", blocks=True, render_order=RenderOrder.ACTOR,
                     fighter=fighter_component, inventory=inventory_component, level=level_component,
                     equipment=equipment_component)
-    player.character_name = constants['player_name']
-    entities = [player]
+    player.character_name = _globals.constants['player_name']
+    _globals.entities = [player]
 
     #Starting Inventory, sprite
-    origin = constants['options_origin']
+    origin = _globals.constants['options_origin']
     
     #HEKIN QUIVER
     item_component = Item(use_function=use_quiver, stackable=False, flammable=True,
                     description="A quiver for storing arrows.",
                     effect="Firing preference is currently unassigned.")
-    item = Entity(0, 0, 394, colors_list[names_list['Quiver']], 'Quiver', item=item_component)
+    item = Entity(0, 0, 394, _globals.colors_list[_globals.get_from_dict(_globals.names_list,'Quiver')], 'Quiver', item=item_component)
     player.inventory.items.append(item)    
 
     if origin == "Adventurer":
@@ -315,21 +315,21 @@ def get_game_variables(constants, names_list, colors_list):
         item_component = Item(use_function=None, stackable=False,
                         description="A short, one-handed sword.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-        item = Entity(0, 0, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component, item=item_component)
+        item = Entity(0, 0, 369, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Sword')], 'Sword', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)       
         
         #shield
         item_component = Item(use_function=None, stackable=False,
                         description="A small, round, metal shield.")
         equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-        item = Entity(0, 0, 375, colors_list[names_list['Shield']], 'Shield', equippable=equippable_component, item=item_component)
+        item = Entity(0, 0, 375, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Shield')], 'Shield', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)
         
         #10 gold
         item_component = Item(use_function=None, stackable=True, count=20,
                description="Yanno, gold coins! For procuring goods and/or services!")
-        item = Entity(0, 0, 365, colors_list[names_list['Gold']], 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
+        item = Entity(0, 0, 365, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Gold')], 'Gold', render_order=RenderOrder.ITEM, item=item_component)
+        player.inventory.add_item(item)
         player.gold_collected = 20
         
     elif origin == "Ranger":
@@ -340,7 +340,7 @@ def get_game_variables(constants, names_list, colors_list):
         ammo_component = Ammo(hit_function=hit_component, retrievable=True)
         item_component = Item(use_function=use_arrow(), stackable=True, count=3, ammo=ammo_component, flammable=True, range=0,
                        description="Poison-coated arrow. Icky!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Poison Arrow', item=item_component)
+        item = Entity(0, 0, 378, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Arrow')], 'Poison Arrow', item=item_component)
         player.inventory.items.append(item)    
         
         #10x. Arrow
@@ -348,14 +348,14 @@ def get_game_variables(constants, names_list, colors_list):
         ammo_component = Ammo(hit_function=hit_component, retrievable=True)
         item_component = Item(use_function=None, stackable=True, count=10, ammo=ammo_component, flammable=True, range=0,
                        description="Arrow. Pewpew!")
-        item = Entity(0, 0, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+        item = Entity(0, 0, 378, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Arrow')], 'Arrow', item=item_component)
         player.inventory.items.append(item) 
 
         #Bow
         item_component = Item(use_function=None, stackable=False, flammable=True, ammo=["Arrow", "Poison Arrow"], range=5,
                         description="A small, low-range bow.")
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=0)
-        item = Entity(0, 0, 377, colors_list[names_list['Short Bow']], 'Short Bow', equippable=equippable_component, item=item_component)
+        item = Entity(0, 0, 377, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Short Bow')], 'Short Bow', equippable=equippable_component, item=item_component)
         player.equipment.list.append(item)       
         
 
@@ -380,7 +380,7 @@ def get_game_variables(constants, names_list, colors_list):
         item_component = Item(use_function=None, stackable=True, count=100,
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
+        player.inventory.add_item(item)
         player.gold_collected = 100
         
     elif origin == "Criminal":
@@ -405,7 +405,7 @@ def get_game_variables(constants, names_list, colors_list):
         item_component = Item(use_function=None, stackable=True, count=30,
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
+        player.inventory.add_item(item)
         player.gold_collected = 30
         
     elif origin == "Tourist":
@@ -422,17 +422,16 @@ def get_game_variables(constants, names_list, colors_list):
         item_component = Item(use_function=None, stackable=True, count=10,
                description="Yanno, gold coins! For procuring goods and/or services!")
         item = Entity(0, 0, 365, libtcod.dark_yellow, 'Gold', render_order=RenderOrder.ITEM, item=item_component)
-        player.inventory.add_item(item, names_list)
+        player.inventory.add_item(item)
         player.gold_collected = 10
         
-    game_map = GameMap(constants['map_width'], constants['map_height'])
-    game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                      constants['map_width'], constants['map_height'], player, entities, names_list, colors_list)
+    game_map = GameMap(_globals.constants['map_width'], _globals.constants['map_height'])
+    game_map.make_map(player)
    
 
     
-    message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
+    message_log = MessageLog(_globals.constants['message_x'], _globals.constants['message_width'], _globals.constants['message_height'])
 
     game_state = GameStates.PLAYERS_TURN
 
-    return player, entities, game_map, message_log, game_state
+    return player, _globals.entities, game_map, message_log, game_state

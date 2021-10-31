@@ -4,6 +4,7 @@ from random import randint, choice
 from entity import Entity
 
 from game_messages import Message
+import _globals
 
 from components.ai import BasicMonster, RandomWalk, CameraMan, RatKing
 from components.equipment import Equipment
@@ -42,7 +43,7 @@ class GameMap:
 
         return tiles
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, names_list, render_colors_list):
+    def make_map(self, player):
         rooms = []
         num_rooms = 0
         boss_placed = False
@@ -50,13 +51,13 @@ class GameMap:
         center_of_last_room_x = None
         center_of_last_room_y = None
 
-        for r in range(max_rooms):
+        for r in range (_globals.constants['max_rooms']):
             # random width and height
-            w = randint(room_min_size, room_max_size)
-            h = randint(room_min_size, room_max_size)
+            w = randint(_globals.constants['room_min_size'], _globals.constants['room_max_size'])
+            h = randint(_globals.constants['room_min_size'], _globals.constants['room_max_size'])
             # random position without going out of the boundaries of the map (with a 1-tile buffer as well)
-            x = randint(1, map_width - w - 2)
-            y = randint(1, map_height - h - 2)
+            x = randint(1, _globals.constants['map_width'] - w - 2)
+            y = randint(1, _globals.constants['map_height'] - h - 2)
 
             # "Rect" class makes rectangles easier to work with
             new_room = Rect(x, y, w, h)
@@ -105,11 +106,11 @@ class GameMap:
                     #don't place boss monsters in rooms 1-3
                     coin = randint(0, 100)
                     if coin >49:
-                        boss_placed = self.place_boss(entities, new_x, new_y, w, h)
+                        boss_placed = self.place_boss(new_x, new_y, w, h)
                     else:
-                        self.place_entities(new_room, entities, names_list, render_colors_list)
+                        self.place_entities(new_room)
                 else:
-                    self.place_entities(new_room, entities, names_list, render_colors_list)
+                    self.place_entities(new_room)
 
                     
                 # finally, append the new room to the list
@@ -118,7 +119,7 @@ class GameMap:
 
         #ensure a boss was placed if needed
         if self.dungeon_level == 5 and boss_placed == False:
-            boss_placed = self.place_boss(entities, new_x, new_y, w, h)
+            boss_placed = self.place_boss(new_x, new_y, w, h)
 
         self.clean_map()
     
@@ -135,18 +136,18 @@ class GameMap:
         while spot_blocked:
             rx = randint(-w+1, w-1)
             ry = randint(-h+1, h-1)
-            if not any([entity for entity in entities if entity.x == player.x+rx and entity.y == player.y+ry and entity.fighter]):
+            if not any([entity for entity in _globals.entities if entity.x == player.x+rx and entity.y == player.y+ry and entity.fighter]):
                 if not self.tiles[player.x + rx][player.y + ry].block_sight or self.tiles[player.x+rx][player.y+ry].empty_space:
                     spot_blocked = False
         
         cameraman = Entity(player.x +rx, player.y +ry, 270, libtcod.Color(191, 191, 191), 'Camera Op.', blocks=True, render_order=RenderOrder.ACTOR,
                         fighter=fighter_component, ai=ai_component)
-        entities.append(cameraman)  
+        _globals.entities.append(cameraman)  
         
         stairs_component = Stairs(self.dungeon_level + 1)
         down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, 320, (102,102,153), 'Stairs',
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
-        entities.append(down_stairs)        
+        _globals.entities.append(down_stairs)        
 
     def place_boss(self, entities, center_x, center_y, w, h):
         #populate a boss room dependant on dungeon level
@@ -174,12 +175,12 @@ class GameMap:
                     print('rats; ' + str(x + rx) + "," + str(y + ry))
 
                     if 0 < x + rx < self.width and 0 < y + ry < self.height:
-                        if not any([entity for entity in entities if entity.x == x+rx and entity.y == y+ry and entity.ai]):
+                        if not any([entity for entity in _globals.entities if entity.x == x+rx and entity.y == y+ry and entity.ai]):
                             if not self.tiles[x + rx][y + ry].block_sight or self.tiles[x+rx][y+ry].empty_space:
                                 spot_blocked = False
                                 
                 monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-                entities.append(monster)
+                _globals.entities.append(monster)
                 
             for princes in range(1, randint(1,3)): 
                 fighter_component = Fighter(hp=15, defense=0, power=8, speed=8, xp=30)
@@ -190,11 +191,11 @@ class GameMap:
                     ry = randint(-h+1, h-1)
                     print('princes; ' + str(x + rx) + "," + str(y + ry))
                     if 0 < x + rx < self.width and 0 < y + ry < self.height:
-                        if not any([entity for entity in entities if entity.x == x+rx and entity.y == y+ry and entity.ai]):
+                        if not any([entity for entity in _globals.entities if entity.x == x+rx and entity.y == y+ry and entity.ai]):
                             if not self.tiles[x + rx][y + ry].block_sight or self.tiles[x+rx][y+ry].empty_space:
                                 spot_blocked = False
                 monster = Entity(x, y, 330, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-                entities.append(monster)
+                _globals.entities.append(monster)
                 
             return True
        
@@ -375,7 +376,7 @@ class GameMap:
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
             
-    def place_entities(self, room, entities, names_list, colors_list):
+    def place_entities(self, room):
         max_monsters_per_room = from_dungeon_level([[2, 1], [3, 6], [4, 10]], self.dungeon_level)
         max_items_per_room = from_dungeon_level([[1, 1], [1, 2], [1, 3], [2,4]], self.dungeon_level)
         # Get a random number of monsters
@@ -428,7 +429,7 @@ class GameMap:
             y = randint(room.y1 + 1, room.y2 - 1)
 
             # Check if an entity is already in that location
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            if not any([entity for entity in _globals.entities if entity.x == x and entity.y == y]):
                 monster_choice = random_choice_from_dict(monster_chances)
 
                 if monster_choice == 'rat':
@@ -443,12 +444,12 @@ class GameMap:
                         for i in range(1, randint(0,3)+1):
                             rx = randint(room.x1 + 1, room.x2 - 1)
                             ry = randint(room.y1 + 1, room.y2 - 1)
-                            if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
+                            if not any([entity for entity in _globals.entities if entity.x == rx and entity.y == ry]):
                                 fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                                 ai_component = BasicMonster()
                                 swarm = Entity(rx, ry, 272, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                                entities.append(swarm)
+                                _globals.entities.append(swarm)
                                 
                 elif monster_choice == 'rat_prince':
                     fighter_component = Fighter(hp=15, defense=0, power=8, speed=8, xp=40)
@@ -462,12 +463,12 @@ class GameMap:
                         for i in range(1, randint(0,2)):
                             rx = randint(room.x1 + 1, room.x2 - 1)
                             ry = randint(room.y1 + 1, room.y2 - 1)
-                            if not any([entity for entity in entities if entity.x == rx and entity.y == ry]):
+                            if not any([entity for entity in _globals.entities if entity.x == rx and entity.y == ry]):
                                 fighter_component = Fighter(hp=3, defense=0, power=3, speed=10, xp=5)
                                 ai_component = BasicMonster()
                                 swarm = Entity(rx, ry, 272, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                                entities.append(swarm)
+                                _globals.entities.append(swarm)
 
                 elif monster_choice == 'bat':
                     fighter_component = Fighter(hp=9, defense=0, power=3, speed=10, xp=10)
@@ -499,13 +500,13 @@ class GameMap:
 
                     monster = Entity(x, y, 282, libtcod.Color(242, 221, 131), 'troll', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                entities.append(monster)
+                _globals.entities.append(monster)
 
         for i in range(number_of_items):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
 
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            if not any([entity for entity in _globals.entities if entity.x == x and entity.y == y]):
                 item_choice = random_choice_from_dict(item_chances)
                 if item_choice == 'none':
                     a=1
@@ -513,44 +514,44 @@ class GameMap:
                     item_component = Item(use_function=heal, stackable=False, amount=20,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
                         effect="Used as an instant cure to minor wounds.")
-                    item = Entity(x, y, 349, colors_list[names_list['Cure Wounds']], 'Cure Wounds', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 349, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Cure Wounds')], 'Cure Wounds', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'restore_wounds':
                     item_component = Item(use_function=restore_wounds, stackable=False, duration=10, healing=4,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
                         effect="Used to slowly restore moderate wounds.")
-                    item = Entity(x, y, 349, colors_list[names_list['Restore Wounds']], 'Restore Wounds', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 349, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Restore Wounds')], 'Restore Wounds', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'foul_liquid':
                     item_component = Item(use_function=poison_potion, stackable=False, duration=5, damage=2,
                         description="A small glass vial containing a semi-translusent crystalline liquid which shimmers slightly in the light.",
                         effect="Smells like smoke and tar.")
-                    item = Entity(x, y, 349, colors_list[names_list['Foul Liquid']], 'Foul Liquid', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 349, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Foul Liquid')], 'Foul Liquid', render_order=RenderOrder.ITEM,
                                   item=item_component)
                 elif item_choice == 'sword':
                     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-                    item = Entity(x, y, 369, colors_list[names_list['Sword']], 'Sword', equippable=equippable_component)
+                    item = Entity(x, y, 369, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Sword')], 'Sword', equippable=equippable_component)
                     
                 elif item_choice == 'shield':
                     equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-                    item = Entity(x, y, 375, colors_list[names_list['Shield']], 'Shield', equippable=equippable_component)
+                    item = Entity(x, y, 375, _globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Shield')], 'Shield', equippable=equippable_component)
                     
                 elif item_choice == 'fireball_scroll':
                     item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
                         'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
                                           damage=25, radius=3, flammable=False)  #Fireball scrolls are not flamable
-                    item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Fireball Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, choice(_globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Scrolls')]), 'Fireball Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                                   
                 elif item_choice == 'confusion_scroll':
                     item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
                         'Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan), flammable=True)
-                    item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Confusion Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, choice(_globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Scrolls')]), 'Confusion Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
                                   
                 elif item_choice == 'lightning_scroll':
                     item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5, flammable=True)
-                    item = Entity(x, y, 333, choice(colors_list['Scrolls']), 'Lightning Scroll', render_order=RenderOrder.ITEM,
+                    item = Entity(x, y, 333, choice(_globals.colors_list[_globals.get_from_dict(_globals.names_list, 'Scrolls')]), 'Lightning Scroll', render_order=RenderOrder.ITEM,
                                   item=item_component)
 
                 elif item_choice == 'arrows':
@@ -559,30 +560,28 @@ class GameMap:
                     ammo_component = Ammo(hit_function=hit_component, retrievable=True)
                     item_component = Item(use_function=None, stackable=True, count=arrow_count, ammo=ammo_component, flammable=True, range=0,
                                 description="Arrow. Pewpew!")
-                    item = Entity(x, y, 378, colors_list[names_list['Arrow']], 'Arrow', item=item_component)
+                    item = Entity(x, y, 378, _globals.get_from_dict(_globals.colors_list, 'Arrow'), 'Arrow', item=item_component)
 
                 else:
                     print("Unhandled item spawn choice .. " + str(item_choice) + " .. game_map line 585.")
 
-                if item_choice != 'none': entities.append(item)
+                if item_choice != 'none': _globals.entities.append(item)
 
 
     def is_blocked(self, x, y):
         return self.tiles[x][y].blocked
 
 
-    def next_floor(self, player, message_log, constants, names_list, render_colors_list):
+    def next_floor(self, player, message_log):
         self.dungeon_level += 1
-        entities = [player]
+        results = [player]
 
         self.tiles = self.initialize_tiles()
-        self.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                      constants['map_width'], constants['map_height'], player, entities, names_list, render_colors_list)
+        self.make_map(player)
 
         player.fighter.heal(player.fighter.max_hp * .1)
         message_log.add_message(Message('You take a moment to rest, and recover your strength.', libtcod.light_violet))
         
         if self.dungeon_level == 5: message_log.add_message(Message('You hear strange sounds of scratching and squeaking.', libtcod.light_red))
-            
 
-        return entities
+        return results
