@@ -62,7 +62,7 @@ def cast_lightning(*args, **kwargs):
     target = None
     closest_distance = maximum_range + 1
 
-    for entity in entities:
+    for entity in _globals.entities:
         if entity.fighter and entity != caster and libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
             distance = caster.distance_to(entity)
 

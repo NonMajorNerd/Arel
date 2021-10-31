@@ -1,5 +1,6 @@
 import libtcodpy as libtcod
 import textwrap
+import _globals
 
 from components.ammo import Ammo
 from game_messages import Message
@@ -8,7 +9,7 @@ from menus import m1m2_menu
 #from loader_functions.initialize_new_game import constants, player
 
 def Fire_And_Preference(player=None, constants=None):
-    if not constants: print("Error; ammo_functions line 7.. F&P without constants")
+    if not _globals.constants: print("Error; ammo_functions line 7.. F&P without constants")
     
     ammo_list =[]
 
@@ -37,12 +38,12 @@ def Fire_And_Preference(player=None, constants=None):
 
         x = player.x + 1
         y = player.y - (h+1)
-        if x + w >= constants['screen_width'] -2: x = player.x - (w+2)
+        if x + w >= _globals.constants['screen_width'] -2: x = player.x - (w+2)
         if y < 1: y = 1
 
         pref = m1m2_menu(x, y, w, h, numoptions, ammo_list)
 
-    if pref != 'exit': constants['options_ammo_preference'] = pref
+    if pref != 'exit': _globals.constants['options_ammo_preference'] = pref
     
     for i in player.inventory.items:
         if i.name == 'Quiver':

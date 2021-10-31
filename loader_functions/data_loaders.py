@@ -1,14 +1,15 @@
 import os
 import shelve
-
-def save_game(player, entities, game_map, message_log, game_state, constants):
+import _globals
+def save_game(player, game_map, message_log, game_state):
+    print(str(_globals.entities.index(player)))
     with shelve.open('savegame', 'n') as data_file:
-        data_file['player_index'] = entities.index(player)
-        data_file['entities'] = entities
+        data_file['player_index'] = _globals.entities.index(player)
+        data_file['entities'] = _globals.entities
         data_file['game_map'] = game_map
         data_file['message_log'] = message_log
         data_file['game_state'] = game_state
-        data_file['constants'] = constants
+        data_file['constants'] = _globals.constants
 
 
 def load_game():
@@ -25,4 +26,4 @@ def load_game():
         
     player = entities[player_index]
 
-    return player, entities, game_map, message_log, game_state, constants
+    return player, game_map, message_log, game_state
