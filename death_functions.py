@@ -22,7 +22,7 @@ def kill_player(player, game_map, constants):
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
-    #record information for high score, i.e. player name, class, score, & dungeon level
+    #record information for high score, i.e. player name, score, class, character level & dungeon level
     save_high_score(constants['player_name'], player.score, constants['options_origin'], player.level.current_level, game_map.dungeon_level)
 
     while True:
