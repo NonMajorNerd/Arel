@@ -3,6 +3,7 @@ import libtcodpy as libtcod
 from game_messages import Message
 
 from game_states import GameStates
+from loader_functions.data_loaders import save_high_score
 
 from render_functions import RenderOrder
 
@@ -20,7 +21,10 @@ def kill_player(player, game_map, constants):
     
     key = libtcod.Key()
     mouse = libtcod.Mouse()
-     
+
+    #record information for high score, i.e. player name, class, score, & dungeon level
+    save_high_score(constants['player_name'], player.score, constants['options_origin'], player.level.current_level, game_map.dungeon_level)
+
     while True:
         #render the screen. this erases the inventory and shows the names of objects under the mouse.
         libtcod.console_set_default_background(0, libtcod.black)

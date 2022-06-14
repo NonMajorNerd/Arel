@@ -2,6 +2,7 @@ import tcod as libtcod
 
 from game_states import GameStates
 from ammo_functions import Fire_And_Preference
+from loader_functions.data_loaders import initialize_high_scores
 
 def handle_keys(key, game_state):
     if game_state == GameStates.PLAYERS_TURN:
@@ -131,6 +132,13 @@ def handle_player_turn_keys(key):
 
     elif key_char == 's':
         return {'show_character_screen': True}
+        
+    #elif key_char == '`':
+     #   return {
+      #      results = []
+       #     #entity.fighter.heal(amount)                                                                            #heal for ammt                                                    
+        #    results.append({'message': Message('Your wounds instantly close!', libtcod.lighter_green)}) 
+         #   return results }
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen
@@ -187,8 +195,15 @@ def handle_main_menu(key):
         return {'new_game': True}
     elif key_char == 'b':
         return {'load_game': True}
-    elif key_char == 'c' or key.vk == libtcod.KEY_ESCAPE:
+    elif key_char == 'c':
+        return{'view_high_scores': True} 
+    elif key_char == 'd' or key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
+
+    #Useful for wiping highscore data during testing. Probably don't wanna leave this one in though.
+    #Also if called after data has been wiped it throws an Attribute error for 'new_game=action.get(new_game)'? Python's dumb, I love it
+    #elif key_char == 'x':
+    #    return initialize_high_scores()
 
     return {}
 
@@ -203,6 +218,16 @@ def handle_level_up_menu(key):
         elif key_char == 'c':
             return {'level_up': 'def'}
 
+    return {}
+
+def handle_high_scores_menu(key):
+    if key:
+        key_char = chr(key.c)
+
+        if key_char == libtcod.KEY_ENTER:
+            return {'exit': True}
+        elif key_char == libtcod.KEY_ESCAPE:
+            return {'exit': True}
     return {}
 
 def handle_character_screen(key):

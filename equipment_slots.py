@@ -8,3 +8,4 @@ class EquipmentSlots(Enum):
     ARMOR = 5
     ACC1 = 6
     ACC2 = 7
+    GOLD = 8

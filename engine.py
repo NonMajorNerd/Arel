@@ -11,8 +11,8 @@ from game_messages import Message, message_log_history
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables, get_unidentified_names, get_render_colors, load_customfont
-from loader_functions.data_loaders import load_game, save_game
-from menus import main_menu, message_box, inventory_menu, character_screen, game_options, origin_options, intro, character_name, help_menu
+from loader_functions.data_loaders import load_game, save_game, save_high_score                 
+from menus import high_score_menu, main_menu, menu_template, message_box, inventory_menu, character_screen, game_options, origin_options, intro, character_name, help_menu
 from render_functions import get_all_at, RenderOrder, clear_all, render_all
 from map_objects.tile import Door
 from equipment_slots import EquipmentSlots
@@ -499,6 +499,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 player_turn_results.append({'targeting_cancelled': True})
             else:
                 save_game(player, entities, game_map, message_log, game_state, constants)
+                save_high_score(constants['player_name'], player.score, constants['options_origin'], player.level.current_level, game_map.dungeon_level)
 
                 return True
 
@@ -711,9 +712,10 @@ def main():
 
             new_game = action.get('new_game')
             load_saved_game = action.get('load_game')
+            view_high_scores = action.get('view_high_scores')
             exit_game = action.get('exit')
 
-            if show_load_error_message and (new_game or load_saved_game or exit_game):
+            if show_load_error_message and (new_game or load_saved_game or view_high_scores or exit_game):
                 show_load_error_message = False
             elif new_game:
                 constants = get_constants()
@@ -734,6 +736,10 @@ def main():
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_error_message = True
+
+            elif view_high_scores:
+                constants = get_constants()
+                high_score_menu()
 
             elif exit_game:
                 break

@@ -256,8 +256,11 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     #     libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
     #     y += 1
 
+    #health bar
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
                libtcod.light_red, libtcod.darker_red)
+    #score tracker           
+    libtcod.console_print_ex(panel, 1, 2, libtcod.BKGND_NONE, libtcod.LEFT, "Score: " + str(player.score))           
     # libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT,
     #                          'Dungeon level: {0}'.format(game_map.dungeon_level))
     # libtcod.console_print_ex(panel, 1, 4, libtcod.BKGND_NONE, libtcod.LEFT,
