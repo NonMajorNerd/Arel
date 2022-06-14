@@ -738,7 +738,6 @@ def main():
                     show_load_error_message = True
 
             elif view_high_scores:
-                constants = get_constants()
                 high_score_menu()
 
             elif exit_game:
