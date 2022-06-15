@@ -779,60 +779,80 @@ def high_score_menu(): #Render the High Scores display
     libtcod.console_set_default_foreground(0, libtcod.white)
 
     display = load_high_scores()
-    display_name_one = str(display[0])                  # Rank One name     | name      0
-    display_score_one = str(display[1])                 # score             | score     1
-    display_class_one = str(display[2])                 # class             | name      2
-    display_character_level_one = str(display[3])       # level             | score     3
-    display_dungeon_level_one = str(display[4])         # dungeon level     | name      4
-    display_name_two = str(display[5])                  # Rank Two name     | score     5
-    display_score_two = str(display[6])                 # score             | name      6
-    display_class_two = str(display[7])                 # class             | score     7
-    display_character_level_two = str(display[8])       # level             | name      8
-    display_dungeon_level_two = str(display[9])         # dungeon level     | score     9
-    display_name_three = str(display[10])               # Rank Three name   | 
-    display_score_three = str(display[11])              # score             | 
-    display_class_three = str(display[12])              # class             | 
-    display_character_level_three = str(display[13])    # level             | 
-    display_dungeon_level_three = str(display[14])      # dungeon level     | 
-    display_name_four = str(display[15])                # Rank Four name    | 
-    display_score_four = str(display[16])               # score             | 
-    display_class_four = str(display[17])               # class             | 
-    display_character_level_four = str(display[18])     # level             | 
-    display_dungeon_level_four = str(display[19])       # dungeon level     | 
-    display_name_five = str(display[20])                # Rank Five name    |  
-    display_score_five = str(display[21])               # score             | 
-    display_class_five = str(display[22])               # class             | 
-    display_character_level_five = str(display[23])     # level             | 
-    display_dungeon_level_five = str(display[24])       # dungeon level     | 
+    display_name_one = str(display[0])
+    display_score_one = str(display[1])
+    display_class_one = str(display[2])
+    display_character_level_one = str(display[3])
+    display_dungeon_level_one = str(display[4])
+    display_name_two = str(display[5])
+    display_score_two = str(display[6])
+    display_class_two = str(display[7])
+    display_character_level_two = str(display[8])
+    display_dungeon_level_two = str(display[9])
+    display_name_three = str(display[10])
+    display_score_three = str(display[11])
+    display_class_three = str(display[12])
+    display_character_level_three = str(display[13])
+    display_dungeon_level_three = str(display[14])
+    display_name_four = str(display[15])
+    display_score_four = str(display[16])
+    display_class_four = str(display[17])
+    display_character_level_four = str(display[18])
+    display_dungeon_level_four = str(display[19])
+    display_name_five = str(display[20])
+    display_score_five = str(display[21])
+    display_class_five = str(display[22])
+    display_character_level_five = str(display[23])
+    display_dungeon_level_five = str(display[24])
+    display_name_six = str(display[25])
+    display_score_six = str(display[26])
+    display_class_six = str(display[27])
+    display_character_level_six = str(display[28])
+    display_dungeon_level_six = str(display[29])
+    display_name_seven = str(display[30])
+    display_score_seven = str(display[31])
+    display_class_seven = str(display[32])
+    display_character_level_seven = str(display[33])
+    display_dungeon_level_seven = str(display[34])
+    display_name_eight = str(display[35])
+    display_score_eight = str(display[36])
+    display_class_eight = str(display[37])
+    display_character_level_eight = str(display[38])
+    display_dungeon_level_eight = str(display[39])
+    display_name_nine = str(display[40])
+    display_score_nine = str(display[41])
+    display_class_nine = str(display[42])
+    display_character_level_nine = str(display[43])
+    display_dungeon_level_nine = str(display[44])
+    display_name_ten = str(display[45])
+    display_score_ten = str(display[46])
+    display_class_ten = str(display[47])
+    display_character_level_ten = str(display[48])
+    display_dungeon_level_ten = str(display[49])
     
-    if display_score_one != '0': #If a score exists to be displayed, do so
-        libtcod.console_print_ex(0, 2, 3, libtcod.BKGND_SET, libtcod.LEFT, "1. " + display_name_one + " the level " + display_character_level_one + " " + display_class_one + ", reached floor " + display_dungeon_level_one)
-        libtcod.console_print_ex(0, 5, 4, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_one)
-    else: #If not, say so
-        libtcod.console_print_ex(0, 2, 3, libtcod.BKGND_SET, libtcod.LEFT, "1. Empty")
-    if display_score_two != '0':
-        libtcod.console_print_ex(0, 2, 6, libtcod.BKGND_SET, libtcod.LEFT, "2. " + display_name_two + " the level " + display_character_level_two + " " + display_class_two + ", reached floor " + display_dungeon_level_two)
-        libtcod.console_print_ex(0, 5, 7, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_two)
-    else:
-        libtcod.console_print_ex(0, 2, 6, libtcod.BKGND_SET, libtcod.LEFT, "2. Empty")
-    if display_score_three != '0':
-        libtcod.console_print_ex(0, 2, 9, libtcod.BKGND_SET, libtcod.LEFT, "3. " + display_name_three + " the level " + display_character_level_three + " " + display_class_three + ", reached floor " + display_dungeon_level_three)
-        libtcod.console_print_ex(0, 5, 10, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_three)
-    else:
-        libtcod.console_print_ex(0, 2, 9, libtcod.BKGND_SET, libtcod.LEFT, "3. Empty")
-    if display_score_four != '0':
-        libtcod.console_print_ex(0, 2, 12, libtcod.BKGND_SET, libtcod.LEFT, "4. " + display_name_four + " the level " + display_character_level_four + " " + display_class_four + ", reached floor " + display_dungeon_level_four)
-        libtcod.console_print_ex(0, 5, 13, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_four)
-    else:
-        libtcod.console_print_ex(0, 2, 12, libtcod.BKGND_SET, libtcod.LEFT, "4. Empty")
-    if display_score_five != '0':
-        libtcod.console_print_ex(0, 2, 15, libtcod.BKGND_SET, libtcod.LEFT, "5. " + display_name_five + " the level " + display_character_level_five + " " + display_class_five + ", reached floor " + display_dungeon_level_five)
-        libtcod.console_print_ex(0, 5, 16, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_five)
-    else:
-        libtcod.console_print_ex(0, 2, 15, libtcod.BKGND_SET, libtcod.LEFT, "5. Empty")
-    libtcod.console_print_ex(0, 11, 22, libtcod.BKGND_SET, libtcod.LEFT, "yuh")
+    libtcod.console_print_ex(0, 2, 3, libtcod.BKGND_SET, libtcod.LEFT, "1. " + display_name_one + " the level " + display_character_level_one + " " + display_class_one + ", reached floor " + display_dungeon_level_one)
+    libtcod.console_print_ex(0, 5, 4, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_one)
+    libtcod.console_print_ex(0, 2, 6, libtcod.BKGND_SET, libtcod.LEFT, "2. " + display_name_two + " the level " + display_character_level_two + " " + display_class_two + ", reached floor " + display_dungeon_level_two)
+    libtcod.console_print_ex(0, 5, 7, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_two)
+    libtcod.console_print_ex(0, 2, 9, libtcod.BKGND_SET, libtcod.LEFT, "3. " + display_name_three + " the level " + display_character_level_three + " " + display_class_three + ", reached floor " + display_dungeon_level_three)
+    libtcod.console_print_ex(0, 5, 10, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_three)
+    libtcod.console_print_ex(0, 2, 12, libtcod.BKGND_SET, libtcod.LEFT, "4. " + display_name_four + " the level " + display_character_level_four + " " + display_class_four + ", reached floor " + display_dungeon_level_four)
+    libtcod.console_print_ex(0, 5, 13, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_four)
+    libtcod.console_print_ex(0, 2, 15, libtcod.BKGND_SET, libtcod.LEFT, "5. " + display_name_five + " the level " + display_character_level_five + " " + display_class_five + ", reached floor " + display_dungeon_level_five)
+    libtcod.console_print_ex(0, 5, 16, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_five)
+    libtcod.console_print_ex(0, 2, 18, libtcod.BKGND_SET, libtcod.LEFT, "6. " + display_name_six + " the level " + display_character_level_six + " " + display_class_six + ", reached floor " + display_dungeon_level_six)
+    libtcod.console_print_ex(0, 5, 19, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_six)
+    libtcod.console_print_ex(0, 2, 21, libtcod.BKGND_SET, libtcod.LEFT, "7. " + display_name_seven + " the level " + display_character_level_seven + " " + display_class_seven + ", reached floor " + display_dungeon_level_seven)
+    libtcod.console_print_ex(0, 5, 22, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_seven)
+    libtcod.console_print_ex(0, 2, 24, libtcod.BKGND_SET, libtcod.LEFT, "8. " + display_name_eight + " the level " + display_character_level_eight + " " + display_class_eight + ", reached floor " + display_dungeon_level_eight)
+    libtcod.console_print_ex(0, 5, 25, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_eight)
+    libtcod.console_print_ex(0, 2, 27, libtcod.BKGND_SET, libtcod.LEFT, "9. " + display_name_nine + " the level " + display_character_level_nine + " " + display_class_nine + ", reached floor " + display_dungeon_level_nine)
+    libtcod.console_print_ex(0, 5, 28, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_nine)
+    libtcod.console_print_ex(0, 2, 30, libtcod.BKGND_SET, libtcod.LEFT, "10. " + display_name_ten + " the level " + display_character_level_ten + " " + display_class_ten + ", reached floor " + display_dungeon_level_ten)
+    libtcod.console_print_ex(0, 5, 31, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_ten)
+    #libtcod.console_print_ex(0, 11, 22, libtcod.BKGND_SET, libtcod.LEFT, "yuh")
 
-    libtcod.console_print_ex(0, 2, 26, libtcod.BKGND_SET, libtcod.LEFT, "Enter or Esc to return") 
+    libtcod.console_print_ex(0, 2, 34, libtcod.BKGND_SET, libtcod.LEFT, "Enter or Esc to return") 
     libtcod.console_set_default_foreground(0, libtcod.black)    
     
     while True:
