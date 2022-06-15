@@ -704,7 +704,7 @@ def main():
                       constants['screen_height'])
 
             if show_load_error_message:
-                message_box(con, 'No save game to load', 50, constants['screen_width'], constants['screen_height'])
+                message_box(con, 'No save game to load', 20, 60, 30)
 
             libtcod.console_flush()
 

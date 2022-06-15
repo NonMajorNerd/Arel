@@ -779,31 +779,31 @@ def high_score_menu(): #Render the High Scores display
     libtcod.console_set_default_foreground(0, libtcod.white)
 
     display = load_high_scores()
-    display_name_one = str(display[0])                  # Rank One name 
-    display_score_one = str(display[1])                 # score
-    display_class_one = str(display[2])                 # class
-    display_character_level_one = str(display[3])       # level
-    display_dungeon_level_one = str(display[4])         # dungeon level
-    display_name_two = str(display[5])                  # Rank Two name
-    display_score_two = str(display[6])                 # score
-    display_class_two = str(display[7])                 # class
-    display_character_level_two = str(display[8])       # level 
-    display_dungeon_level_two = str(display[9])         # dungeon level
-    display_name_three = str(display[10])               # Rank Three name
-    display_score_three = str(display[11])              # score
-    display_class_three = str(display[12])              # class
-    display_character_level_three = str(display[13])    # level 
-    display_dungeon_level_three = str(display[14])      # dungeon level
-    display_name_four = str(display[15])                # Rank Four name
-    display_score_four = str(display[16])               # score 
-    display_class_four = str(display[17])               # class 
-    display_character_level_four = str(display[18])     # level 
-    display_dungeon_level_four = str(display[19])       # dungeon level
-    display_name_five = str(display[20])                # Rank Five name
-    display_score_five = str(display[21])               # score
-    display_class_five = str(display[22])               # class
-    display_character_level_five = str(display[23])     # level 
-    display_dungeon_level_five = str(display[24])       # dungeon level
+    display_name_one = str(display[0])                  # Rank One name     | name      0
+    display_score_one = str(display[1])                 # score             | score     1
+    display_class_one = str(display[2])                 # class             | name      2
+    display_character_level_one = str(display[3])       # level             | score     3
+    display_dungeon_level_one = str(display[4])         # dungeon level     | name      4
+    display_name_two = str(display[5])                  # Rank Two name     | score     5
+    display_score_two = str(display[6])                 # score             | name      6
+    display_class_two = str(display[7])                 # class             | score     7
+    display_character_level_two = str(display[8])       # level             | name      8
+    display_dungeon_level_two = str(display[9])         # dungeon level     | score     9
+    display_name_three = str(display[10])               # Rank Three name   | 
+    display_score_three = str(display[11])              # score             | 
+    display_class_three = str(display[12])              # class             | 
+    display_character_level_three = str(display[13])    # level             | 
+    display_dungeon_level_three = str(display[14])      # dungeon level     | 
+    display_name_four = str(display[15])                # Rank Four name    | 
+    display_score_four = str(display[16])               # score             | 
+    display_class_four = str(display[17])               # class             | 
+    display_character_level_four = str(display[18])     # level             | 
+    display_dungeon_level_four = str(display[19])       # dungeon level     | 
+    display_name_five = str(display[20])                # Rank Five name    |  
+    display_score_five = str(display[21])               # score             | 
+    display_class_five = str(display[22])               # class             | 
+    display_character_level_five = str(display[23])     # level             | 
+    display_dungeon_level_five = str(display[24])       # dungeon level     | 
     
     if display_score_one != '0': #If a score exists to be displayed, do so
         libtcod.console_print_ex(0, 2, 3, libtcod.BKGND_SET, libtcod.LEFT, "1. " + display_name_one + " the level " + display_character_level_one + " " + display_class_one + ", reached floor " + display_dungeon_level_one)
@@ -830,7 +830,7 @@ def high_score_menu(): #Render the High Scores display
         libtcod.console_print_ex(0, 5, 16, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + display_score_five)
     else:
         libtcod.console_print_ex(0, 2, 15, libtcod.BKGND_SET, libtcod.LEFT, "5. Empty")
-    # libtcod.console_print_ex(0, 11, 22, libtcod.BKGND_SET, libtcod.LEFT, "yuh")
+    libtcod.console_print_ex(0, 11, 22, libtcod.BKGND_SET, libtcod.LEFT, "yuh")
 
     libtcod.console_print_ex(0, 2, 26, libtcod.BKGND_SET, libtcod.LEFT, "Enter or Esc to return") 
     libtcod.console_set_default_foreground(0, libtcod.black)    

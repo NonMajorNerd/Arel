@@ -132,13 +132,6 @@ def handle_player_turn_keys(key):
 
     elif key_char == 's':
         return {'show_character_screen': True}
-        
-    #elif key_char == '`':
-     #   return {
-      #      results = []
-       #     #entity.fighter.heal(amount)                                                                            #heal for ammt                                                    
-        #    results.append({'message': Message('Your wounds instantly close!', libtcod.lighter_green)}) 
-         #   return results }
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen
@@ -202,7 +195,7 @@ def handle_main_menu(key):
 
     #Useful for wiping highscore data during testing. Probably don't wanna leave this one in though.
     #Also if called after data has been wiped it throws an Attribute error for 'new_game=action.get(new_game)'? Python's dumb, I love it
-    #elif key_char == 'x':
+    # elif key_char == 'x':
     #    return initialize_high_scores()
 
     return {}
