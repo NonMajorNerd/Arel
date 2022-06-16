@@ -3,7 +3,7 @@ import libtcodpy as libtcod
 from game_messages import Message
 
 from game_states import GameStates
-from loader_functions.data_loaders import save_high_score
+from scoreboard_functions import save_high_score
 
 from render_functions import RenderOrder
 
