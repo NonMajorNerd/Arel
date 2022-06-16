@@ -2,7 +2,7 @@ import tcod as libtcod
 
 from game_states import GameStates
 from ammo_functions import Fire_And_Preference
-from loader_functions.data_loaders import initialize_high_scores
+from scoreboard_functions import initialize_high_scores
 
 def handle_keys(key, game_state):
     if game_state == GameStates.PLAYERS_TURN:

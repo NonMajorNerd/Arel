@@ -3,7 +3,7 @@ import tcod as libtcod
 import textwrap
 import operator
 from game_messages import Message
-from loader_functions.data_loaders import load_high_scores
+from scoreboard_functions import load_high_scores
 from random_utils import left, mid, right, myattrgetter
 from equipment_slots import EquipmentSlots
 
