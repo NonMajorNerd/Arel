@@ -305,7 +305,7 @@ def load_high_scores():
         player_class_eight = score_data['player_class_eight']
         player_level_eight = score_data['player_level_eight']
         dungeon_level_eight = score_data['dungeon_level_eight']
-        player_nine = score_data['player_name_eight']
+        player_nine = score_data['player_name_nine']
         player_score_nine = score_data['player_score_nine']
         player_class_nine = score_data['player_class_nine']
         player_level_nine = score_data['player_level_nine']

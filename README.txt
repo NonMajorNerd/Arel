@@ -12,8 +12,8 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
  A'Rel Readme
  
  v 0.0.0.1
- Coding by NonMajorNerd and RubberDucky
- Testing and design by NonMajorNerd, RubberDucky, Narmyra, FinitelyCraig, and ProbablyTom
+ Coding by NonMajorNerd, RubberDucky, and Shawnntaun
+ Testing and design by NonMajorNerd, RubberDucky, Narmyra, FinitelyCraig, ProbablyTom, and Shawnntaun
  Art by Quale (https://imgur.com/a/uHx4k), Kenney (https://kenney.nl/assets/bit-pack), and NonMajorNerd
  
  Based on the tcod library
@@ -97,7 +97,16 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     **************
     * Change log *
     **************
-	
+	06/16/22
+		Fixed a bug which caused duplicate names in ranks 8 & 9 during initialization of scoreboard
+
+	06/15/22
+		Updated scoring system, streamlined sorting process 
+		Introduced randomized character list in place of '[Rank]: Empty' for first-time players
+
+	06/11/22
+		Introduced scoring system, High Scores option in main menu
+
 	07/15/21
 		Got rid of message log
 		Added turn order timeline
