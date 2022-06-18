@@ -1,6 +1,5 @@
 import libtcodpy as libtcod
 import textwrap
-import _globals
 
 from game_messages import Message
 from entity import get_ent_name
@@ -20,7 +19,7 @@ class Inventory:
 
         return self.base_capacity + bonus
 
-    def add_item(self, item): 
+    def add_item(self, item, names_list):
         results = []
 
         stacked = False
@@ -28,12 +27,12 @@ class Inventory:
             if i.name == item.name and i.item.stackable:
                 i.item.count += item.item.count
                 stacked = True
-                name = get_ent_name(item, _globals.names_list)
+                name = get_ent_name(item, names_list)
                 results.append({
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
                 })
-                if item.name == 'Gold': self.owner.gold_collected += item.count; self.owner.current_gold += item.count
+                if item.name == 'Gold': self.owner.gold_collected += item.count
                 
         if not stacked:
             if len(self.items) >= self.max_capacity:
@@ -42,17 +41,18 @@ class Inventory:
                     'message': Message('You cannot carry any more, your inventory is full', libtcod.yellow)
                 })
             else: 
-                name = _globals.get_from_dict(_globals.names_list, item)
+                name = get_ent_name(item, names_list)
                 results.append({
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
                 })
+                if item.name == 'Gold': self.owner.gold_collected += item.item.count
 
             self.items.append(item)
 
         return results
 
-    def use(self, item_entity, **kwargs):
+    def use(self, item_entity, names_list, colors_list, constants, **kwargs):
         results = []
         used = False
             
@@ -71,7 +71,7 @@ class Inventory:
                     
                 pref = m1m2_menu(x=31, y=21, w=25, h=8, numoptions=8, optionslist=ammo_list)
 
-                _globals.constants['options_ammo_preference'] = pref
+                constants['options_ammo_preference'] = pref
 
                 if pref == None:
                     item_entity.item.effect_lines = textwrap.wrap("  Firing preference is currently unassigned.", 26) 
@@ -107,11 +107,11 @@ class Inventory:
 
         #if the item was used, it is automatically identified. Update the 'names_list' with the real name of the item.
         if used:
-            if not item_entity.name in _globals.colors_list.keys():
-                if _globals.names_list[item_entity.name] in _globals.colors_list.keys():
-                    _globals.colors_list[item_entity.name] = _globals.colors_list[_globals.names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
-                    del _globals.colors_list[_globals.names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
-            _globals.names_list[item_entity.name] = item_entity.name                                         #update the name in the names list
+            if not item_entity.name in colors_list.keys():
+                if names_list[item_entity.name] in colors_list.keys():
+                    colors_list[item_entity.name] = colors_list[names_list[item_entity.name]]       #add a new key for the indentified name (eg 'Healing Potion') using the unidentified names current value (eg 'Cyan Potion')
+                    del colors_list[names_list[item_entity.name]]                                   #remove the unidentified names value (eg 'Cyan Potion')
+            names_list[item_entity.name] = item_entity.name                                         #update the name in the names list
 
         return results
 

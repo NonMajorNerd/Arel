@@ -5,7 +5,7 @@ from equipment_slots import EquipmentSlots
     # Replace ACC1 and ACC2 with a single system that can support up to two accessories
 
 def StatChange(equipment, item):
-                #equipment is an Equipment component, item is an Equippable component
+    #equipment is an Equipment component, item is an Equippable component
                 
     # This function will return a dictionary of stat changes based on the equipment and
     # the item (equipment) passed to it. 

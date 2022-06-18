@@ -1,5 +1,5 @@
 import libtcodpy as libtcod
-
+import _globals
 from game_messages import Message
 
 
@@ -85,14 +85,14 @@ class Fighter:
         if self.hp > self.max_hp:
             self.hp = self.max_hp
 
-    def attack(self, target, constants):
+    def attack(self, target):
         results = []
 
         damage = self.power - target.fighter.defense
         if target.name == 'Player':
-            damage = int(damage * (constants['options_enemy_damage_scale']/100))
+            damage = int(damage * (_globals.constants['options_enemy_damage_scale']/100))
         else:
-            damage = int(damage * (constants['options_player_damage_scale']/100))
+            damage = int(damage * (_globals.constants['options_player_damage_scale']/100))
             
         if damage > 0:
             results.append({'message': Message('{0} attacks {1} for {2} hit points.'.format(

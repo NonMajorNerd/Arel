@@ -1,4 +1,5 @@
 import libtcodpy as libtcod
+import _globals
 
 from random import randint
 
@@ -8,23 +9,23 @@ from entity import Entity
 from render_functions import RenderOrder
 
 class CameraMan:
-    def take_turn(self, target, fov_map, game_map, entities, constants):
+    def take_turn(self, target, fov_map, game_map):
         results = []
         monster = self.owner
 
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
             if int(monster.distance_to(target)) <= 3:
-                monster.move_from(target, game_map, fov_map, entities)
+                monster.move_from(target, game_map, fov_map)
                
             elif int(monster.distance_to(target)) > 5:
-                monster.move_astar(target, entities, game_map)
+                monster.move_astar(target, game_map)
                
             else:
                 random_x = randint(-1, 1)
                 random_y = randint(-1, 1)
                     
                 ent_in_way = False
-                for ent in entities:
+                for ent in _globals.entities:
                     if ent.x == monster.x+random_x and ent.y == monster.y+random_y and ent.blocks:
                         ent_in_way = True
                             
@@ -32,22 +33,22 @@ class CameraMan:
                         if libtcod.map_is_in_fov(fov_map, monster.x+random_x, monster.y+random_y):
                             monster.move(random_x, random_y)
         else:
-            monster.move_astar(target, entities, game_map)
+            monster.move_astar(target, game_map)
             
         return results
 
 class BasicMonster:
-    def take_turn(self, target, fov_map, game_map, entities, constants):
+    def take_turn(self, target, fov_map, game_map):
         results = []
 
         monster = self.owner
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
 
             if monster.distance_to(target) >= 2:
-                monster.move_astar(target, entities, game_map)
+                monster.move_astar(target, game_map)
 
             elif target.fighter.hp > 0:
-                attack_results = monster.fighter.attack(target, constants)
+                attack_results = monster.fighter.attack(target)
                 results.extend(attack_results)
 
         return results
@@ -58,7 +59,7 @@ class ConfusedMonster:
         self.previous_ai = previous_ai
         self.number_of_turns = number_of_turns
 
-    def take_turn(self, target, fov_map, game_map, entities, constants):
+    def take_turn(self, target, fov_map, game_map):
         results = []
 
         if self.number_of_turns > 0:
@@ -66,7 +67,7 @@ class ConfusedMonster:
             random_y = self.owner.y + randint(0, 2) - 1
 
             if random_x != self.owner.x and random_y != self.owner.y:
-                self.owner.move_towards(random_x, random_y, game_map, entities)
+                self.owner.move_towards(random_x, random_y, game_map, _globals.entities)
 
             self.number_of_turns -= 1
         else:
@@ -79,7 +80,7 @@ class RandomWalk:
     def __init__(self, randomfactor=50):
         self.randomfactor = randomfactor
 
-    def take_turn(self, target, fov_map, game_map, entities, constants):
+    def take_turn(self, target, fov_map, game_map):
         results = []
         monster = self.owner
         
@@ -90,12 +91,12 @@ class RandomWalk:
                 random_y = self.owner.y + randint(0, 2) - 1
 
                 if random_x != self.owner.x and random_y != self.owner.y:
-                    self.owner.move_towards(random_x, random_y, game_map, entities)
+                    self.owner.move_towards(random_x, random_y, game_map)
             else:
                 if monster.distance_to(target) >= 2:
-                    monster.move_astar(target, entities, game_map)
+                    monster.move_astar(target, game_map)
                 elif target.fighter.hp > 0:
-                    attack_results = monster.fighter.attack(target, constants)
+                    attack_results = monster.fighter.attack(target)
                     results.extend(attack_results)
 
         return results
@@ -106,7 +107,7 @@ class RatKing:
         self.ratchanceperturn = ratchanceperturn
         self.princechanceperturn =  princechanceperturn
         
-    def take_turn(self, target, fov_map, game_map, entities, constants):
+    def take_turn(self, target, fov_map, game_map):
         results = []
         monster = self.owner
                             
@@ -117,12 +118,12 @@ class RatKing:
                 random_y = self.owner.y + randint(0, 2) - 1
 
                 if random_x != self.owner.x and random_y != self.owner.y:
-                    self.owner.move_towards(random_x, random_y, game_map, entities)
+                    self.owner.move_towards(random_x, random_y, game_map, _globals.entities)
             else:
                 if monster.distance_to(target) >= 2:
-                    monster.move_astar(target, entities, game_map)
+                    monster.move_astar(target, game_map)
                 elif target.fighter.hp > 0:
-                    attack_results = monster.fighter.attack(target, constants)
+                    attack_results = monster.fighter.attack(target)
                     results.extend(attack_results)
 
         dice = randint(0, 100)
@@ -135,11 +136,11 @@ class RatKing:
                 x = self.owner.x + randint(-1,1)
                 y = self.owner.y + randint(-1,1)
                 if x < game_map.width and y < game_map.height:
-                    if not any([entity for entity in entities if entity.x == x and entity.y == y and entity.fighter]):
+                    if not any([entity for entity in _globals.entities if entity.x == x and entity.y == y and entity.fighter]):
                             if not game_map.tiles[x][y].block_sight or game_map.tiles[x][y].empty_space:
                                 spot_blocked = False
             monster = Entity(x, y, 304, libtcod.Color(191, 191, 191), 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-            entities.append(monster)
+            _globals.entities.append(monster)
             
         elif dice < self.ratchanceperturn + self.princechanceperturn  + 1:
             fighter_component = Fighter(hp=5, defense=0, power=3, speed=10, xp=15)
@@ -149,10 +150,10 @@ class RatKing:
                 x = self.owner.x + randint(-1,1)
                 y = self.owner.y + randint(-1,1)
                 if x < game_map.width and y < game_map.height:
-                    if not any([entity for entity in entities if entity.x == x and entity.y == y and entity.fighter]):
+                    if not any([entity for entity in _globals.entities if entity.x == x and entity.y == y and entity.fighter]):
                             if not game_map.tiles[x][y].block_sight or game_map.tiles[x][y].empty_space:
                                 spot_blocked = False
             monster = Entity(x, y, 330, libtcod.lighter_violet, 'rat prince', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-            entities.append(monster)
+            _globals.entities.append(monster)
 
         return results
