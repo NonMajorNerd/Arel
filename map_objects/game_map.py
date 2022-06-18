@@ -1,10 +1,10 @@
 import tcod as libtcod
+import _globals
+import components.vendors as vendors 
+
 from random import randint, choice
-
 from entity import Entity
-
 from game_messages import Message
-
 from components.ai import BasicMonster, RandomWalk, CameraMan, RatKing
 from components.equipment import Equipment
 from components.equipment import EquipmentSlots
@@ -14,18 +14,15 @@ from components.inventory import Inventory
 from components.fighter import Fighter
 from components.stairs import Stairs
 from components.ammo import Ammo
-
 from item_functions import cast_confuse, cast_fireball, cast_lightning, heal, poison_potion, restore_wounds, use_arrow
 from ammo_functions import BasicShot, PoisonShot
 from condition_functions import Poison, Healing
-
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile, Door
-
 from random_utils import from_dungeon_level, random_choice_from_dict
-
 from render_functions import RenderOrder
 
+global boss_defeated #for the purposes of knowing when to render a 'shady' vendor room 
 
 class GameMap:
     def __init__(self, width, height, dungeon_level=1):
@@ -46,6 +43,8 @@ class GameMap:
         rooms = []
         num_rooms = 0
         boss_placed = False
+        self.boss_defeated = False
+        vendor_placed = False
         
         center_of_last_room_x = None
         center_of_last_room_y = None
@@ -151,7 +150,9 @@ class GameMap:
     def place_boss(self, entities, center_x, center_y, w, h):
         #populate a boss room dependant on dungeon level
             
-        if self.dungeon_level == 5:
+        self.boss_defeated = True #either the player defeats the boss and meets a 'shady' vendor, or dies, and this global is reset during map generation
+
+        if self.dungeon_level >= 5:
             #Spawn one rat king, some rats and princes
             
             fighter_component = Fighter(hp=40, defense=0, power=6, speed=5, xp=100)
@@ -200,6 +201,16 @@ class GameMap:
        
         print("NO BOSS PLACED .. DUNGEON LEVEL " +  str(self.dungeon_level))
         return False
+
+    #for general vendor rooms found throughout the dungeon
+    def generate_vendor_room():
+
+        return
+
+    #for post-boss vendor rooms, with the good good loot n such
+    def generate_shady_vendor_room():
+
+        return
 
     def clean_map(self):
         #this iterates through the map and turns unused wall space into empty space so that the autotile function will work in rendering
@@ -571,18 +582,17 @@ class GameMap:
         return self.tiles[x][y].blocked
 
 
-    def next_floor(self, player, message_log, constants, names_list, render_colors_list):
+    def next_floor(self, player, message_log):
         self.dungeon_level += 1
         entities = [player]
 
         self.tiles = self.initialize_tiles()
-        self.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                      constants['map_width'], constants['map_height'], player, entities, names_list, render_colors_list)
+        self.make_map(_globals.constants['max_rooms'], _globals.constants['room_min_size'], _globals.constants['room_max_size'],
+                      _globals.constants['map_width'], _globals.constants['map_height'], player, entities, _globals.names_list, _globals.colors_list)
 
         player.fighter.heal(player.fighter.max_hp * .1)
         message_log.add_message(Message('You take a moment to rest, and recover your strength.', libtcod.light_violet))
         
         if self.dungeon_level == 5: message_log.add_message(Message('You hear strange sounds of scratching and squeaking.', libtcod.light_red))
-            
 
         return entities
