@@ -77,6 +77,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		*Rebalance item drops to account for bows, arrows..
 		*Update help menu / readme for mouse support and other controls
 
+		*Merchants? Vendors? Vending merchants? Merchandizing vendors? Who knows?
 		*Add communicable conditions
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
 		*Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)

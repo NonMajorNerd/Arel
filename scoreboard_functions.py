@@ -5,7 +5,7 @@ import shelve
 def save_high_score(player_name, player_score, player_class, player_level, dungeon_level):
 
     try: #retrieve current high score data
-        with shelve.open('scoreboard', 'c') as score_data:
+        with shelve.open('data_files/scoreboard', 'c') as score_data:
             rank_one_name = score_data['player_name_one']
             rank_one_score = score_data['player_score_one']
             rank_one_class = score_data['player_class_one']
@@ -89,7 +89,7 @@ def save_high_score(player_name, player_score, player_class, player_level, dunge
     score_list.sort(key=lambda a: a[1], reverse=True) 
 
     #save the new scoreboard
-    with shelve.open('scoreboard', 'c') as final_scores:
+    with shelve.open('data_files/scoreboard', 'c') as final_scores:
         final_scores['player_name_one'] = score_list[0][0]
         final_scores['player_score_one'] = score_list[0][1]
         final_scores['player_class_one'] = score_list[0][2]
@@ -158,7 +158,7 @@ def initialize_high_scores():
     score_list = [(player_one), (player_two), (player_three), (player_four), (player_five), (player_six), (player_seven), (player_eight), (player_nine), (player_ten)]
      
     score_list.sort(key=lambda a: a[1], reverse = True)
-    with shelve.open('scoreboard', 'c') as final_scores:
+    with shelve.open('data_files/scoreboard', 'c') as final_scores:
         final_scores['player_name_one'] = score_list[0][0]
         final_scores['player_score_one'] = score_list[0][1]
         final_scores['player_class_one'] = score_list[0][2]
@@ -211,10 +211,10 @@ def initialize_high_scores():
         final_scores['dungeon_level_ten'] = score_list[9][4]
 
 def load_high_scores():
-    if not os.path.isfile('scoreboard.dat'):
+    if not os.path.isfile('data_files/scoreboard.dat'):
         initialize_high_scores()
 
-    with shelve.open('scoreboard', 'r') as score_data: 
+    with shelve.open('data_files/scoreboard', 'r') as score_data: 
         player_one = score_data['player_name_one']
         player_score_one = score_data['player_score_one']
         player_class_one = score_data['player_class_one']

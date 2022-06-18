@@ -1,8 +1,12 @@
 import tcod as libtcod
+import components.vendors as vendors
+import _globals
+
 
 from game_states import GameStates
-from ammo_functions import Fire_And_Preference
-from scoreboard_functions import initialize_high_scores
+from components.vendors import vendor_data_loader
+from loader_functions.data_loaders import save_game
+from map_objects import game_map
 
 def handle_keys(key, game_state):
     if game_state == GameStates.PLAYERS_TURN:
@@ -25,6 +29,8 @@ def handle_keys(key, game_state):
         return  player_pick_dir(key, strkey='close')
     elif game_state == GameStates.FIRING:
         return  player_pick_dir(key, strkey='fire')
+    elif game_state == GameStates.VENDOR_SCREEN:
+        return handle_vendor_screen(key)
         
     return {}
 
@@ -133,6 +139,9 @@ def handle_player_turn_keys(key):
     elif key_char == 's':
         return {'show_character_screen': True}
 
+    elif key_char == 'v':
+        return {'show_vendor_screen': True}
+
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen
         return {'fullscreen': True}
@@ -224,6 +233,12 @@ def handle_high_scores_menu(key):
     return {}
 
 def handle_character_screen(key):
+    if key.vk == libtcod.KEY_ESCAPE:
+        return {'exit': True}
+
+def handle_vendor_screen(key):
+    # if key.vk == libtcod.KEY_ENTER:
+    #     return {'purchase': True}
     if key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
 

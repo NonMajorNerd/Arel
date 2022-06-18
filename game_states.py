@@ -13,3 +13,4 @@ class GameStates(Enum):
     KICKING = 10
     CLOSING = 11
     FIRING = 12
+    VENDOR_SCREEN = 13

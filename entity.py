@@ -1,11 +1,11 @@
 import libtcodpy as libtcod
 
 import math
+import random
+import _globals
 
 from components.item import Item
 from render_functions import RenderOrder
-
-import random
 
 def get_ent_name(ent, names_list):
     return names_list[ent.name]
@@ -16,7 +16,7 @@ class Entity:
     """
     def __init__(self, x, y, char, color, name, blocks=False,
         render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inventory=None, stairs=None,
-        level=None, equipment=None, equippable=None, ammo=None):
+        level=None, equipment=None, equippable=None, ammo=None, gold_collected=None, current_gold=None, vendor=False):
         self.x = x
         self.y = y
         self.char = char
@@ -34,6 +34,8 @@ class Entity:
         self.equippable = equippable
         self.ammo = ammo
         self.conditions = []
+        self.current_gold = current_gold
+        self.vendor = vendor
 
         if self.name == "Player":
             self.character_name = "Player"
@@ -46,6 +48,7 @@ class Entity:
             self.potions_drank = 0
             self.scrolls_read = 0
             self.gold_collected = 0
+            self.current_gold = 0
 
 
         if self.fighter: self.fighter.owner = self
@@ -71,7 +74,7 @@ class Entity:
         self.x += dx
         self.y += dy
 
-    def move_towards(self, target_x, target_y, game_map, entities):
+    def move_towards(self, target_x, target_y, game_map):
         dx = target_x - self.x
         dy = target_y - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -80,11 +83,11 @@ class Entity:
         dy = int(round(dy / distance))
 
         if not (game_map.is_blocked(self.x + dx, self.y + dy) or
-                    get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
+                    get_blocking_entities_at_location(self.x + dx, self.y + dy)):
             self.move(dx, dy)
 
             
-    def move_from(self, target, game_map, fov_map, entities):
+    def move_from(self, target, game_map, fov_map):
 
         dx = target.x - self.x
         dy = target.y - self.y
@@ -121,7 +124,7 @@ class Entity:
             for y in my:
                 if not (x, y) == (0, 0):
                     ent_in_way = False
-                    for ent in entities:
+                    for ent in _globals.entities:
                         if ent.x == self.x+x and ent.y == self.y+y: #if you add and. ent.blocks: then we will only avoid other actors..
                             if not ent.name == "Junk" and ent.blocks:              #excluding this means we avoid all entities other than Junk
                                 ent_in_way = True                   
@@ -145,7 +148,7 @@ class Entity:
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
-    def move_astar(self, target, entities, game_map):
+    def move_astar(self, target, game_map):
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(game_map.width, game_map.height)
 
@@ -158,7 +161,7 @@ class Entity:
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
         # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-        for entity in entities:
+        for entity in _globals.entities:
             if entity.blocks and entity != self and entity != target:
                 # Set the tile as a wall so it must be navigated around
                 libtcod.map_set_properties(fov, entity.x, entity.y, True, False)
@@ -183,14 +186,14 @@ class Entity:
         else:
             # Keep the old move function as a backup so that if there are no paths (for example another monster blocks a corridor)
             # it will still try to move towards the player (closer to the corridor opening)
-            self.move_towards(target.x, target.y, game_map, entities)
+            self.move_towards(target.x, target.y, game_map)
 
             # Delete the path to free memory
         libtcod.path_delete(my_path)
 
 
-def get_blocking_entities_at_location(entities, destination_x, destination_y):
-    for entity in entities:
+def get_blocking_entities_at_location(destination_x, destination_y):
+    for entity in _globals.entities:
         if entity.blocks and entity.x == destination_x and entity.y == destination_y:
             return entity
 
