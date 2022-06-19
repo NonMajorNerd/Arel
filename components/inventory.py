@@ -20,20 +20,19 @@ class Inventory:
 
         return self.base_capacity + bonus
 
-    def add_item(self, item): 
+    def add_item(self, item, quantity): 
         results = []
 
         stacked = False
         for i in self.items:
             if i.name == item.name and i.item.stackable:
-                i.item.count += item.item.count
+                i.item.count += quantity
                 stacked = True
                 name = get_ent_name(item, _globals.names_list)
                 results.append({
                     'item_added': item,
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
                 })
-                if item.name == 'Gold': self.owner.gold_collected += item.count; self.owner.current_gold += item.count
                 
         if not stacked:
             if len(self.items) >= self.max_capacity:
@@ -48,7 +47,10 @@ class Inventory:
                     'message': Message('You pick up the {0}!'.format(name), libtcod.blue)
                 })
 
-            self.items.append(item)
+            if item.name == 'Gold': #don't add a physical 'Gold" item, just increase the player's current_gold & gold_collected values
+                self.owner.gold_collected += quantity; self.owner.current_gold += quantity 
+            else:
+                self.items.append(item)
 
         return results
 
@@ -117,7 +119,7 @@ class Inventory:
 
     def remove_item(self, item):
         if item.item.stackable and item.item.count > 1:
-                item.item.count -=1
+                item.item.count = item.item.count - 1
         else:       
             self.items.remove(item)
 

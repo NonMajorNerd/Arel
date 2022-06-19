@@ -1,9 +1,11 @@
 import textwrap
 
 class Item:
-    def __init__(self, use_function=None, targeting=False, targeting_message=None, stackable=False, count=1,
-        description="No Description", effect=None, flammable=False, ammo=None, range=0, cost=0, **kwargs):
+    def __init__(self, name=None, use_function=None, targeting=False, targeting_message=None, stackable=False, count=1,
+        description="No Description", effect=None, flammable=False, ammo=None, range=0, cost=0, take_at_buy=True, **kwargs):
         
+        self.name = name
+
         self.use_function = use_function                #what, if any, is this items "use" function?
         self.targeting = targeting                      #does this item require targeting when used?
         self.targeting_message = targeting_message      #what is the message displayed when targeting occurs
@@ -17,6 +19,8 @@ class Item:
         self.range = range
 
         self.cost = cost                                #how much does this item cost?
+
+        self.take_at_buy = take_at_buy
         
         self.description_lines = textwrap.wrap("  " + description, 26)               #description for display in the inventory system
         if len(self.description_lines) > 8:
