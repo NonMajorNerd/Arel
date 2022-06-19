@@ -13,8 +13,10 @@ def save_game(player, entities, game_map, message_log, game_state):
         data_file['game_state'] = game_state
         data_file['constants'] = _globals.constants
         
+    with shelve.open('data_files/vendor_data', 'n') as vendor_data:
+        vendor_data['vendor_inventory'] = _globals.vendorEnt.inventory.items
+        vendor_data['vendor_equipment'] = _globals.vendorEnt.equipment.list
     #also save vendor's inventory, and player's scoreboard info
-    vendor_data_loader.save_vendor_inventory()
     scoreboard_functions.save_high_score(_globals.constants['player_name'], player.score, _globals.constants['options_origin'], player.level.current_level, game_map.dungeon_level)
 
 def load_game():
@@ -29,10 +31,13 @@ def load_game():
         game_state = data_file['game_state']
         constants = data_file['constants']
         
+    with shelve.open('data_files/vendor_data', 'r') as vendor_data:
+        _globals.vendorEnt.inventory.items = vendor_data['vendor_inventory']
+        _globals.vendorEnt.equipment.list = vendor_data['vendor_equipment']
+    
     player = entities[player_index]
     
     #also load vendor's inventory, and player's scoreboard info
-    vendor_data_loader.load_vendor_inventory()
     scoreboard_functions.load_high_scores()
 
     return player, entities, game_map, message_log, game_state, constants
