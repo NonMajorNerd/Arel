@@ -77,7 +77,7 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
 		*Rebalance item drops to account for bows, arrows..
 		*Update help menu / readme for mouse support and other controls
 
-		*Merchants? Vendors? Vending merchants? Merchandizing vendors? Who knows?
+		*Expand on vendors, more complex spawning, boss vendors, etc.
 		*Add communicable conditions
 		*Build AI subroutines capable of opening doors (A*  ignore door? check when moving if destination is a door, if so open instead of move)
 		*Check carrying cap after dequipping items (currently you can dequip a bag and be carrying more than you should be able to)
@@ -98,6 +98,11 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     **************
     * Change log *
     **************
+	6/19/22
+		Implementation of vendor system, interactable vendor npcs
+		Updates to player inventory and menus to accomadate vendors
+		Removed 'Gold' as a physical item, replaced inventory screen 'Score: ' tracker with a 'Current Gold: ' tracker.
+
 	06/16/22
 		Fixed a bug which caused duplicate names in ranks 8 & 9 during initialization of scoreboard
 
