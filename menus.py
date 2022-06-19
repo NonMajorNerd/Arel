@@ -1203,7 +1203,7 @@ def inventory_menu(player, message_log, fov_map):
         libtcod.console_set_default_background(0, screen_green)
         libtcod.console_set_default_foreground(0, libtcod.black)
         libtcod.console_print_ex(0, 3, line, libtcod.BKGND_SET, libtcod.LEFT, "                           ")  
-        libtcod.console_print_ex(0, 3, line, libtcod.BKGND_NONE, libtcod.LEFT, strname)   
+        libtcod.console_print_ex(0, 3, line, libtcod.BKGND_NONE, libtcod.LEFT, strname + " x" + str(item.item.count))
         
         #clear the description area
         libtcod.console_set_default_background(0, screen_darkgray)
