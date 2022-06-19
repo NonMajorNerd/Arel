@@ -377,10 +377,10 @@ def game_options():
                 #constants['options_death_delete_save'] = True
                 
             elif difficulty == "Expert":
-                constants['options_enemy_damage_scale'] = 130
-                constants['options_player_damage_scale'] = 70
-                constants['options_xp_multiplier'] = round(.5, 1)
-                constants['options_luck_scale'] = 75
+                _globals.constants['options_enemy_damage_scale'] = 130
+                _globals.constants['options_player_damage_scale'] = 70
+                _globals.constants['options_xp_multiplier'] = round(.5, 1)
+                _globals.constants['options_luck_scale'] = 75
                 #constants['options_death_delete_save'] = True
                 
             elif difficulty == "Sadist":
@@ -703,7 +703,7 @@ def origin_options():
             
         elif origin == "Tourist": 
             libtcod.console_print_ex(0, 13, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(256))
-            desc= "This is why they say not to travel, just stay at home. You only wanted some time away from home, and now you're someone elses warning story."
+            desc= "This is why they say not to travel, just stay at home. You only wanted some time away from home, and now you're someone else's warning story."
         
             libtcod.console_print_ex(0, 13, 22, libtcod.BKGND_NONE, libtcod.LEFT, chr(395) + " Cargo Shorts (+8 Carrying)")
             libtcod.console_print_ex(0, 13, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(365) + " 10 Gold")
@@ -1041,7 +1041,11 @@ def inventory_menu(player, message_log, fov_map):
         libtcod.console_print_ex(0, 24, 7, libtcod.BKGND_SET, libtcod.RIGHT, "Off Hand")
         libtcod.console_print_ex(0, 24, 9, libtcod.BKGND_SET, libtcod.RIGHT, "Accessory")
         
-        libtcod.console_print_ex(0, 42, 3, libtcod.BKGND_SET, libtcod.LEFT, "Score: " + str(player.score))
+        libtcod.console_set_default_foreground(0, libtcod.light_flame)
+        if player.current_gold <= 100000: libtcod.console_print_ex(0, 42, 3, libtcod.BKGND_SET, libtcod.LEFT, "Gold: " + str(player.current_gold) + "g")
+        else: libtcod.console_print_ex(0, 42, 3, libtcod.BKGND_SET, libtcod.LEFT, "Gold: +100000g ")
+        libtcod.console_set_default_foreground(0, screen_blue)
+
         libtcod.console_print_ex(0, 45, 5, libtcod.BKGND_SET, libtcod.RIGHT, "Helm")
         libtcod.console_print_ex(0, 45, 7, libtcod.BKGND_SET, libtcod.RIGHT, "Armor")
         libtcod.console_print_ex(0, 45, 9, libtcod.BKGND_SET, libtcod.RIGHT, "Accessory")
@@ -1119,7 +1123,7 @@ def inventory_menu(player, message_log, fov_map):
             #print in inventory list
             if currentpage == 1:
                 for x in range (0 + (itemsperpage * (currentpage-1)), numequip):
-                    itm = get_item_at("equipment", currentpage, x, player)
+                    itm = get_item_at("equipment", x, player)
                     libtcod.console_print_ex(0, 3, y, libtcod.BKGND_NONE, libtcod.LEFT, "> " + get_name_string(itm, _globals.names_list))    
                     y += 1
                 
@@ -1148,12 +1152,12 @@ def inventory_menu(player, message_log, fov_map):
             if currentpage == 1: end -= numequip   
             for x in range (start, end):
                 if x < len(player.inventory.items):
-                    itm = get_item_at("inventory", currentpage, x, player)
+                    itm = get_item_at("inventory", x, player)
                     libtcod.console_print_ex(0, 3, y, libtcod.BKGND_NONE, libtcod.LEFT, get_name_string(itm, _globals.names_list))    
                     y += 1   
                 
         mx = mouse.cx
-        my = mouse.cy
+        my = mouse.cy 
 
         # elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
         #     cap = numitems -1
@@ -1191,7 +1195,7 @@ def inventory_menu(player, message_log, fov_map):
             iindex = index - numequip
         
         #get the item at the current index
-        item = get_item_at(system, currentpage, iindex, player)
+        item = get_item_at(system, iindex, player)
         line = 13 + (index%itemsperpage)
         
         #draw the green selection line
@@ -1596,10 +1600,10 @@ def sort_menu():
             if index < 7: index += 1
 
             
-def get_item_at(system, page, index, player):
+def get_item_at(system, index, player):
 
-    #numequip = len(player.equipment.list) #- player.equipment.list.count(None))
-    numitems = len(player.inventory.items) #+ numequip
+    numequip = len(player.equipment.list) - player.equipment.list.count(None)
+    numitems = len(player.inventory.items) + numequip
 
     itm = None
 
@@ -1608,7 +1612,7 @@ def get_item_at(system, page, index, player):
     elif system == "inventory":
         itm = player.inventory.items[index]
     elif system == "stock":                 #note that this branch requires both the 'stock' to be passed to the system variable, as well as 'vendorEnt' to the player variable
-        itm = player.inventory.items[index]
+        itm = _globals.vendorEnt.inventory.items[index]
 
         
     return itm

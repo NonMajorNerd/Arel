@@ -6,6 +6,7 @@ import time
 #imports
 import copy
 import _globals
+import _items
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
@@ -207,6 +208,8 @@ def play_game(player, game_map, message_log, game_state, con, panel): #feed play
                             player.y = target.y
                             target.x = tx
                             target.y = ty
+                        elif target.name == "Vendor":
+                            player_turn_results.extend(vendor_menu(player))
                         else:
                             attack_results = player.fighter.attack(target)
                             player_turn_results.extend(attack_results)     
@@ -451,7 +454,7 @@ def play_game(player, game_map, message_log, game_state, con, panel): #feed play
         #        player_turn_results.extend(player.inventory.drop_item(item))
 
         elif show_vendor_screen:
-            player_turn_results.extend(vendor_menu(player, _globals.vendorEnt))
+            player_turn_results.extend(vendor_menu(player))
         
         elif take_stairs and game_state == GameStates.PLAYERS_TURN:
             for entity in _globals.entities:

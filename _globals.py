@@ -1,37 +1,25 @@
-# import libtcodpy as libtcod
-# from entity import Entity
-# from components.inventory import Inventory
-# from render_functions import RenderOrder
-
-# class globals(): 
-
-#     global vendorEnt    #the vendor entity
-#     vendorEnt = Entity(1, 1, 1, libtcod.black, 'Vendor', render_order=RenderOrder.CORPSE, inventory=Inventory(24), vendor=True)
-
-#     global vendor_stock #a list of all items the base vendor entity has in it's inventory
-#     vendor_stock = [vendorEnt.inventory.items]
-
-#     #global playerEnt
-
-
-
 #https://stackoverflow.com/questions/13034496/using-global-variables-between-files
 import tcod as libtcod
 import random
+import _items
+
 from entity import Entity
 from components.inventory import Inventory
-from map_objects import game_map
 from render_functions import RenderOrder
-from components.vendors import vendor_data_loader
+from components.equipment import Equipment
+from components.fighter import Fighter
 
 def init():
-    global constants, names_list, colors_list, entities, colors, vendorEnt, vendor_stock 
+    global constants, names_list, colors_list, entities, colors, vendorEnt, vendor_inventory, vendor_equipment, vendor_stock_amt, last_item_purchased, amt_purchased
 
     entities = []
 
     #globals for vendor usage
-    vendorEnt = Entity(1, 1, 260, libtcod.purple, 'Vendor', render_order=RenderOrder.ACTOR, inventory=Inventory(24), vendor=True)
-    vendor_stock = [vendorEnt.inventory.items]
+    vendor_fighter_component = Fighter(hp=1000, defense=1000, power=1000, speed=1)
+    vendorEnt = Entity(1, 1, 388, libtcod.white, 'Vendor', blocks=True, render_order=RenderOrder.TARGETING, fighter=vendor_fighter_component, inventory=Inventory(24), equipment=Equipment(), vendor=True)  
+    vendor_stock_amt = 0
+    last_item_purchased = " "
+    amt_purchased=0
 
     window_title = "A'Rel"
 
@@ -206,7 +194,7 @@ def init():
     'Shield':                   'Shield',
     'Short Bow':                'Short Bow',
     'Arrow':                    'Arrow',
-    'Poison Arrow':              'Poison Arrow',
+    'Poison Arrow':             'Poison Arrow',
     'Quiver':                   'Quiver',
     'Vendor':                   'Vendor',
     'Camera Op.':               'Camera Op.',
@@ -240,7 +228,8 @@ def init():
     }
 
     #populate the vendors inventory
-    vendor_data_loader.populate_vendor_inventory()
+    _items.init()
+    #vendor_data_loader.populate_vendor_inventory()
 
 def get_from_dict(dict, key):
     if key in dict.keys():
