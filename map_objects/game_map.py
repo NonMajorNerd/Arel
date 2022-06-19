@@ -79,8 +79,7 @@ class GameMap:
                 if num_rooms == 0:
                     # this is the first room, where the player starts at
                     player.x = new_x
-                    player.y = new_y
-                    
+                    player.y = new_y          
 
                     
                 else:
@@ -124,6 +123,21 @@ class GameMap:
         self.assign_blitmap()
 
         self.create_doors()
+        
+        #place the vendor
+        w = int(rooms[len(rooms)-1].w / 2) 
+        h = int(rooms[len(rooms)-1].h / 2)
+        spot_blocked = True
+        while spot_blocked:
+            rx = randint(-w+1, w-1)
+            ry = randint(-h+1, h-1)
+            if not any([entity for entity in entities if entity.x == player.x+rx and entity.y == player.y+ry and entity.fighter]):
+                if not self.tiles[player.x + rx][player.y + ry].block_sight or self.tiles[player.x+rx][player.y+ry].empty_space:
+                    spot_blocked = False
+        
+        _globals.vendorEnt.x=player.x+rx; _globals.vendorEnt.y=player.y+ry;
+        entities.append(_globals.vendorEnt)
+
 
         #make the first camera man!!!
         fighter_component = Fighter(hp=5, defense=0, power=0, speed=5)
