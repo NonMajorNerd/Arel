@@ -7,6 +7,7 @@ import time
 import copy
 import _globals
 import _items
+import components.vendors as vendors 
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
@@ -673,6 +674,8 @@ def main():
 
     _globals.init() 
     _globals.load_customfont()
+        
+    vendors.vendor_data_loader.populate_vendor_inventory()
 
     libtcod.console_set_custom_font('fontplus.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW, 16, 30)
     

@@ -10,7 +10,7 @@ from components.equipment import Equipment
 from components.fighter import Fighter
 
 def init():
-    global constants, names_list, colors_list, entities, colors, vendorEnt, vendor_inventory, vendor_equipment, vendor_stock_amt, last_item_purchased, amt_purchased
+    global constants, names_list, comp_names, colors_list, entities, colors, vendorEnt, vendor_inventory, vendor_equipment, vendor_stock_amt, last_item_purchased, amt_purchased
 
     entities = []
 
@@ -138,9 +138,10 @@ def init():
     'Sword':                        libtcod.light_sky,
     'Shield':                       libtcod.darker_orange,
     'Gold':                         libtcod.dark_yellow,
-    'Short Bow':                    libtcod.brass,
+    'Bow':                          libtcod.brass,
     'Arrow':                        libtcod.desaturated_amber,
-    'Quiver':                       libtcod.desaturated_amber
+    'Quiver':                       libtcod.desaturated_amber,
+    'Debugger Lanyard':             libtcod.white
     }
     
     potion_colors_list = [    
@@ -192,7 +193,7 @@ def init():
     'Targeter':                 'Targeter',
     'Sword':                    'Sword',
     'Shield':                   'Shield',
-    'Short Bow':                'Short Bow',
+    'Bow':                      'Bow',
     'Arrow':                    'Arrow',
     'Poison Arrow':             'Poison Arrow',
     'Quiver':                   'Quiver',
@@ -204,7 +205,7 @@ def init():
     'rat king':                 'rat king',
     'bat':                      'bat',
     'goblin':                   'goblin',
-    'Goblin Spear':             'Spear',
+    'Goblin Spear':             'Goblin Spear',
     'troll':                    'troll',
     'remains of Camera Op.':    'Remains of Camera Op.',
     'remains of rat':           'Remains of Rat',
@@ -214,17 +215,36 @@ def init():
     'remains of goblin':        'Remains of Goblin',
     'remains of troll':         'Remains of Troll',
     'Staff':                    'Staff',
-    'Merchants Bag':            'Merchants Bag',
+    'Merchants Bag':            "Merchant's Bag",
     'Fingerless Gloves':        'Fingerless Gloves',
     'Dagger':                   'Dagger',
     'Gold':                     'Gold',
     'Cargo Shorts':             'Cargo Shorts',
+    'Debugger Lanyard':         'Debugger Lanyard',
     'Cure Wounds':              (str(potion_colors_list.pop()) + " Potion"),
     'Restore Wounds':           (str(potion_colors_list.pop()) + " Potion"),
     'Foul Liquid':              (str(potion_colors_list.pop()) + " Potion"),
     'Lightning Scroll':         ("Scroll labeled '" + str(scroll_names_list.pop()) + "'"),
     'Fireball Scroll':          ("Scroll labeled '" + str(scroll_names_list.pop()) + "'"),
     'Confusion Scroll':         ("Scroll labeled '" + str(scroll_names_list.pop()) + "'")
+    }
+
+    comp_names = {
+        'Staff':                    'Staff',
+        'Merchants Bag':            'Bag',
+        'Fingerless Gloves':        'Gloves',
+        'Dagger':                   'Dagger',
+        'Gold':                     'Gold',
+        'Cargo Shorts':             'Shorts',
+        'Debugger Lanyard':         'Lanyard',
+        'Sword':                    'Sword',
+        'Shield':                   'Shield',
+        'Bow':                      'Bow',
+        'Arrow':                    'Arrow',
+        'Poison Arrow':             'Poison Arrow',
+        'Quiver':                   'Quiver',
+        'Goblin Spear':             'Goblin Spear',
+
     }
 
     #populate the vendors inventory
