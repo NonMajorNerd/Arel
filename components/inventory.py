@@ -51,6 +51,8 @@ class Inventory:
                 self.owner.gold_collected += quantity; self.owner.current_gold += quantity 
             else:
                 self.items.append(item)
+                for i in range(quantity):
+                    self.items.append(item) 
 
         return results
 
