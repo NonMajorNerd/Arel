@@ -98,10 +98,17 @@ Yb,_,dP       `8b,          88       Yb, `8b*d8' ,d8b,_
     **************
     * Change log *
     **************
+	10/16/22
+		Updates to vendor system; changes to item naming scheme to optimize UI space in vendor & inventory screens,
+		Corrections and adjustments made to item comparisons in both vendor and player inventories, item with higher stats of the two will 
+		display it's name and relevant stats in green, 'lesser' item and stats in red
+		Changes to how vendor's inventories are generated, as well as player's equip/dequip function to correct duplicating items bug
+		Various minor hotfixes
+	
 	6/19/22
 		Implementation of vendor system, interactable vendor npcs
 		Updates to player inventory and menus to accomadate vendors
-		Removed 'Gold' as a physical item, replaced inventory screen 'Score: ' tracker with a 'Current Gold: ' tracker.
+		Removed 'Gold' as a physical item, replaced inventory screen 'Score: ' tracker with a 'Current Gold: ' tracker
 
 	06/16/22
 		Fixed a bug which caused duplicate names in ranks 8 & 9 during initialization of scoreboard
