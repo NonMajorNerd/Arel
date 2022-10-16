@@ -1,6 +1,5 @@
 import tcod as libtcod
 import _globals
-import components.vendors as vendors 
 
 from random import randint, choice
 from entity import Entity
@@ -137,6 +136,7 @@ class GameMap:
         
         _globals.vendorEnt.x=player.x+rx; _globals.vendorEnt.y=player.y+ry;
         entities.append(_globals.vendorEnt)
+       # vendors.vendor_data_loader.populate_vendor_inventory()
 
 
         #make the first camera man!!!
